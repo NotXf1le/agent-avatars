@@ -1,5 +1,5 @@
 /**
- * Deterministic Agent Avatars.
+ * Agent Avatars.
  *
  * Deterministic, zero-dependency 5x4 avatar generation backed by an
  * exhaustive, uniformly addressable catalog of symmetric masks.

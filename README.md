@@ -1,4 +1,4 @@
-# Deterministic Agent Avatars
+# Agent Avatars
 
 Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.
 
