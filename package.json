@@ -2,6 +2,14 @@
   "name": "deterministic-agent-avatars",
   "version": "1.0.0-rc.2",
   "description": "Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/NotXf1le/deterministic-agent-avatars.git"
+  },
+  "homepage": "https://notxf1le.github.io/deterministic-agent-avatars/",
+  "bugs": {
+    "url": "https://github.com/NotXf1le/deterministic-agent-avatars/issues"
+  },
   "type": "module",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
@@ -61,6 +69,7 @@
   "sideEffects": false,
   "scripts": {
     "build": "node scripts/build.mjs",
+    "build:pages": "node scripts/build-pages.mjs",
     "benchmark": "node scripts/benchmark.mjs",
     "demo": "node scripts/serve-demo.mjs",
     "test": "npm run build && npm run test:runtime && tsc -p tests/tsconfig.json && npm run test:html && node tests/package.test.mjs && node tests/release-policy.test.mjs && node tests/consumer.test.mjs",

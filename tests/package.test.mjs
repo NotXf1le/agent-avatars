@@ -132,6 +132,14 @@ const marker = true;`, new Map([
   assert.equal(packageJson.name, "deterministic-agent-avatars");
   assert.equal(packageJson.version, "1.0.0-rc.2");
   assert.equal(packageJson.description, "Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.");
+  assert.deepEqual(packageJson.repository, {
+    type: "git",
+    url: "git+https://github.com/NotXf1le/deterministic-agent-avatars.git",
+  });
+  assert.equal(packageJson.homepage, "https://notxf1le.github.io/deterministic-agent-avatars/");
+  assert.deepEqual(packageJson.bugs, {
+    url: "https://github.com/NotXf1le/deterministic-agent-avatars/issues",
+  });
   assert.equal(packageJson.dependencies, undefined);
   assert.deepEqual(packageJson.exports["."], {
     import: {

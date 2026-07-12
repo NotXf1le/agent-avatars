@@ -1,6 +1,7 @@
 node_modules/
 dist/
 coverage/
+_site/
 /docs/superpowers/
 *.tgz
 *.zip
