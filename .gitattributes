@@ -1,0 +1,5 @@
+/docs/superpowers export-ignore
+/node_modules export-ignore
+/dist export-ignore
+/*.tgz export-ignore
+/*.zip export-ignore

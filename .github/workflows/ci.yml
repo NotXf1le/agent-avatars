@@ -1,0 +1,98 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  runtime:
+    name: Runtime / Node ${{ matrix.node }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [18.20.8, 20.19.5, 22.16.0, 24.14.1]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      # Compatibility jobs intentionally override the newer repository devEngine.
+      - run: npm ci --ignore-scripts --force
+      - run: npm run test:runtime
+
+  release-gate:
+    name: Packed consumer gate / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.14.1
+          cache: npm
+      - run: npm ci
+      - run: npm test
+      - run: npm run release:dry-run
+      - run: npm audit
+
+  packed-runtime:
+    name: Packed runtime / Node ${{ matrix.node }} / ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+        node: [18.20.8, 24.14.1]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node }}
+          cache: npm
+      # The packed runtime itself is what this older-Node job validates.
+      - run: npm ci --ignore-scripts --force
+      - run: npm run test:packed-runtime
+
+  react:
+    name: React ${{ matrix.react }} SSR
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - react: 18.3.1
+            reactTypes: 18.3.31
+          - react: 19.2.7
+            reactTypes: 19.2.17
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.14.1
+          cache: npm
+      - run: npm ci
+      - run: npm install --no-save --ignore-scripts react@${{ matrix.react }} react-dom@${{ matrix.react }} @types/react@${{ matrix.reactTypes }}
+      - run: npm run test:react
+      - run: npm run test:types
+
+  browser:
+    name: Chromium browser smoke
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24.14.1
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:browser

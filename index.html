@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Generate deterministic SVG and PNG avatars for AI agents, bots, services, and users.">
+  <meta name="theme-color" content="#f7f8fc">
+  <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%2F%3E">
+  <title>Deterministic Agent Avatars</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --page: #f7f8fc;
+      --surface: #ffffff;
+      --surface-soft: #f0f1f7;
+      --ink: #171923;
+      --muted: #666b7a;
+      --line: #dfe2eb;
+      --accent: #5b4df5;
+      --accent-strong: #4638dc;
+      --accent-soft: #ece9ff;
+      --success: #26845b;
+      --danger: #c33e4d;
+      --shadow: 0 24px 70px rgba(32, 29, 62, .11);
+      --radius-lg: 28px;
+      --radius-md: 18px;
+      --radius-sm: 12px;
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    :root[data-ui-theme="dark"] {
+      color-scheme: dark;
+      --page: #101219;
+      --surface: #181b25;
+      --surface-soft: #202431;
+      --ink: #f3f4f8;
+      --muted: #a7adbc;
+      --line: #303545;
+      --accent: #a89fff;
+      --accent-strong: #c1bbff;
+      --accent-soft: #2b284b;
+      --success: #7bd3aa;
+      --danger: #ff9aa5;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .32);
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { margin: 0; min-width: 320px; background: var(--page); color: var(--ink); }
+    body, button, input, select, textarea { font: inherit; }
+    button, input, select, textarea { color: inherit; }
+    button, a { -webkit-tap-highlight-color: transparent; }
+    a { color: inherit; }
+    img { display: block; }
+
+    .container { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      border-bottom: 1px solid color-mix(in srgb, var(--line) 78%, transparent);
+      background: color-mix(in srgb, var(--page) 88%, transparent);
+      backdrop-filter: blur(18px);
+    }
+
+    .header-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: inherit; text-decoration: none; font-weight: 760; letter-spacing: -.025em; }
+    .brand-mark { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 50%; transition: opacity .35s ease, transform .35s ease; }
+    .brand-mark.is-changing { animation: brand-avatar-change .62s ease; }
+    @keyframes brand-avatar-change {
+      0% { opacity: .35; transform: scale(.82) rotate(-7deg); }
+      65% { opacity: 1; transform: scale(1.06) rotate(2deg); }
+      100% { opacity: 1; transform: scale(1) rotate(0); }
+    }
+    .nav { display: flex; align-items: center; gap: 24px; font-size: .9rem; color: var(--muted); }
+    .nav a { text-decoration: none; transition: color .18s ease; }
+    .nav a:hover { color: var(--ink); }
+    .nav .nav-support { padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--surface); }
+
+    .hero { min-height: 650px; display: grid; grid-template-columns: 1.04fr .96fr; align-items: center; gap: clamp(42px, 7vw, 94px); padding: 92px 0 86px; }
+    .hero h1 { max-width: 760px; margin: 0; font-size: clamp(3.1rem, 7.2vw, 6.6rem); line-height: .94; letter-spacing: -.072em; }
+    .hero h1 span { color: var(--accent); }
+    .hero-copy > p { max-width: 630px; margin: 28px 0 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.7; }
+    .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 34px; }
+    .catalog-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 630px; margin: 0 0 34px; }
+    .catalog-stat { min-height: 104px; display: flex; flex-direction: column; justify-content: center; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
+    .catalog-stat:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); box-shadow: 0 12px 28px rgba(32, 29, 62, .08); transform: translateY(-2px); }
+    .catalog-stat strong { display: block; color: var(--accent-strong); font-size: clamp(1.3rem, 2.4vw, 1.7rem); font-variant-numeric: tabular-nums; letter-spacing: -.045em; }
+    .catalog-stat span { display: block; margin-top: 5px; color: var(--muted); font-size: .66rem; font-weight: 700; letter-spacing: .055em; line-height: 1.35; text-transform: uppercase; }
+    .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 0 18px; font-weight: 720; text-decoration: none; cursor: pointer; transition: transform .16s ease, background .16s ease, border-color .16s ease; }
+    .button:hover { transform: translateY(-1px); }
+    .button-primary { background: var(--ink); color: var(--page); }
+    .button-secondary { border-color: var(--line); background: var(--surface); color: var(--ink); }
+    .button-accent { background: var(--accent); color: #ffffff; }
+    :root[data-ui-theme="dark"] .button-accent { color: #171923; }
+    .button svg { width: 18px; height: 18px; }
+    .copy-button { position: relative; overflow: hidden; }
+    .copy-button.is-copied { border-color: transparent; background: var(--success); color: #ffffff; animation: copy-pop .34s ease; }
+    @keyframes copy-pop {
+      0% { transform: scale(1); }
+      45% { transform: scale(.95); }
+      100% { transform: scale(1); }
+    }
+
+    .hero-showcase { position: relative; min-height: 500px; }
+    .showcase-carousel { position: absolute; inset: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 14px; }
+    .showcase-viewport { min-height: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 36px; background: var(--surface); box-shadow: var(--shadow); transform: rotate(2deg); }
+    .showcase-track { display: flex; height: 100%; transition: transform .42s cubic-bezier(.22, .75, .25, 1); will-change: transform; }
+    .showcase-page { min-width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 20px; }
+    .avatar-tile { min-height: 210px; display: grid; place-items: center; overflow: hidden; border-radius: 24px; background: var(--surface-soft); }
+    .showcase-page .avatar-tile { min-height: 0; }
+    .avatar-tile:nth-child(2), .avatar-tile:nth-child(3) { background: var(--accent-soft); }
+    .avatar-tile img { width: min(150px, 76%); height: auto; transition: transform .28s ease; }
+    .avatar-tile:hover img { transform: scale(1.045); }
+    .showcase-controls { display: flex; align-items: center; justify-content: flex-end; gap: 10px; padding-right: 8px; }
+    .showcase-counter { margin-right: auto; color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
+    .showcase-control { width: 42px; height: 42px; display: inline-grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; background: var(--surface); color: var(--ink); cursor: pointer; transition: transform .16s ease, border-color .16s ease, opacity .16s ease; }
+    .showcase-control:hover:not(:disabled) { border-color: var(--accent); transform: translateY(-1px); }
+    .showcase-control:disabled { cursor: not-allowed; opacity: .4; }
+    .showcase-control svg { width: 18px; height: 18px; }
+
+    .section { padding: 104px 0; }
+    .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 32px; margin-bottom: 34px; }
+    .section-heading h2 { max-width: 720px; margin: 0; font-size: clamp(2.2rem, 5vw, 4.6rem); line-height: 1; letter-spacing: -.06em; }
+    .section-heading p { max-width: 430px; margin: 0; color: var(--muted); line-height: 1.65; }
+
+    .playground-shell { display: grid; grid-template-columns: minmax(280px, .82fr) minmax(460px, 1.18fr); overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); }
+    .controls-panel { padding: clamp(24px, 4vw, 42px); border-right: 1px solid var(--line); }
+    .controls-panel h3, .preview-panel h3 { margin: 0; font-size: 1rem; letter-spacing: -.02em; }
+    .control-stack { display: grid; gap: 24px; margin-top: 28px; }
+    .field { display: grid; gap: 8px; }
+    .field-label { font-size: .88rem; font-weight: 750; }
+    .field-help { margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.45; }
+    input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: var(--radius-sm); outline: none; background: var(--page); transition: border-color .16s ease, box-shadow .16s ease; }
+    input, select { min-height: 48px; padding: 0 13px; }
+    select { appearance: none; padding-right: 40px; cursor: pointer; }
+    .select-wrap { position: relative; }
+    .select-wrap::after { content: ""; position: absolute; top: calc(50% + 2px); right: 17px; width: 7px; height: 7px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); pointer-events: none; transform: translateY(-50%) rotate(45deg); }
+    textarea { min-height: 150px; resize: vertical; padding: 14px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .72rem; line-height: 1.5; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+    .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .example-list { display: flex; flex-wrap: wrap; gap: 7px; }
+    .example-button { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; background: transparent; color: var(--muted); font-size: .72rem; cursor: pointer; }
+    .example-button:hover { border-color: var(--accent); color: var(--ink); }
+
+    .preview-panel { min-height: 680px; display: grid; grid-template-rows: auto 1fr auto; gap: 24px; padding: clamp(24px, 4vw, 42px); }
+    .preview-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+    .preview-stage { position: relative; min-height: 390px; display: grid; place-items: center; overflow: hidden; border-radius: 24px; background: var(--surface-soft); }
+    .preview-stage::before, .preview-stage::after { content: ""; position: absolute; border: 1px solid color-mix(in srgb, var(--line) 72%, transparent); border-radius: 50%; }
+    .preview-stage::before { width: 330px; height: 330px; }
+    .preview-stage::after { width: 470px; height: 470px; }
+    .preview-stage img { position: relative; z-index: 1; width: min(300px, 68vw); height: min(300px, 68vw); visibility: hidden; filter: drop-shadow(0 18px 28px rgba(24, 23, 40, .12)); }
+    .preview-stage.is-ready img { visibility: visible; }
+    .identity-caption { position: absolute; z-index: 2; right: 18px; bottom: 18px; left: 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--line) 80%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(12px); }
+    .identity-caption strong { display: block; overflow: hidden; text-overflow: ellipsis; font-size: .82rem; white-space: nowrap; }
+    .identity-caption span { color: var(--muted); font-size: .72rem; white-space: nowrap; }
+    .preview-footer { display: grid; gap: 14px; }
+    .action-row { display: flex; flex-wrap: wrap; gap: 9px; }
+    .action-row .button { flex: 1 1 140px; }
+    .status { min-height: 1.2em; margin: 0; color: var(--muted); font-size: .78rem; }
+    .status.is-error { color: var(--danger); }
+    details { border-top: 1px solid var(--line); padding-top: 14px; }
+    summary { cursor: pointer; color: var(--muted); font-size: .8rem; font-weight: 700; }
+    details textarea { margin-top: 12px; }
+
+    .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .feature { min-height: 250px; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
+    .feature-number { margin-bottom: 52px; color: var(--accent); font-size: .78rem; font-weight: 800; }
+    .feature h3 { margin: 0; font-size: 1.35rem; letter-spacing: -.035em; }
+    .feature p { margin: 12px 0 0; color: var(--muted); line-height: 1.65; }
+
+    .install-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 30px; padding: clamp(28px, 5vw, 58px); border-radius: var(--radius-lg); background: var(--ink); color: var(--page); }
+    .install-card h2 { margin: 0; font-size: clamp(2rem, 4vw, 3.7rem); letter-spacing: -.055em; }
+    .install-card p { max-width: 560px; margin: 12px 0 0; opacity: .7; line-height: 1.6; }
+    .install-command { display: flex; align-items: center; gap: 10px; border: 1px solid color-mix(in srgb, var(--page) 28%, transparent); border-radius: 14px; padding: 8px; background: color-mix(in srgb, var(--page) 8%, transparent); }
+    .install-command code { padding-left: 10px; font-size: .84rem; white-space: nowrap; }
+    .install-command button { min-width: 76px; min-height: 40px; border: 0; border-radius: 9px; background: var(--page); color: var(--ink); font-weight: 750; cursor: pointer; }
+
+    .site-footer { padding: 34px 0 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
+    .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
+    .footer-inner p { margin: 0; }
+    .footer-links { display: flex; gap: 20px; }
+    .footer-links a { text-underline-offset: 3px; }
+
+    .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+    @media (max-width: 900px) {
+      .hero { grid-template-columns: 1fr; padding-top: 72px; }
+      .hero-showcase { min-height: 460px; }
+      .showcase-viewport { transform: none; }
+      .section-heading { align-items: start; flex-direction: column; }
+      .playground-shell { grid-template-columns: 1fr; }
+      .controls-panel { border-right: 0; border-bottom: 1px solid var(--line); }
+      .feature-grid { grid-template-columns: 1fr; }
+      .feature { min-height: auto; }
+      .feature-number { margin-bottom: 30px; }
+      .install-card { grid-template-columns: 1fr; }
+      .install-command { width: fit-content; max-width: 100%; }
+    }
+
+    @media (max-width: 640px) {
+      .container { width: min(calc(100% - 24px), 1180px); }
+      .header-inner { min-height: 64px; }
+      .brand span { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+      .nav a:not(.nav-support) { display: none; }
+      .hero, .hero-copy, .hero-showcase { min-width: 0; }
+      .hero { min-height: auto; padding: 60px 0 68px; }
+      .hero h1 { max-width: 100%; font-size: clamp(2.55rem, 12.5vw, 4rem); letter-spacing: -.06em; overflow-wrap: anywhere; }
+      .hero h1 span { display: block; }
+      .hero-copy > p { font-size: 1rem; }
+      .hero-actions { display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; }
+      .hero-actions .button { width: 100%; }
+      .catalog-stats { grid-template-columns: 1fr; max-width: none; }
+      .hero-showcase { min-height: 360px; }
+      .showcase-carousel, .showcase-viewport, .showcase-track { min-width: 0; max-width: 100%; }
+      .showcase-page { min-width: 100%; max-width: 100%; flex: 0 0 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 12px; }
+      .avatar-tile img { width: min(120px, 72%); max-width: 100%; }
+      .avatar-tile { min-height: 156px; border-radius: 18px; }
+      .showcase-controls { padding-right: 0; }
+      .section { padding: 76px 0; }
+      .field-row { grid-template-columns: 1fr; }
+      .preview-panel { min-height: 610px; }
+      .preview-stage { min-height: 340px; }
+      .preview-stage::before { width: 260px; height: 260px; }
+      .preview-stage::after { width: 380px; height: 380px; }
+      .identity-caption { align-items: start; flex-direction: column; gap: 4px; }
+      .install-command { align-items: stretch; flex-direction: column; width: 100%; }
+      .install-command code { overflow-x: auto; padding: 8px 4px; }
+      .footer-inner { align-items: start; flex-direction: column; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      html { scroll-behavior: auto; }
+      *, *::before, *::after { transition-duration: .01ms !important; }
+      .copy-button.is-copied { animation: none; }
+      .brand-mark.is-changing { animation: none; }
+    }
+  </style>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="./" aria-label="Deterministic Agent Avatars home">
+        <img class="brand-mark" id="brand-avatar" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="34" height="34" alt="" aria-hidden="true">
+        <span>Deterministic Agent Avatars</span>
+      </a>
+      <nav class="nav" aria-label="Main navigation">
+        <a href="#playground">Generator</a>
+        <a href="#how-it-works">How it works</a>
+        <a class="nav-support" href="https://ko-fi.com/felixkoba" target="_blank" rel="noreferrer">Support</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="container hero">
+      <div class="hero-copy">
+        <h1>One seed.<br><span>One identity.</span></h1>
+        <p>Generate consistent SVG and PNG avatars for assistants, bots, services, and users — locally, instantly, and without runtime dependencies.</p>
+        <div class="hero-actions">
+          <a class="button button-primary" href="#playground">
+            Try the generator
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </a>
+          <button class="button button-secondary copy-button" id="copy-install-top" type="button">Copy install command</button>
+        </div>
+      </div>
+
+      <section class="hero-showcase" aria-label="Unique avatar examples">
+        <div class="showcase-carousel">
+          <div class="showcase-viewport">
+            <div class="showcase-track" id="showcase-track"></div>
+          </div>
+          <div class="showcase-controls" role="group" aria-label="Avatar example navigation">
+            <span class="showcase-counter" id="showcase-counter" aria-live="polite"></span>
+            <button class="showcase-control" id="showcase-prev" type="button" aria-label="Previous avatar examples">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14.5 5-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+            <button class="showcase-control" id="showcase-next" type="button" aria-label="Next avatar examples">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m9.5 5 7 7-7 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
+            </button>
+          </div>
+        </div>
+      </section>
+    </section>
+
+    <section class="section" id="playground">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Build an identity in seconds.</h2>
+          <p>Use a stable seed for the identity and a project namespace to keep the same name distinct across products.</p>
+        </div>
+
+        <div class="catalog-stats" role="group" aria-label="Avatar library statistics">
+          <div class="catalog-stat"><strong id="shape-count">—</strong><span>unique forms</span></div>
+          <div class="catalog-stat"><strong id="background-count">—</strong><span>background palettes</span></div>
+          <div class="catalog-stat"><strong id="combination-count">—</strong><span>maximum combinations</span></div>
+        </div>
+
+        <div class="playground-shell">
+          <section class="controls-panel" aria-labelledby="controls-title">
+            <h3 id="controls-title">Identity settings</h3>
+            <div class="control-stack">
+              <label class="field">
+                <span class="field-label">Identity seed</span>
+                <input id="seed" type="text" value="research-assistant" autocomplete="off" spellcheck="false">
+                <span class="field-help">A stable name or ID, such as a bot name, service key, or user identifier.</span>
+              </label>
+
+              <div class="example-list" role="group" aria-label="Seed examples">
+                <button class="example-button" type="button" data-seed="research-assistant">Research assistant</button>
+                <button class="example-button" type="button" data-seed="support-bot">Support bot</button>
+                <button class="example-button" type="button" data-seed="api-gateway">API gateway</button>
+              </div>
+
+              <label class="field">
+                <span class="field-label">Project namespace</span>
+                <input id="namespace" type="text" value="My Project" autocomplete="off" spellcheck="false">
+                <span class="field-help">Use one stable project name. It separates identical seeds used by different apps.</span>
+              </label>
+
+              <div class="field-row">
+                <label class="field">
+                  <span class="field-label">Color theme</span>
+                  <span class="select-wrap"><select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select></span>
+                </label>
+              </div>
+
+              <label class="field">
+                <span class="field-label">PNG export size</span>
+                <span class="select-wrap"><select id="png-size">
+                    <option value="32">32 × 32 px</option>
+                    <option value="64">64 × 64 px</option>
+                    <option value="192">192 × 192 px</option>
+                    <option value="200" selected>200 × 200 px</option>
+                </select></span>
+                <span class="field-help">SVG remains resolution-independent at every size.</span>
+              </label>
+            </div>
+          </section>
+
+          <section class="preview-panel" aria-labelledby="preview-title">
+            <div class="preview-head">
+              <h3 id="preview-title">Live preview</h3>
+            </div>
+
+            <div class="preview-stage" id="preview-stage">
+              <img id="avatar" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="300" height="300" alt="Generated deterministic avatar">
+              <div class="identity-caption">
+                <strong id="identity-name">research-assistant</strong>
+                <span id="identity-scope">Project: my-project</span>
+              </div>
+            </div>
+
+            <div class="preview-footer">
+              <div class="action-row">
+                <button class="button button-secondary copy-button" id="copy-svg" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="2" /></svg>
+                  Copy SVG
+                </button>
+                <button class="button button-secondary" id="download-svg" type="button">Save SVG</button>
+                <button class="button button-secondary copy-button" id="copy-png" type="button">Copy PNG</button>
+                <button class="button button-accent" id="download-png" type="button">Save PNG</button>
+              </div>
+              <p class="status" id="status" role="status" aria-live="polite">Ready to export.</p>
+              <details>
+                <summary>View generated SVG</summary>
+                <textarea id="svg-output" readonly aria-label="Generated SVG source"></textarea>
+              </details>
+            </div>
+          </section>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="how-it-works">
+      <div class="container">
+        <div class="section-heading">
+          <h2>Simple inputs. Stable results.</h2>
+          <p>The generator turns identity data into a constrained visual state without storing images or calling a service.</p>
+        </div>
+        <div class="feature-grid">
+          <article class="feature"><div class="feature-number">01</div><h3>Deterministic by default</h3><p>The same seed, namespace, and options always resolve to the same avatar.</p></article>
+          <article class="feature"><div class="feature-number">02</div><h3>Ready for real interfaces</h3><p>Export SVG or platform-friendly PNG sizes for profiles, dashboards, manifests, and app icons.</p></article>
+          <article class="feature"><div class="feature-number">03</div><h3>Private when needed</h3><p>Use the server-side HMAC helpers before generation when identifiers should not be guessable.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container install-card">
+        <div><h2>Add it to your project.</h2><p>ESM, CommonJS, TypeScript declarations, React, SVG, and Node.js PNG exports are included.</p></div>
+        <div class="install-command"><code>npm install deterministic-agent-avatars</code><button class="copy-button" id="copy-install-bottom" type="button">Copy</button></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <p>Deterministic Agent Avatars · MIT License · 2026 Felix Koba</p>
+      <div class="footer-links"><a href="#playground">Generator</a><a href="https://ko-fi.com/felixkoba" target="_blank" rel="noreferrer">Ko-fi</a></div>
+    </div>
+  </footer>
+
+  <noscript><p class="sr-only">JavaScript is required to run the avatar generator.</p></noscript>
+
+  <script type="module">
+    import { createHashAvatar, getCatalogStats } from "./src/index.mjs";
+    import { copyTextToClipboard } from "./src/browser-clipboard.mjs";
+
+    const seed = document.querySelector("#seed");
+    const namespace = document.querySelector("#namespace");
+    const theme = document.querySelector("#theme");
+    const pngSize = document.querySelector("#png-size");
+    const avatar = document.querySelector("#avatar");
+    const previewStage = document.querySelector("#preview-stage");
+    const svgOutput = document.querySelector("#svg-output");
+    const status = document.querySelector("#status");
+    const identityName = document.querySelector("#identity-name");
+    const identityScope = document.querySelector("#identity-scope");
+    const brandAvatar = document.querySelector("#brand-avatar");
+    const favicon = document.querySelector("#favicon");
+    const shapeCount = document.querySelector("#shape-count");
+    const backgroundCount = document.querySelector("#background-count");
+    const combinationCount = document.querySelector("#combination-count");
+    const exportButtons = [document.querySelector("#copy-svg"), document.querySelector("#download-svg"), document.querySelector("#copy-png"), document.querySelector("#download-png")];
+    const showcaseTrack = document.querySelector("#showcase-track");
+    const showcaseCounter = document.querySelector("#showcase-counter");
+    const showcasePrevious = document.querySelector("#showcase-prev");
+    const showcaseNext = document.querySelector("#showcase-next");
+    const showcaseSeedPool = [
+      "research-assistant", "support-bot", "api-gateway", "release-manager",
+      "data-analyst", "design-agent", "security-monitor", "workflow-orchestrator",
+      "code-reviewer", "knowledge-index", "customer-success", "runtime-service"
+    ];
+    const copyStates = new WeakMap();
+    const brandSeedPool = [
+      "brand-constellation", "brand-orbit", "brand-signal", "brand-spark",
+      "brand-radar", "brand-pulse", "brand-vector", "brand-comet"
+    ];
+    let currentSvg = "";
+    let showcasePage = 0;
+    let showcasePageCount = 0;
+    let showcaseRenderKey = "";
+    let brandAvatarIndex = 0;
+    let brandAvatarTheme = "";
+    let faviconTheme = "";
+
+    function options(size) {
+      return { size, namespace: namespace.value, theme: theme.value };
+    }
+
+    function svgDataUri(svg) {
+      return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
+    }
+
+    function renderCatalogStats() {
+      const stats = getCatalogStats();
+      const format = (value) => value.toLocaleString("en-US");
+      shapeCount.textContent = format(stats.validShapes);
+      backgroundCount.textContent = format(stats.availablePalettes);
+      combinationCount.textContent = format(stats.signatureStates);
+    }
+
+    function setStatus(message, error = false) {
+      status.textContent = message;
+      status.classList.toggle("is-error", error);
+    }
+
+    function renderFavicon() {
+      const svg = createHashAvatar("site-favicon", {
+        size: 64,
+        namespace: "site-favicon",
+        theme: theme.value
+      });
+      favicon.href = svgDataUri(svg);
+      faviconTheme = theme.value;
+    }
+
+    function updateShowcaseControls() {
+      showcaseTrack.style.transform = `translateX(-${showcasePage * 100}%)`;
+      showcaseCounter.textContent = `${showcasePage + 1} / ${showcasePageCount}`;
+      showcasePrevious.disabled = showcasePage === 0;
+      showcaseNext.disabled = showcasePage === showcasePageCount - 1;
+    }
+
+    function renderBrandAvatar() {
+      const svg = createHashAvatar(brandSeedPool[brandAvatarIndex], {
+        size: 34,
+        namespace: "site-brand",
+        theme: theme.value,
+      });
+      brandAvatar.src = svgDataUri(svg);
+      brandAvatar.classList.remove("is-changing");
+      void brandAvatar.offsetWidth;
+      brandAvatar.classList.add("is-changing");
+      brandAvatarTheme = theme.value;
+    }
+
+    function renderShowcase() {
+      const renderKey = theme.value;
+      if (renderKey === showcaseRenderKey) {
+        updateShowcaseControls();
+        return;
+      }
+
+      showcaseRenderKey = renderKey;
+      const seen = new Set();
+      const cards = [];
+
+      for (const baseSeed of showcaseSeedPool) {
+        let candidate = baseSeed;
+        let attempt = 0;
+        let svg = "";
+
+        do {
+          svg = createHashAvatar(candidate, { size: 150, namespace: "public-showcase", theme: theme.value });
+          candidate = `${baseSeed}-${++attempt}`;
+        } while (seen.has(svg));
+
+        seen.add(svg);
+        cards.push({ svg, label: baseSeed.replaceAll("-", " ") });
+      }
+
+      showcaseTrack.replaceChildren();
+      for (let index = 0; index < cards.length; index += 4) {
+        const page = document.createElement("div");
+        page.className = "showcase-page";
+        for (const card of cards.slice(index, index + 4)) {
+          const tile = document.createElement("div");
+          tile.className = "avatar-tile";
+          const image = document.createElement("img");
+          image.src = svgDataUri(card.svg);
+          image.alt = `${card.label} avatar`;
+          image.loading = "lazy";
+          tile.append(image);
+          page.append(tile);
+        }
+        showcaseTrack.append(page);
+      }
+
+      showcasePageCount = Math.ceil(cards.length / 4);
+      showcasePage = Math.min(showcasePage, showcasePageCount - 1);
+      updateShowcaseControls();
+    }
+
+    function render() {
+      document.documentElement.dataset.uiTheme = theme.value;
+      try {
+        if (brandAvatarTheme !== theme.value) renderBrandAvatar();
+        if (faviconTheme !== theme.value) renderFavicon();
+        currentSvg = createHashAvatar(seed.value, options(300));
+        avatar.src = svgDataUri(currentSvg);
+        svgOutput.value = currentSvg;
+        identityName.textContent = seed.value || "Empty seed";
+        identityScope.textContent = `Project: ${namespace.value}`;
+        previewStage.classList.add("is-ready");
+        for (const button of exportButtons) button.disabled = false;
+        setStatus(`Ready to export · ${pngSize.value} × ${pngSize.value} px PNG`);
+        renderShowcase();
+      } catch (error) {
+        currentSvg = "";
+        avatar.removeAttribute("src");
+        svgOutput.value = "";
+        previewStage.classList.remove("is-ready");
+        for (const button of exportButtons) button.disabled = true;
+        setStatus(error instanceof Error ? error.message : String(error), true);
+      }
+    }
+
+    function showCopySuccess(button) {
+      if (!button) return;
+
+      const state = copyStates.get(button) ?? {
+        html: button.innerHTML,
+        ariaLabel: button.getAttribute("aria-label")
+      };
+      const previousTimer = state.timer;
+      if (previousTimer) clearTimeout(previousTimer);
+      copyStates.set(button, state);
+
+      button.classList.remove("is-copied");
+      void button.offsetWidth;
+      button.classList.add("is-copied");
+      button.textContent = "Copied!";
+      button.setAttribute("aria-label", "Copied");
+
+      state.timer = setTimeout(() => {
+        button.innerHTML = state.html;
+        button.classList.remove("is-copied");
+        if (state.ariaLabel === null) button.removeAttribute("aria-label");
+        else button.setAttribute("aria-label", state.ariaLabel);
+      }, 1800);
+    }
+
+    async function copyText(text, successMessage, button) {
+      try {
+        await copyTextToClipboard(text);
+        showCopySuccess(button);
+        setStatus(successMessage);
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : String(error), true);
+      }
+    }
+
+    function download(blob, filename) {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = filename;
+      link.click();
+      setTimeout(() => URL.revokeObjectURL(url), 0);
+    }
+
+    async function createPngBlob(size) {
+      const svg = createHashAvatar(seed.value, options(size));
+      const sourceUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
+      try {
+        const image = new Image();
+        image.src = sourceUrl;
+        await image.decode();
+        const canvas = document.createElement("canvas");
+        canvas.width = size;
+        canvas.height = size;
+        canvas.getContext("2d").drawImage(image, 0, 0, size, size);
+        return await new Promise((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error("PNG export failed.")), "image/png"));
+      } finally {
+        URL.revokeObjectURL(sourceUrl);
+      }
+    }
+
+    document.querySelector("#copy-svg").addEventListener("click", (event) => copyText(currentSvg, "SVG copied to clipboard.", event.currentTarget));
+    document.querySelector("#download-svg").addEventListener("click", () => {
+      download(new Blob([currentSvg], { type: "image/svg+xml;charset=utf-8" }), "avatar.svg");
+      setStatus("SVG download started.");
+    });
+    document.querySelector("#download-png").addEventListener("click", async () => {
+      const size = Number(pngSize.value);
+      try {
+        const blob = await createPngBlob(size);
+        download(blob, `avatar-${size}.png`);
+        setStatus(`${size} × ${size} px PNG download started.`);
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : String(error), true);
+      }
+    });
+    document.querySelector("#copy-png").addEventListener("click", async (event) => {
+      const button = event.currentTarget;
+      const size = Number(pngSize.value);
+      try {
+        if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
+          throw new Error("PNG clipboard is not supported in this browser.");
+        }
+        const blob = await createPngBlob(size);
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        showCopySuccess(button);
+        setStatus(`${size} × ${size} px PNG copied to clipboard.`);
+      } catch (error) {
+        setStatus(error instanceof Error ? error.message : String(error), true);
+      }
+    });
+
+    showcasePrevious.addEventListener("click", () => {
+      showcasePage = Math.max(0, showcasePage - 1);
+      updateShowcaseControls();
+    });
+    showcaseNext.addEventListener("click", () => {
+      showcasePage = Math.min(showcasePageCount - 1, showcasePage + 1);
+      updateShowcaseControls();
+    });
+
+    window.setInterval(() => {
+      if (document.hidden) return;
+      brandAvatarIndex = (brandAvatarIndex + 1) % brandSeedPool.length;
+      renderBrandAvatar();
+    }, 2600);
+
+    for (const input of [seed, namespace, theme, pngSize]) input.addEventListener("input", render);
+    for (const button of document.querySelectorAll("[data-seed]")) button.addEventListener("click", () => { seed.value = button.dataset.seed; render(); });
+    for (const button of [document.querySelector("#copy-install-top"), document.querySelector("#copy-install-bottom")]) button.addEventListener("click", () => copyText("npm install deterministic-agent-avatars", "Install command copied.", button));
+
+    renderCatalogStats();
+    render();
+  </script>
+
+</body>
+</html>

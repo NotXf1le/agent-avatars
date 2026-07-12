@@ -1,0 +1,139 @@
+{
+  "name": "deterministic-agent-avatars",
+  "version": "1.0.0-rc.2",
+  "description": "Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.mts",
+        "default": "./dist/index.mjs"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      },
+      "default": "./dist/index.mjs"
+    },
+    "./png": {
+      "import": {
+        "types": "./dist/png.d.mts",
+        "default": "./dist/png.mjs"
+      },
+      "require": {
+        "types": "./dist/png.d.cts",
+        "default": "./dist/png.cjs"
+      }
+    },
+    "./react": {
+      "import": {
+        "types": "./dist/react.d.mts",
+        "default": "./dist/react.mjs"
+      },
+      "require": {
+        "types": "./dist/react.d.cts",
+        "default": "./dist/react.cjs"
+      }
+    },
+    "./private": {
+      "import": {
+        "types": "./dist/private.d.mts",
+        "default": "./dist/private.mjs"
+      },
+      "require": {
+        "types": "./dist/private.d.cts",
+        "default": "./dist/private.cjs"
+      }
+    },
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "examples/preview.png",
+    "README.md",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "LICENSE"
+  ],
+  "sideEffects": false,
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "benchmark": "node scripts/benchmark.mjs",
+    "demo": "node scripts/serve-demo.mjs",
+    "test": "npm run build && npm run test:runtime && tsc -p tests/tsconfig.json && npm run test:html && node tests/package.test.mjs && node tests/release-policy.test.mjs && node tests/consumer.test.mjs",
+    "test:runtime": "node tests/run-all.mjs",
+    "test:types": "npm run build && tsc -p tests/tsconfig.json",
+    "test:html": "html-validate index.html",
+    "test:browser": "npm run build && node tests/browser.test.mjs",
+    "test:package": "npm run build && node tests/package.test.mjs",
+    "test:packed-runtime": "npm run build && node tests/packed-runtime.test.mjs",
+    "test:consumer": "npm run build && node tests/consumer.test.mjs",
+    "test:react": "node tests/react.test.mjs",
+    "test:release": "npm run test:browser && npm run test:stress && npm run release:dry-run && npm audit",
+    "test:stress": "node tests/png-stress.test.mjs",
+    "test:update-golden": "node scripts/update-golden.mjs",
+    "release:dry-run": "node scripts/release-dry-run.mjs",
+    "prepublishOnly": "node scripts/check-release-tag.mjs",
+    "prepack": "npm test"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devEngines": {
+    "runtime": {
+      "name": "node",
+      "version": ">=24.8.0",
+      "onFail": "error"
+    },
+    "packageManager": {
+      "name": "npm",
+      "version": "11.11.0",
+      "onFail": "error"
+    }
+  },
+  "peerDependencies": {
+    "react": ">=18 <20"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    }
+  },
+  "devDependencies": {
+    "@arethetypeswrong/cli": "0.18.5",
+    "@types/node": "20.19.1",
+    "@types/react": "^18.3.31",
+    "esbuild": "0.25.6",
+    "html-validate": "11.5.6",
+    "playwright": "1.61.1",
+    "publint": "0.3.21",
+    "react": "^18.3.1",
+    "react-dom": "18.3.1",
+    "typescript": "^5.9.3",
+    "vite": "7.3.6",
+    "webpack": "5.108.4",
+    "webpack-cli": "6.0.1"
+  },
+  "keywords": [
+    "deterministic-avatar",
+    "agent-avatar",
+    "ai-agent",
+    "avatar-generator",
+    "identicon",
+    "svg",
+    "png",
+    "typescript",
+    "react",
+    "zero-dependency"
+  ],
+  "author": "Felix Koba",
+  "license": "MIT",
+  "funding": "https://ko-fi.com/felixkoba",
+  "packageManager": "npm@11.11.0",
+  "publishConfig": {
+    "access": "public"
+  }
+}

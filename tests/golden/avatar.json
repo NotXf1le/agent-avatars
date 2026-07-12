@@ -1,0 +1,91 @@
+[
+  {
+    "name": "felix-default",
+    "seed": "Felix",
+    "size": 96,
+    "options": {},
+    "svgSha256": "9305554d34f457b1c064bd641b932977daaab45cac91eb5f66c7b167e6b0eb8f",
+    "signature": "1:s67c:p1bbba488",
+    "rows": [
+      4,
+      31,
+      17,
+      27
+    ],
+    "paletteId": "mint"
+  },
+  {
+    "name": "tenant-dark",
+    "seed": "refund-agent",
+    "size": 64,
+    "options": {
+      "namespace": "acme",
+      "theme": "dark"
+    },
+    "svgSha256": "499b6f68cf77eaf8251afa50419f9d28c9f8137a31f3d40b347b2559d7befeba",
+    "signature": "1:s6ad:pb63f9aa3",
+    "rows": [
+      21,
+      21,
+      10,
+      27
+    ],
+    "paletteId": "mist"
+  },
+  {
+    "name": "fixed-palette",
+    "seed": "workflow:invoice",
+    "size": 192,
+    "options": {
+      "namespace": "northwind",
+      "palette": "sky"
+    },
+    "svgSha256": "1bc5e2ea932e121d64c6904e7f315976a626b4563e8766f044a0afca17534430",
+    "signature": "1:s173:pe0f6be53",
+    "rows": [
+      27,
+      14,
+      21,
+      0
+    ],
+    "paletteId": "sky"
+  },
+  {
+    "name": "raw-unicode",
+    "seed": "Ｆｅｌｉｘ",
+    "size": 96,
+    "options": {
+      "seedMode": "raw",
+      "namespace": "raw-space",
+      "namespaceMode": "raw"
+    },
+    "svgSha256": "c082d0401851f09884a322587beb73fc753b3d768897c8cbaf81c11417347a78",
+    "signature": "1:s135:p1a8cb6c9",
+    "rows": [
+      21,
+      14,
+      4,
+      0
+    ],
+    "paletteId": "lilac"
+  },
+  {
+    "name": "custom-constraints",
+    "seed": "constraint:exact-six",
+    "size": 80,
+    "options": {
+      "minPixels": 6,
+      "maxPixels": 6,
+      "maxDiagonalConnections": 0
+    },
+    "svgSha256": "616f9b25bfd1e00556f27efa8294b7e508ec64bfe39ab038e233cb2bdae6af70",
+    "signature": "1:s132:p1a8cb6c9",
+    "rows": [
+      10,
+      14,
+      4,
+      0
+    ],
+    "paletteId": "lilac"
+  }
+]
