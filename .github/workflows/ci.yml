@@ -23,7 +23,7 @@ jobs:
           node-version: ${{ matrix.node }}
       # Compatibility jobs intentionally override the newer repository devEngine.
       - run: npm ci --ignore-scripts --force
-      - run: npm run test:runtime
+      - run: node tests/run-all.mjs
 
   release-gate:
     name: Packed consumer gate / ${{ matrix.os }}
