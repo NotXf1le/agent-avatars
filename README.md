@@ -17,7 +17,7 @@ Then open `http://localhost:4173/`. ES modules are not supported reliably when t
 ## Installation
 
 ```bash
-npm install deterministic-agent-avatars
+npm install agent-avatars
 ```
 
 Install from the npm registry. Direct Git URL installs are not supported because generated `dist` files are intentionally not tracked.
@@ -25,7 +25,7 @@ Install from the npm registry. Direct Git URL installs are not supported because
 ## JavaScript / TypeScript
 
 ```ts
-import { createHashAvatar } from "deterministic-agent-avatars";
+import { createHashAvatar } from "agent-avatars";
 
 const svg = createHashAvatar("research-assistant", {
   namespace: "my-project",
@@ -39,7 +39,7 @@ The same seed, namespace, and options always produce the same result.
 ## React
 
 ```tsx
-import { AgentAvatar } from "deterministic-agent-avatars/react";
+import { AgentAvatar } from "agent-avatars/react";
 
 export function ResearchAssistant() {
   return (
@@ -61,17 +61,17 @@ TypeScript consumers must use TypeScript 4.7 or newer with `Node16`, `NodeNext`,
 
 | Entry | Environment | Purpose |
 | --- | --- | --- |
-| `deterministic-agent-avatars` | Browser and Node.js | Descriptors, SVG/data URI rendering, catalog inspection, and identity sets. |
-| `deterministic-agent-avatars/react` | Browser and Node.js SSR | React 18/19 `<AgentAvatar>` component. |
-| `deterministic-agent-avatars/png` | Node.js | Synchronous PNG encoding and filesystem export. |
-| `deterministic-agent-avatars/private` | Node.js | HMAC-derived private seeds and avatars. |
+| `agent-avatars` | Browser and Node.js | Descriptors, SVG/data URI rendering, catalog inspection, and identity sets. |
+| `agent-avatars/react` | Browser and Node.js SSR | React 18/19 `<AgentAvatar>` component. |
+| `agent-avatars/png` | Node.js | Synchronous PNG encoding and filesystem export. |
+| `agent-avatars/private` | Node.js | HMAC-derived private seeds and avatars. |
 
 ## SVG and PNG export
 
 ```js
 import { writeFileSync } from "node:fs";
-import { createHashAvatar } from "deterministic-agent-avatars";
-import { createAvatarPng, writeAvatarPngSet } from "deterministic-agent-avatars/png";
+import { createHashAvatar } from "agent-avatars";
+import { createAvatarPng, writeAvatarPngSet } from "agent-avatars/png";
 
 const seed = "research-assistant";
 const options = { namespace: "my-project", theme: "light" };
@@ -123,7 +123,7 @@ Malformed types and unsupported enum values throw `TypeError`. Values outside do
 Batch allocation normally enforces exact signature uniqueness: two different identities cannot receive the same shape-and-palette signature. You can also opt in to **visual distinguishability**, which keeps assignments a requested shape or palette distance apart. This policy is opt-in only; omitting the distance options leaves the existing defaults and exact-uniqueness behavior unchanged.
 
 ```js
-import { createIdentitySet } from "deterministic-agent-avatars";
+import { createIdentitySet } from "agent-avatars";
 
 const team = createIdentitySet(["research", "support", "billing"], {
   ensureUnique: true,
@@ -153,7 +153,7 @@ Without a visual-distance policy, `ensureUnique: false` permits repeated signatu
 ### Growing a set with a manifest
 
 ```js
-import { createIdentitySet } from "deterministic-agent-avatars";
+import { createIdentitySet } from "agent-avatars";
 
 const policy = {
   namespace: "my-project",
@@ -189,13 +189,13 @@ Custom palettes participate in the same rules. Exact signatures use a 32-bit key
 
 - Deterministic output is not anonymization; a known seed and options can be reproduced.
 - A namespace separates collections but is not a secret.
-- For sensitive identifiers, import `derivePrivateSeed` or the private avatar helpers from the Node-only `deterministic-agent-avatars/private` subpath.
+- For sensitive identifiers, import `derivePrivateSeed` or the private avatar helpers from the Node-only `agent-avatars/private` subpath.
 - Never embed a private secret in browser code or commit it to a repository.
 - Generate at least 32 random secret bytes, store them in a secret manager, attach a key identifier to persisted data, and plan key rotation. The private API rejects secrets shorter than 32 encoded bytes; length validation does not replace entropy. A long human-readable password is not a substitute for random entropy.
 - Validate untrusted manifests before storing or reusing them; the library rejects incompatible manifest schemas and options.
 
 ```js
-import { derivePrivateSeed } from "deterministic-agent-avatars/private";
+import { derivePrivateSeed } from "agent-avatars/private";
 
 const privateSeed = await derivePrivateSeed("person@example.com", {
   namespace: "my-project",

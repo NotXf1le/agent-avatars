@@ -42,7 +42,7 @@ Direct Git URL installs are not supported. Publish consumers through the npm tar
 If a source ZIP is required, create it from a clean Git commit rather than the working directory:
 
 ```bash
-git archive --format=zip --output deterministic-agent-avatars-source.zip HEAD
+git archive --format=zip --output agent-avatars-source.zip HEAD
 ```
 
 Do not archive a workspace containing `node_modules`, temporary tarballs, coverage output, or local build artifacts.

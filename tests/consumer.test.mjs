@@ -91,7 +91,7 @@ function readTree(directory) {
 }
 
 export async function runConsumerTests() {
-  const scratchDirectory = mkdtempSync(join(tmpdir(), "deterministic-agent-avatars-consumer-"));
+  const scratchDirectory = mkdtempSync(join(tmpdir(), "agent-avatars-consumer-"));
   try {
     const packDirectory = join(scratchDirectory, "pack");
     const fixtureDirectory = join(scratchDirectory, "fixture");
@@ -109,11 +109,11 @@ export async function runConsumerTests() {
     const tarballPath = join(packDirectory, packReport[0].filename);
 
     writeJson(join(fixtureDirectory, "package.json"), {
-      name: "deterministic-agent-avatars-consumer-fixture",
+      name: "agent-avatars-consumer-fixture",
       private: true,
       type: "module",
       dependencies: {
-        "deterministic-agent-avatars": `file:${tarballPath.replaceAll("\\", "/")}`,
+        "agent-avatars": `file:${tarballPath.replaceAll("\\", "/")}`,
       },
     });
     runNpm(["install", "--ignore-scripts", "--no-audit", "--no-fund"], fixtureDirectory);
@@ -130,10 +130,10 @@ export async function runConsumerTests() {
     }
 
     writeFileSync(join(fixtureDirectory, "consumer.mjs"), `
-      import { STYLE_VERSION, createHashAvatar, getCatalogStats } from "deterministic-agent-avatars";
-      import { createAvatarPng } from "deterministic-agent-avatars/png";
-      import { AgentAvatar } from "deterministic-agent-avatars/react";
-      import { derivePrivateSeed } from "deterministic-agent-avatars/private";
+      import { STYLE_VERSION, createHashAvatar, getCatalogStats } from "agent-avatars";
+      import { createAvatarPng } from "agent-avatars/png";
+      import { AgentAvatar } from "agent-avatars/react";
+      import { derivePrivateSeed } from "agent-avatars/private";
       const svg = createHashAvatar("esm-consumer", { namespace: "fixture" });
       const png = createAvatarPng("esm-consumer", { size: 8 });
       const privateSeed = await derivePrivateSeed("esm-consumer", { secret: "0123456789abcdef0123456789abcdef" });
@@ -148,10 +148,10 @@ export async function runConsumerTests() {
     `, "utf8");
 
     writeFileSync(join(fixtureDirectory, "consumer.cjs"), `
-      const api = require("deterministic-agent-avatars");
-      const pngApi = require("deterministic-agent-avatars/png");
-      const reactApi = require("deterministic-agent-avatars/react");
-      const privateApi = require("deterministic-agent-avatars/private");
+      const api = require("agent-avatars");
+      const pngApi = require("agent-avatars/png");
+      const reactApi = require("agent-avatars/react");
+      const privateApi = require("agent-avatars/private");
       (async () => {
         const png = pngApi.createAvatarPng("cjs-consumer", { size: 8 });
         const privateSeed = await privateApi.derivePrivateSeed("cjs-consumer", { secret: "0123456789abcdef0123456789abcdef" });
@@ -179,10 +179,10 @@ export async function runConsumerTests() {
     assert.deepEqual(cjsResult, esmResult);
 
     const esmTypes = `
-      import { STYLE_VERSION, hash32, type HashOptions } from "deterministic-agent-avatars";
-      import { createAvatarPng } from "deterministic-agent-avatars/png";
-      import { AgentAvatar } from "deterministic-agent-avatars/react";
-      import { derivePrivateSeed } from "deterministic-agent-avatars/private";
+      import { STYLE_VERSION, hash32, type HashOptions } from "agent-avatars";
+      import { createAvatarPng } from "agent-avatars/png";
+      import { AgentAvatar } from "agent-avatars/react";
+      import { derivePrivateSeed } from "agent-avatars/private";
       const options: HashOptions = { namespace: "fixture", domain: "consumer" };
       const version: "1" = STYLE_VERSION;
       const hash: number = hash32("esm-types", options);
@@ -191,10 +191,10 @@ export async function runConsumerTests() {
       void version; void hash; void png;
     `;
     const cjsTypes = `
-      import api = require("deterministic-agent-avatars");
-      import pngApi = require("deterministic-agent-avatars/png");
-      import reactApi = require("deterministic-agent-avatars/react");
-      import privateApi = require("deterministic-agent-avatars/private");
+      import api = require("agent-avatars");
+      import pngApi = require("agent-avatars/png");
+      import reactApi = require("agent-avatars/react");
+      import privateApi = require("agent-avatars/private");
       const version: "1" = api.STYLE_VERSION;
       const png: Uint8Array = pngApi.createAvatarPng("cjs-types", { size: 8 });
       void reactApi.AgentAvatar; void privateApi.derivePrivateSeed("cjs-types", { secret: "0123456789abcdef0123456789abcdef" });
@@ -227,8 +227,8 @@ export async function runConsumerTests() {
 
     const browserRoot = join(fixtureDirectory, "browser-root.mjs");
     const browserReact = join(fixtureDirectory, "browser-react.mjs");
-    writeFileSync(browserRoot, 'import { createHashAvatar } from "deterministic-agent-avatars"; console.log(createHashAvatar("browser"));\n', "utf8");
-    writeFileSync(browserReact, 'import { AgentAvatar } from "deterministic-agent-avatars/react"; console.log(AgentAvatar);\n', "utf8");
+    writeFileSync(browserRoot, 'import { createHashAvatar } from "agent-avatars"; console.log(createHashAvatar("browser"));\n', "utf8");
+    writeFileSync(browserReact, 'import { AgentAvatar } from "agent-avatars/react"; console.log(AgentAvatar);\n', "utf8");
 
     const esbuildDirectory = join(scratchDirectory, "esbuild");
     mkdirSync(esbuildDirectory);

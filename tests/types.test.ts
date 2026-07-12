@@ -8,10 +8,10 @@ import {
   type HashOptions,
   type IdentityManifest,
   type IdentitySetOptions,
-} from "deterministic-agent-avatars";
-import { createAvatarPng, createAvatarPngFromDescriptor, writeAvatarPngSet } from "deterministic-agent-avatars/png";
-import { derivePrivateSeed } from "deterministic-agent-avatars/private";
-import { AgentAvatar, type AgentAvatarProps } from "deterministic-agent-avatars/react";
+} from "agent-avatars";
+import { createAvatarPng, createAvatarPngFromDescriptor, writeAvatarPngSet } from "agent-avatars/png";
+import { derivePrivateSeed } from "agent-avatars/private";
+import { AgentAvatar, type AgentAvatarProps } from "agent-avatars/react";
 
 const options: AvatarOptions = {
   namespace: "acme",

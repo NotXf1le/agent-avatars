@@ -13,6 +13,7 @@ import {
 } from "./render-descriptor.mjs";
 
 const STYLE_VERSION = "1";
+// Compatibility identifier: changing this would change deterministic outputs.
 const LIBRARY_ID = "deterministic-agent-avatars";
 const GRID_W = 5;
 const GRID_H = 4;
