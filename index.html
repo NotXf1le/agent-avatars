@@ -391,7 +391,7 @@
     <section class="section">
       <div class="container install-card">
         <div><h2>Add it to your project.</h2><p>ESM, CommonJS, TypeScript declarations, React, SVG, and Node.js PNG exports are included.</p></div>
-        <div class="install-command"><code>npm install deterministic-agent-avatars</code><button class="copy-button" id="copy-install-bottom" type="button">Copy</button></div>
+        <div class="install-command"><code>npm install agent-avatars</code><button class="copy-button" id="copy-install-bottom" type="button">Copy</button></div>
       </div>
     </section>
   </main>
@@ -678,7 +678,7 @@
 
     for (const input of [seed, namespace, theme, pngSize]) input.addEventListener("input", render);
     for (const button of document.querySelectorAll("[data-seed]")) button.addEventListener("click", () => { seed.value = button.dataset.seed; render(); });
-    for (const button of [document.querySelector("#copy-install-top"), document.querySelector("#copy-install-bottom")]) button.addEventListener("click", () => copyText("npm install deterministic-agent-avatars", "Install command copied.", button));
+    for (const button of [document.querySelector("#copy-install-top"), document.querySelector("#copy-install-bottom")]) button.addEventListener("click", () => copyText("npm install agent-avatars", "Install command copied.", button));
 
     renderCatalogStats();
     render();

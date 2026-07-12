@@ -14,8 +14,8 @@ const require = createRequire(import.meta.url);
 const testsDirectory = dirname(fileURLToPath(import.meta.url));
 const projectRoot = resolve(testsDirectory, "..");
 const PRIVATE_SECRET = "0123456789abcdef0123456789abcdef";
-const esm = await import("deterministic-agent-avatars");
-const cjs = require("deterministic-agent-avatars");
+const esm = await import("agent-avatars");
+const cjs = require("agent-avatars");
 
 function captureError(operation) {
   try {
@@ -125,20 +125,20 @@ const marker = true;`, new Map([
     /\.\/visual-distance\.mjs:1:\d+ TS\d+:.*expected/i
   );
 
-  const packageJson = require("deterministic-agent-avatars/package.json");
+  const packageJson = require("agent-avatars/package.json");
   assert.equal(packageJson.main, "./dist/index.cjs");
   assert.equal(packageJson.module, "./dist/index.mjs");
   assert.equal(packageJson.types, "./dist/index.d.mts");
-  assert.equal(packageJson.name, "deterministic-agent-avatars");
+  assert.equal(packageJson.name, "agent-avatars");
   assert.equal(packageJson.version, "1.0.0-rc.2");
   assert.equal(packageJson.description, "Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.");
   assert.deepEqual(packageJson.repository, {
     type: "git",
-    url: "git+https://github.com/NotXf1le/deterministic-agent-avatars.git",
+    url: "git+https://github.com/NotXf1le/agent-avatars.git",
   });
-  assert.equal(packageJson.homepage, "https://notxf1le.github.io/deterministic-agent-avatars/");
+  assert.equal(packageJson.homepage, "https://notxf1le.github.io/agent-avatars/");
   assert.deepEqual(packageJson.bugs, {
-    url: "https://github.com/NotXf1le/deterministic-agent-avatars/issues",
+    url: "https://github.com/NotXf1le/agent-avatars/issues",
   });
   assert.equal(packageJson.dependencies, undefined);
   assert.deepEqual(packageJson.exports["."], {
@@ -220,8 +220,8 @@ const marker = true;`, new Map([
   assert.match(readme, /does not guarantee (?:a )?maximum packing|does not prove.*(?:packing|assignment).*exists/i);
   assert.match(readme, /attempts exhausted|exhausted.*attempts/i);
 
-  const cjsPrivateSubpathError = captureError(() => require("deterministic-agent-avatars/visual-distance"));
-  const esmPrivateSubpathError = await captureAsyncError(() => import("deterministic-agent-avatars/visual-distance"));
+  const cjsPrivateSubpathError = captureError(() => require("agent-avatars/visual-distance"));
+  const esmPrivateSubpathError = await captureAsyncError(() => import("agent-avatars/visual-distance"));
   for (const error of [cjsPrivateSubpathError, esmPrivateSubpathError]) {
     assert.equal(error.name, "Error");
     assert.equal(error.code, "ERR_PACKAGE_PATH_NOT_EXPORTED");
@@ -345,8 +345,8 @@ const marker = true;`, new Map([
     assert.ok(readFileSync(new URL(file, import.meta.url), "utf8").length > 100, `${file} is missing or empty`);
   }
 
-  const pngEsm = await import("deterministic-agent-avatars/png");
-  const pngCjs = require("deterministic-agent-avatars/png");
+  const pngEsm = await import("agent-avatars/png");
+  const pngCjs = require("agent-avatars/png");
   assert.deepEqual(
     pngEsm.createAvatarPng("package-subpath", { size: 32 }),
     pngCjs.createAvatarPng("package-subpath", { size: 32 })
@@ -358,21 +358,21 @@ const marker = true;`, new Map([
       /descriptor\.rows must contain 4 integers/
     );
   }
-  const reactEsm = await import("deterministic-agent-avatars/react");
-  const reactCjs = require("deterministic-agent-avatars/react");
+  const reactEsm = await import("agent-avatars/react");
+  const reactCjs = require("agent-avatars/react");
   assert.equal(reactEsm.AgentAvatar.displayName, "AgentAvatar");
   assert.equal(reactCjs.AgentAvatar.displayName, "AgentAvatar");
   assert.equal(reactEsm.HashAvatar, reactEsm.AgentAvatar);
   assert.equal(reactCjs.HashAvatar, reactCjs.AgentAvatar);
 
-  const privateEsm = await import("deterministic-agent-avatars/private");
-  const privateCjs = require("deterministic-agent-avatars/private");
+  const privateEsm = await import("agent-avatars/private");
+  const privateCjs = require("agent-avatars/private");
   assert.equal(
     await privateEsm.derivePrivateSeed("package-private", { secret: PRIVATE_SECRET, namespace: "package" }),
     await privateCjs.derivePrivateSeed("package-private", { secret: PRIVATE_SECRET, namespace: "package" })
   );
 
-  const scratchDirectory = mkdtempSync(join(tmpdir(), "deterministic-agent-avatars-build-"));
+  const scratchDirectory = mkdtempSync(join(tmpdir(), "agent-avatars-build-"));
   const scratchDist = join(scratchDirectory, "dist");
   const staleArtifact = join(scratchDist, "stale-artifact.txt");
   mkdirSync(scratchDist);

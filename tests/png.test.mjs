@@ -64,7 +64,7 @@ export async function runPngTests() {
   };
   assert.deepEqual(png.createAvatarPngFromDescriptor(mutatingDescriptor, 32), expected);
 
-  const directory = mkdtempSync(join(tmpdir(), "deterministic-agent-avatars-"));
+  const directory = mkdtempSync(join(tmpdir(), "agent-avatars-"));
   try {
     const result = png.writeAvatarPngSet("export-check", directory, {
       namespace: "exports",

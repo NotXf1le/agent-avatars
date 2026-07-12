@@ -6,6 +6,7 @@ import {
   createHashAvatarFromDescriptor,
 } from "./index.mjs";
 
+// Compatibility identifier: changing this would change deterministic outputs.
 const LIBRARY_ID = "deterministic-agent-avatars";
 const DEFAULT_NAMESPACE = "default";
 const UTF8 = new TextEncoder();

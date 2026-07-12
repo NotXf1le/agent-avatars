@@ -16,7 +16,7 @@ function importSpecifier(fromDirectory, path) {
 }
 
 export async function runBrowserTests() {
-  const scratchDirectory = mkdtempSync(join(tmpdir(), "deterministic-agent-avatars-browser-"));
+  const scratchDirectory = mkdtempSync(join(tmpdir(), "agent-avatars-browser-"));
   let browser;
   let server;
   try {

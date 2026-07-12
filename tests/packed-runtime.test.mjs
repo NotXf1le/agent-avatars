@@ -39,7 +39,7 @@ function runNode(path, cwd) {
 }
 
 export function runPackedRuntimeTest() {
-  const scratchDirectory = mkdtempSync(join(tmpdir(), "deterministic-agent-avatars-packed-runtime-"));
+  const scratchDirectory = mkdtempSync(join(tmpdir(), "agent-avatars-packed-runtime-"));
   try {
     const packDirectory = join(scratchDirectory, "pack");
     const fixtureDirectory = join(scratchDirectory, "fixture");
@@ -57,20 +57,20 @@ export function runPackedRuntimeTest() {
     const tarballPath = join(packDirectory, packReport[0].filename);
 
     writeFileSync(join(fixtureDirectory, "package.json"), `${JSON.stringify({
-      name: "deterministic-agent-avatars-packed-runtime-fixture",
+      name: "agent-avatars-packed-runtime-fixture",
       private: true,
       type: "module",
       dependencies: {
-        "deterministic-agent-avatars": `file:${tarballPath.replaceAll("\\", "/")}`,
+        "agent-avatars": `file:${tarballPath.replaceAll("\\", "/")}`,
       },
     }, null, 2)}\n`, "utf8");
     runNpm(["install", "--ignore-scripts", "--no-audit", "--no-fund"], fixtureDirectory);
 
     const esmPath = join(fixtureDirectory, "consumer.mjs");
     writeFileSync(esmPath, `
-      import { STYLE_VERSION, createHashAvatar, getCatalogStats } from "deterministic-agent-avatars";
-      import { createAvatarPng } from "deterministic-agent-avatars/png";
-      import { derivePrivateSeed } from "deterministic-agent-avatars/private";
+      import { STYLE_VERSION, createHashAvatar, getCatalogStats } from "agent-avatars";
+      import { createAvatarPng } from "agent-avatars/png";
+      import { derivePrivateSeed } from "agent-avatars/private";
       const privateSeed = await derivePrivateSeed("packed-esm", { secret: "0123456789abcdef0123456789abcdef" });
       console.log(JSON.stringify({
         styleVersion: STYLE_VERSION,
@@ -83,9 +83,9 @@ export function runPackedRuntimeTest() {
 
     const cjsPath = join(fixtureDirectory, "consumer.cjs");
     writeFileSync(cjsPath, `
-      const api = require("deterministic-agent-avatars");
-      const png = require("deterministic-agent-avatars/png");
-      const privateApi = require("deterministic-agent-avatars/private");
+      const api = require("agent-avatars");
+      const png = require("agent-avatars/png");
+      const privateApi = require("agent-avatars/private");
       (async () => {
         const privateSeed = await privateApi.derivePrivateSeed("packed-cjs", { secret: "0123456789abcdef0123456789abcdef" });
         console.log(JSON.stringify({

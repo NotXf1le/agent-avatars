@@ -16,6 +16,6 @@ Deterministic avatars are not anonymization. A namespace is public domain separa
 
 ## Reporting a vulnerability
 
-Use the [private security-advisory form](https://github.com/NotXf1le/deterministic-agent-avatars/security/advisories/new). Do not include secrets, personal data, or exploit details in a public issue. Include affected versions, a minimal reproducer, impact, and any known mitigations.
+Use the [private security-advisory form](https://github.com/NotXf1le/agent-avatars/security/advisories/new). Do not include secrets, personal data, or exploit details in a public issue. Include affected versions, a minimal reproducer, impact, and any known mitigations.
 
 You should receive an acknowledgement within seven days. Valid reports will be coordinated through a private advisory until a fix and disclosure timeline are ready.

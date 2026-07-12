@@ -1,14 +1,14 @@
 {
-  "name": "deterministic-agent-avatars",
+  "name": "agent-avatars",
   "version": "1.0.0-rc.2",
   "description": "Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/NotXf1le/deterministic-agent-avatars.git"
+    "url": "git+https://github.com/NotXf1le/agent-avatars.git"
   },
-  "homepage": "https://notxf1le.github.io/deterministic-agent-avatars/",
+  "homepage": "https://notxf1le.github.io/agent-avatars/",
   "bugs": {
-    "url": "https://github.com/NotXf1le/deterministic-agent-avatars/issues"
+    "url": "https://github.com/NotXf1le/agent-avatars/issues"
   },
   "type": "module",
   "main": "./dist/index.cjs",
