@@ -2,9 +2,9 @@
 
 Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.
 
-## Preview
+![Agent control room using stable deterministic avatars](examples/hero-agent-dashboard.png)
 
-![Animated preview of deterministic agent avatars](examples/readme-preview.gif)
+*Stable visual identities for AI agents, bots and services.*
 
 The GitHub Pages-ready demo is `index.html`. Run it locally through a static server:
 
@@ -22,7 +22,7 @@ npm install agent-avatars
 
 Install from the npm registry. Direct Git URL installs are not supported because generated `dist` files are intentionally not tracked.
 
-## JavaScript / TypeScript
+## Quick start
 
 ```ts
 import { createHashAvatar } from "agent-avatars";
@@ -36,7 +36,48 @@ const svg = createHashAvatar("research-assistant", {
 
 The same seed, namespace, and options always produce the same result.
 
-## React
+## Avatar gallery
+
+![Light and dark avatar gallery across built-in palettes](examples/avatar-gallery.png)
+
+Each card uses a real seed and built-in palette. The paired previews show the same identity in light and dark themes.
+
+## Deterministic output
+
+![The same deterministic avatar rendered in Browser, Node.js, and React SSR](examples/deterministic-output.png)
+
+The same seed, namespace, and options resolve to the same shape and palette in browser SVG, Node.js PNG output, and server-rendered React.
+
+## Batch uniqueness
+
+![Naive hash allocation compared with createIdentitySet visual-distance allocation](examples/batch-uniqueness.png)
+
+`createIdentitySet()` can enforce exact signature uniqueness and optional shape or palette distance across a group, making agents easier to distinguish than a small modulo-selected variant pool.
+
+## Light and dark themes
+
+![The same agent activity interface in light and dark themes](examples/light-dark-themes.png)
+
+Theme changes adapt the colors without changing each agent's deterministic shape or palette identity.
+
+## Private identities
+
+![Server-side private seed flow from a sensitive identifier to a browser-safe avatar](examples/private-seed-flow.png)
+
+Generate stable avatars from sensitive identifiers without exposing the original seed. Private derivation belongs on the server; never embed the HMAC secret in browser code.
+
+```js
+import { derivePrivateSeed } from "agent-avatars/private";
+
+const privateSeed = await derivePrivateSeed("person@example.com", {
+  namespace: "my-project",
+  secret: process.env.AVATAR_HMAC_SECRET,
+});
+```
+
+## API reference
+
+### React
 
 ```tsx
 import { AgentAvatar } from "agent-avatars/react";
@@ -57,7 +98,7 @@ React 18 or 19 is an optional peer dependency.
 
 TypeScript consumers must use TypeScript 4.7 or newer with `Node16`, `NodeNext`, or `Bundler` module resolution. Legacy `node10` subpath resolution is not supported.
 
-## Package entry points
+### Package entry points
 
 | Entry | Environment | Purpose |
 | --- | --- | --- |
@@ -66,7 +107,7 @@ TypeScript consumers must use TypeScript 4.7 or newer with `Node16`, `NodeNext`,
 | `agent-avatars/png` | Node.js | Synchronous PNG encoding and filesystem export. |
 | `agent-avatars/private` | Node.js | HMAC-derived private seeds and avatars. |
 
-## SVG and PNG export
+### SVG and PNG export
 
 ```js
 import { writeFileSync } from "node:fs";
@@ -94,7 +135,7 @@ PNG generation is synchronous. Do not forward an untrusted request size directly
 
 PNG-only options are `supersample` (integer `1..8`), `sizes` (unique integer output sizes), and `baseName` for filesystem export. `createAvatarPngFromDescriptor` accepts only `supersample`, because palette, namespace, and identity selection are already fixed by the descriptor.
 
-## Options
+### Options
 
 | Option | Purpose |
 | --- | --- |
@@ -118,7 +159,7 @@ Custom colors must be six-digit hexadecimal values. Contrast is validated by def
 
 Malformed types and unsupported enum values throw `TypeError`. Values outside documented capacity or resource bounds throw `RangeError`. Deterministic allocation exhaustion and incompatible persisted assignments throw `Error`; callers should treat manifests as versioned data and keep the prior valid snapshot when growth fails.
 
-## Batch uniqueness
+### Batch allocation details
 
 Batch allocation normally enforces exact signature uniqueness: two different identities cannot receive the same shape-and-palette signature. You can also opt in to **visual distinguishability**, which keeps assignments a requested shape or palette distance apart. This policy is opt-in only; omitting the distance options leaves the existing defaults and exact-uniqueness behavior unchanged.
 
@@ -150,7 +191,7 @@ Each channel is disabled by a threshold of `0`. `minimumShapeDistance` must be a
 
 Without a visual-distance policy, `ensureUnique: false` permits repeated signatures and sets larger than the configured signature state space. The returned manifest remains reusable when subsequent calls also set `ensureUnique: false`. Switching such a manifest back to unique allocation is rejected if its historical entries contain duplicate signatures or exceed the state space. `getCatalogStats().signatureStates` reports this exact signature capacity; it is not a promise that every palette looks different in every theme.
 
-### Growing a set with a manifest
+#### Growing a set with a manifest
 
 ```js
 import { createIdentitySet } from "agent-avatars";
@@ -175,7 +216,7 @@ The manifest stores the complete distinguishability policy, including its `visua
 
 Manifest compatibility also includes `seedMode`. A manifest created with `seedMode: "human"` is rejected under `"raw"`, and vice versa. Because `1.0.0-rc.2` adds this binding, manifests produced by `1.0.0-rc.1` are intentionally incompatible and must be regenerated.
 
-### Capacity and allocation limits
+#### Capacity and allocation limits
 
 Allocation uses a greedy deterministic allocator. It considers identities in a stable order and tries at most `maxAttempts` deterministic candidates for each new identity. It does not guarantee a maximum packing and failure does not prove that no valid assignment exists elsewhere in the state space. Capacity can fall sharply with higher thresholds, especially in `both` mode.
 
@@ -185,23 +226,14 @@ To bound synchronous aggregate work, one call accepts at most 256 custom palette
 
 Custom palettes participate in the same rules. Exact signatures use a 32-bit key derived from the palette colors; selected custom palettes with different colors but a colliding palette signature key are rejected rather than treated as interchangeable.
 
-## Security limitations
+### Security limitations
 
 - Deterministic output is not anonymization; a known seed and options can be reproduced.
 - A namespace separates collections but is not a secret.
-- For sensitive identifiers, import `derivePrivateSeed` or the private avatar helpers from the Node-only `agent-avatars/private` subpath.
+- For sensitive identifiers, use the Node-only `agent-avatars/private` subpath described in [Private identities](#private-identities).
 - Never embed a private secret in browser code or commit it to a repository.
 - Generate at least 32 random secret bytes, store them in a secret manager, attach a key identifier to persisted data, and plan key rotation. The private API rejects secrets shorter than 32 encoded bytes; length validation does not replace entropy. A long human-readable password is not a substitute for random entropy.
 - Validate untrusted manifests before storing or reusing them; the library rejects incompatible manifest schemas and options.
-
-```js
-import { derivePrivateSeed } from "agent-avatars/private";
-
-const privateSeed = await derivePrivateSeed("person@example.com", {
-  namespace: "my-project",
-  secret: process.env.AVATAR_HMAC_SECRET,
-});
-```
 
 ## Support
 

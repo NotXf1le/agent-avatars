@@ -61,7 +61,12 @@
   "files": [
     "dist",
     "examples/preview.png",
-    "examples/readme-preview.gif",
+    "examples/hero-agent-dashboard.png",
+    "examples/avatar-gallery.png",
+    "examples/deterministic-output.png",
+    "examples/batch-uniqueness.png",
+    "examples/light-dark-themes.png",
+    "examples/private-seed-flow.png",
     "README.md",
     "CHANGELOG.md",
     "SECURITY.md",
