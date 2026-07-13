@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="examples/avatar-cycle.gif" width="224" height="224" alt="Animated deterministic avatar">
+</p>
+
 # Agent Avatars
 
 Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.

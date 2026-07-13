@@ -61,6 +61,7 @@
   "files": [
     "dist",
     "examples/preview.png",
+    "examples/avatar-cycle.gif",
     "examples/hero-agent-dashboard.png",
     "examples/avatar-gallery.png",
     "examples/deterministic-output.png",

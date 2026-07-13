@@ -73,6 +73,17 @@ const themeSpecs = [
   ["deployment-bot", "lime"],
 ];
 
+const cycleSpecs = [
+  ["avatar-cycle", "leaf"],
+  ["avatar-cycle", "indigo"],
+  ["avatar-cycle", "aqua"],
+  ["avatar-cycle", "sand"],
+  ["avatar-cycle", "orchid"],
+  ["avatar-cycle", "coral"],
+  ["avatar-cycle", "apricot"],
+  ["avatar-cycle", "ice"],
+];
+
 function allocateDiverse(specs, namespace, minimumShapeDistance = 7) {
   const allocated = [];
   for (const [seed, palette] of specs) {
@@ -101,6 +112,7 @@ function allocateDiverse(specs, namespace, minimumShapeDistance = 7) {
 const diverseHero = allocateDiverse(heroSpecs, "readme-hero-diverse");
 const diverseGallery = allocateDiverse(gallerySpecs, "readme-gallery-diverse");
 const diverseThemes = allocateDiverse(themeSpecs, "readme-themes-diverse");
+const diverseCycle = allocateDiverse(cycleSpecs, "readme-avatar-cycle");
 
 const batch = createIdentitySet(
   ["research", "coding", "support", "billing", "reviewer", "deployment"],
@@ -166,6 +178,11 @@ const output = {
       theme: "dark",
       collisionNonce: item.collisionNonce,
     }),
+  })),
+  cycle: diverseCycle.map((item) => avatar(item.seed, 256, {
+    namespace: "readme-avatar-cycle",
+    palette: item.palette,
+    collisionNonce: item.collisionNonce,
   })),
   private: avatar("person@example.com", 104, {
     namespace: "private-demo",

@@ -199,6 +199,7 @@ const marker = true;`, new Map([
   assert.deepEqual(packageJson.files, [
     "dist",
     "examples/preview.png",
+    "examples/avatar-cycle.gif",
     "examples/hero-agent-dashboard.png",
     "examples/avatar-gallery.png",
     "examples/deterministic-output.png",
@@ -423,6 +424,7 @@ const marker = true;`, new Map([
     "SECURITY.md",
     "package.json",
     "examples/preview.png",
+    "examples/avatar-cycle.gif",
     "examples/hero-agent-dashboard.png",
     "examples/avatar-gallery.png",
     "examples/deterministic-output.png",
