@@ -179,7 +179,7 @@ const output = {
       collisionNonce: item.collisionNonce,
     }),
   })),
-  cycle: diverseCycle.map((item) => avatar(item.seed, 256, {
+  cycle: diverseCycle.map((item) => avatar(item.seed, 512, {
     namespace: "readme-avatar-cycle",
     palette: item.palette,
     collisionNonce: item.collisionNonce,

@@ -11,6 +11,9 @@ $Root = Split-Path -Parent (Split-Path -Parent $MyInvocation.MyCommand.Path)
 $Examples = Join-Path $Root "examples"
 $AssetScript = Join-Path $Root "scripts\readme-avatar-assets.mjs"
 $assets = (& node $AssetScript) | ConvertFrom-Json
+$FrameSize = 512
+$FrameCenter = $FrameSize / 2
+$OutlineRadius = 200
 
 if ($assets.provenance.renderer -ne "src/png.mjs#createAvatarPng/createAvatarPngFromDescriptor") {
   throw "Unexpected avatar renderer provenance."
@@ -21,7 +24,7 @@ if ($assets.cycle.Count -lt 2) {
 
 $encoder = [System.Windows.Media.Imaging.GifBitmapEncoder]::new()
 foreach ($asset in $assets.cycle) {
-  if ($asset.size -ne 256) { throw "Avatar GIF frames must be 256 by 256 pixels." }
+  if ($asset.size -ne $FrameSize) { throw "Avatar GIF frames must be $FrameSize by $FrameSize pixels." }
   $bytes = [Convert]::FromBase64String([string]$asset.png)
   $stream = [System.IO.MemoryStream]::new($bytes, $false)
   try {
@@ -32,22 +35,23 @@ foreach ($asset in $assets.cycle) {
     )
     $source = $decoder.Frames[0]
 
-    # GitHub-achievement-style outline: a small white ring behind the
-    # official 192 px avatar circle, with the rest of the 256 px frame transparent.
+    # GitHub-achievement-style outline: an 8 px white ring behind the
+    # official 384 px avatar circle. README displays the 512 px GIF at 224 px,
+    # so browser downsampling smooths the binary-transparency GIF edge.
     $visual = [System.Windows.Media.DrawingVisual]::new()
     $drawing = $visual.RenderOpen()
     $drawing.DrawEllipse(
       [System.Windows.Media.Brushes]::White,
       $null,
-      [System.Windows.Point]::new(128, 128),
-      100,
-      100
+      [System.Windows.Point]::new($FrameCenter, $FrameCenter),
+      $OutlineRadius,
+      $OutlineRadius
     )
-    $drawing.DrawImage($source, [System.Windows.Rect]::new(0, 0, 256, 256))
+    $drawing.DrawImage($source, [System.Windows.Rect]::new(0, 0, $FrameSize, $FrameSize))
     $drawing.Close()
     $composited = [System.Windows.Media.Imaging.RenderTargetBitmap]::new(
-      256,
-      256,
+      $FrameSize,
+      $FrameSize,
       96,
       96,
       [System.Windows.Media.PixelFormats]::Pbgra32
