@@ -61,6 +61,7 @@
   "files": [
     "dist",
     "examples/preview.png",
+    "examples/readme-preview.gif",
     "README.md",
     "CHANGELOG.md",
     "SECURITY.md",

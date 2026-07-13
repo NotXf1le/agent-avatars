@@ -4,7 +4,7 @@ Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services,
 
 ## Preview
 
-![Deterministic avatar preview](examples/preview.png)
+![Animated preview of deterministic agent avatars](examples/readme-preview.gif)
 
 The GitHub Pages-ready demo is `index.html`. Run it locally through a static server:
 
@@ -207,7 +207,7 @@ const privateSeed = await derivePrivateSeed("person@example.com", {
 
 If this project is useful to you, you can support its development on Ko-fi:
 
-[Support on Ko-fi](https://ko-fi.com/felixkoba)
+[![Support me on Ko-fi](https://ko-fi.com/img/githubbutton_sm.svg)](https://ko-fi.com/felixkoba)
 
 ## Development checks
 

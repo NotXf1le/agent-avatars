@@ -196,7 +196,15 @@ const marker = true;`, new Map([
   assert.equal(packageJson.devDependencies.playwright, "1.61.1");
   assert.equal(packageJson.scripts.prepublishOnly, "node scripts/check-release-tag.mjs");
   assert.equal(packageJson.scripts["release:dry-run"], "node scripts/release-dry-run.mjs");
-  assert.deepEqual(packageJson.files, ["dist", "examples/preview.png", "README.md", "CHANGELOG.md", "SECURITY.md", "LICENSE"]);
+  assert.deepEqual(packageJson.files, [
+    "dist",
+    "examples/preview.png",
+    "examples/readme-preview.gif",
+    "README.md",
+    "CHANGELOG.md",
+    "SECURITY.md",
+    "LICENSE",
+  ]);
   const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
   assert.match(readme, /PNG rendering caps its high-resolution RGBA buffer at 64 MiB/);
   assert.match(readme, /explicit `supersample` value exceeds that budget, the API throws a `RangeError`/);
@@ -410,6 +418,7 @@ const marker = true;`, new Map([
     "SECURITY.md",
     "package.json",
     "examples/preview.png",
+    "examples/readme-preview.gif",
     "dist/index.cjs",
     "dist/index.d.cts",
     "dist/index.d.mts",
