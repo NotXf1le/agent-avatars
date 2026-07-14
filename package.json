@@ -1,6 +1,6 @@
 {
   "name": "agent-avatars",
-  "version": "1.0.0-rc.2",
+  "version": "1.0.0",
   "description": "Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.",
   "repository": {
     "type": "git",

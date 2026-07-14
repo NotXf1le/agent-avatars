@@ -218,7 +218,7 @@ const expanded = createIdentitySet(["research", "support", "billing", "release"]
 
 The manifest stores the complete distinguishability policy, including its `visual-distance/v1` schema. Reuse the manifest when a set grows: historical assignments stay unchanged and constrain every new assignment. The requested policy must match the stored policy exactly, or hydration is rejected. A manifest is also checked pairwise, so a tampered set that no longer satisfies its stored policy is rejected.
 
-Manifest compatibility also includes `seedMode`. A manifest created with `seedMode: "human"` is rejected under `"raw"`, and vice versa. Because `1.0.0-rc.2` adds this binding, manifests produced by `1.0.0-rc.1` are intentionally incompatible and must be regenerated.
+Manifest compatibility also includes `seedMode`. A manifest created with `seedMode: "human"` is rejected under `"raw"`, and vice versa. Manifests produced by `1.0.0-rc.1` are intentionally incompatible with `1.0.0` and must be regenerated.
 
 #### Capacity and allocation limits
 
