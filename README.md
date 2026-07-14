@@ -4,11 +4,12 @@
 
 # Agent Avatars
 
-Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.
+Deterministic visual identities for AI agents, bots, services, and users.
 
-![Agent control room using stable deterministic avatars](examples/hero-agent-dashboard.png)
-
-*Stable visual identities for AI agents, bots and services.*
+- **Zero dependencies.** Generate SVG, data URI, and PNG avatars locally.
+- **Stable.** The same seed and namespace produce the same identity.
+- **Portable.** Browser, Node.js, React 18/19, ESM, CommonJS, and SSR.
+- **Group-aware.** Keep agent identities visually distinct with `createIdentitySet()`.
 
 The GitHub Pages-ready demo is `index.html`. Run it locally through a static server:
 
