@@ -103,6 +103,82 @@ React 18 or 19 is an optional peer dependency.
 
 TypeScript consumers must use TypeScript 4.7 or newer with `Node16`, `NodeNext`, or `Bundler` module resolution. Legacy `node10` subpath resolution is not supported.
 
+### Fallback for missing or broken avatar images
+
+Keep an explicitly configured image as the first choice and use a deterministic avatar only when the URL is missing or fails to load.
+
+```tsx
+import { useState } from "react";
+import { AgentAvatar } from "agent-avatars/react";
+
+type AgentImageProps = {
+  src?: string;
+  agentId?: string;
+  agentName: string;
+  theme: "light" | "dark";
+  size?: number;
+};
+
+export function AgentImage({
+  src,
+  agentId,
+  agentName,
+  theme,
+  size = 40,
+}: AgentImageProps) {
+  const [failedSrc, setFailedSrc] = useState<string>();
+
+  if (!src || failedSrc === src) {
+    return (
+      <AgentAvatar
+        seed={agentId ?? agentName}
+        size={size}
+        options={{
+          namespace: "my-product/agents",
+          theme,
+        }}
+        alt={`${agentName} avatar`}
+        className="rounded-full"
+      />
+    );
+  }
+
+  return (
+    <img
+      src={src}
+      width={size}
+      height={size}
+      alt={`${agentName} avatar`}
+      className="rounded-full"
+      onError={() => setFailedSrc(src)}
+    />
+  );
+}
+```
+
+Prefer a stable agent ID as the seed. Use the agent name only when no stable identifier is available.
+
+### Components that expect an avatar URL
+
+Use `avatarDataUri()` when a component accepts an image URL string rather than a React element.
+
+```ts
+import { avatarDataUri } from "agent-avatars";
+
+const avatarUrl = avatarDataUri(agent.id ?? agent.name, {
+  namespace: "my-product/agents",
+  theme,
+  size: 40,
+});
+
+const avatar = {
+  avatar: avatarUrl,
+  title: agent.name,
+};
+```
+
+The returned value is a local SVG data URI. It can be passed to image elements and component APIs that accept `src`, `avatar`, or similar URL fields, provided their Content Security Policy allows `data:` images.
+
 ### Package entry points
 
 | Entry | Environment | Purpose |
