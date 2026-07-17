@@ -8,6 +8,7 @@ const pageFiles = Object.freeze([
   ".nojekyll",
   "index.html",
   "src/browser-clipboard.mjs",
+  "src/browser-zip.mjs",
   "src/catalog-cache.mjs",
   "src/index.mjs",
   "src/render-descriptor.mjs",

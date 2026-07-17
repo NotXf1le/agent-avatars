@@ -61,10 +61,23 @@ export async function runBrowserTests() {
       logLevel: "silent",
     });
 
+    const demoFiles = new Map([
+      ["/demo/index.html", join(projectRoot, "index.html")],
+      ["/demo/src/browser-clipboard.mjs", join(projectRoot, "src", "browser-clipboard.mjs")],
+      ["/demo/src/browser-zip.mjs", join(projectRoot, "src", "browser-zip.mjs")],
+      ["/demo/src/catalog-cache.mjs", join(projectRoot, "src", "catalog-cache.mjs")],
+      ["/demo/src/index.mjs", join(projectRoot, "src", "index.mjs")],
+      ["/demo/src/render-descriptor.mjs", join(projectRoot, "src", "render-descriptor.mjs")],
+      ["/demo/src/visual-distance.mjs", join(projectRoot, "src", "visual-distance.mjs")],
+    ]);
+
     server = createServer((request, response) => {
-      const path = request.url === "/bundle.js" ? bundlePath : join(scratchDirectory, "index.html");
+      const pathname = new URL(request.url ?? "/", "http://127.0.0.1").pathname;
+      const path = pathname === "/bundle.js"
+        ? bundlePath
+        : demoFiles.get(pathname) ?? join(scratchDirectory, "index.html");
       response.writeHead(200, {
-        "Content-Type": path.endsWith(".js") ? "text/javascript; charset=utf-8" : "text/html; charset=utf-8",
+        "Content-Type": /\.m?js$/.test(path) ? "text/javascript; charset=utf-8" : "text/html; charset=utf-8",
       });
       createReadStream(path).pipe(response);
     });
@@ -89,7 +102,46 @@ export async function runBrowserTests() {
     assert.equal(result.width, "40");
     assert.equal(result.alt, "Browser avatar");
 
-    return { chromium: true, browserRoot: true, browserReact: true };
+    await page.setViewportSize({ width: 500, height: 900 });
+    await page.goto(`http://127.0.0.1:${address.port}/demo/index.html#playground`, { waitUntil: "networkidle" });
+    await page.locator("#set-mode-tab").click();
+    await page.waitForFunction(() => document.querySelector("#set-count")?.textContent?.includes("ready"));
+    const mobileLayout = await page.evaluate(() => {
+      const rect = (selector) => document.querySelector(selector).getBoundingClientRect();
+      const header = rect(".set-workspace-head");
+      const title = rect(".set-title-block");
+      const sizeControl = rect(".set-size-control");
+      const grid = document.querySelector(".set-grid");
+      return {
+        headerHeight: header.height,
+        titleHeight: title.height,
+        sizeControlHeight: sizeControl.height,
+        columns: getComputedStyle(grid).gridTemplateColumns.split(" ").length,
+        horizontalOverflow: document.documentElement.scrollWidth - innerWidth,
+      };
+    });
+    assert.ok(mobileLayout.headerHeight < 360, `Mobile set header is unexpectedly tall: ${mobileLayout.headerHeight}px.`);
+    assert.ok(mobileLayout.titleHeight < 90, `Mobile set title is unexpectedly tall: ${mobileLayout.titleHeight}px.`);
+    assert.ok(mobileLayout.sizeControlHeight < 80, `Mobile size control is unexpectedly tall: ${mobileLayout.sizeControlHeight}px.`);
+    assert.equal(mobileLayout.columns, 1);
+    assert.ok(mobileLayout.horizontalOverflow <= 0, `Mobile demo overflows horizontally by ${mobileLayout.horizontalOverflow}px.`);
+
+    await page.locator(".set-item-main").first().click();
+    const mobileActions = await page.locator(".set-item.is-selected .set-item-actions").evaluate((actions) => {
+      const bounds = actions.getBoundingClientRect();
+      return [...actions.children].map((child) => {
+        const rect = child.getBoundingClientRect();
+        return {
+          withinBounds: rect.left >= bounds.left - 1 && rect.right <= bounds.right + 1,
+          contentFits: child.scrollWidth <= child.clientWidth + 1,
+        };
+      });
+    });
+    assert.ok(mobileActions.every((action) => action.withinBounds));
+    assert.ok(mobileActions.every((action) => action.contentFits));
+    assert.deepEqual(pageErrors, []);
+
+    return { chromium: true, browserRoot: true, browserReact: true, responsiveDemo: true };
   } finally {
     if (browser) await browser.close();
     if (server) await new Promise((resolvePromise) => server.close(resolvePromise));

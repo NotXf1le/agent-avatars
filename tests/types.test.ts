@@ -2,6 +2,7 @@ import {
   createHashAvatar,
   createAvatarDescriptor,
   createIdentitySet,
+  createIdentitySetWithFallback,
   hash32,
   STYLE_VERSION,
   type AvatarOptions,
@@ -28,6 +29,11 @@ const identityOptions: IdentitySetOptions = {
   distanceMode: "both",
 };
 const policyResult = createIdentitySet(["a", "b"], identityOptions);
+const fallbackResult = createIdentitySetWithFallback(["a", "b"], identityOptions);
+if (fallbackResult.policyAdjustment) {
+  const adjustmentReason: "manifest-policy" | "capacity" = fallbackResult.policyAdjustment.reason;
+  void adjustmentReason;
+}
 const explicitManifest: IdentityManifest = {
   schema: "deterministic-agent-avatars-manifest/v1",
   styleVersion: "1",

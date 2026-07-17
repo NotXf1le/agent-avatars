@@ -1380,6 +1380,111 @@ function createIdentitySet(seeds, options = {}) {
   return { items, manifest, stateSpace: normalized.stateSpace };
 }
 
+function readManifestDistinguishability(manifest) {
+  try {
+    if (!manifest || typeof manifest !== "object" || Array.isArray(manifest)
+      || Object.getPrototypeOf(manifest) !== Object.prototype) return undefined;
+    const descriptor = Object.getOwnPropertyDescriptor(manifest, "distinguishability");
+    if (!descriptor) return { policy: null };
+    if (!descriptor.enumerable || !Object.hasOwn(descriptor, "value")) return undefined;
+    const policy = descriptor.value;
+    if (!policy || typeof policy !== "object" || Array.isArray(policy)
+      || Object.getPrototypeOf(policy) !== Object.prototype) return undefined;
+    const keys = ["schema", "minimumShapeDistance", "minimumPaletteDistance", "mode"];
+    const snapshot = {};
+    if (Reflect.ownKeys(policy).length !== keys.length) return undefined;
+    for (const key of keys) {
+      const item = Object.getOwnPropertyDescriptor(policy, key);
+      if (!item?.enumerable || !Object.hasOwn(item, "value")) return undefined;
+      snapshot[key] = item.value;
+    }
+    if (snapshot.schema !== "visual-distance/v1") return undefined;
+    const normalized = normalizeDistinguishability({
+      minimumShapeDistance: snapshot.minimumShapeDistance,
+      minimumPaletteDistance: snapshot.minimumPaletteDistance,
+      distanceMode: snapshot.mode,
+    });
+    if (!normalized) return undefined;
+    return { policy: normalized };
+  } catch {
+    return undefined;
+  }
+}
+
+function optionsWithPolicy(options, policy) {
+  return {
+    ...options,
+    minimumShapeDistance: policy?.minimumShapeDistance ?? 0,
+    minimumPaletteDistance: policy?.minimumPaletteDistance ?? 0,
+    distanceMode: policy?.mode ?? "either",
+  };
+}
+
+function policyAdjustment(reason, requested, result) {
+  return Object.freeze({
+    reason,
+    requested: requested ?? null,
+    applied: result.manifest.distinguishability ?? null,
+  });
+}
+
+/**
+ * Creates a set while keeping strict createIdentitySet() semantics available.
+ * A persisted manifest wins over conflicting requested distance settings. When
+ * a new allocation cannot satisfy its requested distances, the thresholds are
+ * reduced together in bounded deterministic steps until allocation succeeds.
+ */
+function createIdentitySetWithFallback(seeds, options = {}) {
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("options must be an object.");
+  }
+  const requested = normalizeDistinguishability(options);
+
+  try {
+    return createIdentitySet(seeds, options);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "";
+    if (message === "Manifest distinguishability policy does not match the requested policy.") {
+      const manifestPolicy = readManifestDistinguishability(options.manifest);
+      if (manifestPolicy) {
+        const result = createIdentitySet(seeds, optionsWithPolicy(options, manifestPolicy.policy));
+        return {
+          ...result,
+          policyAdjustment: policyAdjustment("manifest-policy", requested, result),
+        };
+      }
+    }
+
+    if (!requested || options.manifest !== undefined
+      || !message.startsWith("deterministic allocation attempts exhausted")) throw error;
+
+    const tried = new Set([`${requested.minimumShapeDistance}|${requested.minimumPaletteDistance}`]);
+    for (let step = 1; step <= 10; step++) {
+      const factor = (10 - step) / 10;
+      const minimumShapeDistance = Math.floor(requested.minimumShapeDistance * factor);
+      const minimumPaletteDistance = Math.round(requested.minimumPaletteDistance * factor * 1000) / 1000;
+      const key = `${minimumShapeDistance}|${minimumPaletteDistance}`;
+      if (tried.has(key)) continue;
+      tried.add(key);
+      try {
+        const result = createIdentitySet(seeds, {
+          ...options,
+          minimumShapeDistance,
+          minimumPaletteDistance,
+        });
+        return {
+          ...result,
+          policyAdjustment: policyAdjustment("capacity", requested, result),
+        };
+      } catch (candidateError) {
+        const candidateMessage = candidateError instanceof Error ? candidateError.message : "";
+        if (!candidateMessage.startsWith("deterministic allocation attempts exhausted")) throw candidateError;
+      }
+    }
+    throw error;
+  }
+}
+
 export {
   STYLE_VERSION,
   GRID_W,
@@ -1399,4 +1504,5 @@ export {
   createHashAvatar,
   avatarDataUri,
   createIdentitySet,
+  createIdentitySetWithFallback,
 };

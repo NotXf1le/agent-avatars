@@ -478,6 +478,24 @@ export async function runCoreTests() {
       && !/impossible/i.test(error.message)
   );
 
+  const relaxedDistanceSet = api.createIdentitySetWithFallback(["exhaust-first", "exhaust-second"], {
+    namespace: "distance-exhaustion",
+    includeSvg: false,
+    minPixels: 6,
+    maxPixels: 6,
+    maxDiagonalConnections: 0,
+    palettes: [["#FFFFFF", "#111111"]],
+    minimumShapeDistance: 20,
+    minimumPaletteDistance: 20,
+    distanceMode: "both",
+    maxAttempts: 32,
+  });
+  assert.equal(relaxedDistanceSet.items.length, 2);
+  assert.equal(relaxedDistanceSet.policyAdjustment.reason, "capacity");
+  assert.equal(relaxedDistanceSet.policyAdjustment.requested.minimumShapeDistance, 20);
+  assert.equal(relaxedDistanceSet.policyAdjustment.requested.minimumPaletteDistance, 20);
+  assert.equal(relaxedDistanceSet.policyAdjustment.applied, null);
+
   for (const value of [1.5, -1, 21, NaN, Infinity, -Infinity, "1", null, true]) {
     assert.throws(
       () => api.createIdentitySet(["distance"], { minimumShapeDistance: value }),
@@ -561,6 +579,17 @@ export async function runCoreTests() {
   });
   assert.deepEqual(distanceSet.manifest.distinguishability, distancePolicy);
   assert.equal(Object.isFrozen(distanceSet.manifest.distinguishability), true);
+  const manifestPolicyFallback = api.createIdentitySetWithFallback(["policy"], {
+    namespace: "policy",
+    includeSvg: false,
+    minimumShapeDistance: 9,
+    minimumPaletteDistance: 30,
+    distanceMode: "both",
+    manifest: distanceSet.manifest,
+  });
+  assert.deepEqual(manifestPolicyFallback.manifest, distanceSet.manifest);
+  assert.equal(manifestPolicyFallback.policyAdjustment.reason, "manifest-policy");
+  assert.deepEqual(manifestPolicyFallback.policyAdjustment.applied, distancePolicy);
   const upperBoundarySet = api.createIdentitySet(["upper-boundaries"], {
     includeSvg: false,
     minimumShapeDistance: 20,

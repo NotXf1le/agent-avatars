@@ -44,7 +44,25 @@
       --shadow: 0 24px 70px rgba(0, 0, 0, .32);
     }
 
+    .playground-shell.is-dark-avatar-theme {
+      color-scheme: dark;
+      color: var(--ink);
+      --page: #101219;
+      --surface: #181b25;
+      --surface-soft: #202431;
+      --ink: #f3f4f8;
+      --muted: #a7adbc;
+      --line: #303545;
+      --accent: #a89fff;
+      --accent-strong: #c1bbff;
+      --accent-soft: #2b284b;
+      --success: #7bd3aa;
+      --danger: #ff9aa5;
+      --shadow: 0 24px 70px rgba(0, 0, 0, .32);
+    }
+
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html { scroll-behavior: smooth; }
     body { margin: 0; min-width: 320px; background: var(--page); color: var(--ink); }
     body, button, input, select, textarea { font: inherit; }
@@ -83,17 +101,13 @@
     .hero h1 span { color: var(--accent); }
     .hero-copy > p { max-width: 630px; margin: 28px 0 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.7; }
     .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 34px; }
-    .catalog-stats { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 630px; margin: 0 0 34px; }
-    .catalog-stat { min-height: 104px; display: flex; flex-direction: column; justify-content: center; padding: 18px 20px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease; }
-    .catalog-stat:hover { border-color: color-mix(in srgb, var(--accent) 55%, var(--line)); box-shadow: 0 12px 28px rgba(32, 29, 62, .08); transform: translateY(-2px); }
-    .catalog-stat strong { display: block; color: var(--accent-strong); font-size: clamp(1.3rem, 2.4vw, 1.7rem); font-variant-numeric: tabular-nums; letter-spacing: -.045em; }
-    .catalog-stat span { display: block; margin-top: 5px; color: var(--muted); font-size: .66rem; font-weight: 700; letter-spacing: .055em; line-height: 1.35; text-transform: uppercase; }
     .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 0 18px; font-weight: 720; text-decoration: none; cursor: pointer; transition: transform .16s ease, background .16s ease, border-color .16s ease; }
     .button:hover { transform: translateY(-1px); }
     .button-primary { background: var(--ink); color: var(--page); }
     .button-secondary { border-color: var(--line); background: var(--surface); color: var(--ink); }
     .button-accent { background: var(--accent); color: #ffffff; }
     :root[data-ui-theme="dark"] .button-accent { color: #171923; }
+    .playground-shell.is-dark-avatar-theme .button-accent { color: #171923; }
     .button svg { width: 18px; height: 18px; }
     .copy-button { position: relative; overflow: hidden; }
     .copy-button.is-copied { border-color: transparent; background: var(--success); color: #ffffff; animation: copy-pop .34s ease; }
@@ -125,44 +139,196 @@
     .section-heading h2 { max-width: 720px; margin: 0; font-size: clamp(2.2rem, 5vw, 4.6rem); line-height: 1; letter-spacing: -.06em; }
     .section-heading p { max-width: 430px; margin: 0; color: var(--muted); line-height: 1.65; }
 
-    .playground-shell { display: grid; grid-template-columns: minmax(280px, .82fr) minmax(460px, 1.18fr); overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); }
-    .controls-panel { padding: clamp(24px, 4vw, 42px); border-right: 1px solid var(--line); }
-    .controls-panel h3, .preview-panel h3 { margin: 0; font-size: 1rem; letter-spacing: -.02em; }
-    .control-stack { display: grid; gap: 24px; margin-top: 28px; }
+    .generator-section { min-height: calc(100dvh - 72px); scroll-margin-top: 72px; padding: 24px 0 28px; }
+    .generator-toolbar { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 32px; margin-bottom: 14px; }
+    .generator-intro h2 { margin: 0; font-size: 1.35rem; letter-spacing: -.035em; }
+    .generator-intro p { max-width: 560px; margin: 5px 0 0; color: var(--muted); font-size: .8rem; line-height: 1.45; }
+    .generator-modes { display: flex; gap: 22px; margin: 0; border-bottom: 1px solid var(--line); }
+    .generator-mode { position: relative; min-height: 44px; display: inline-flex; align-items: center; border: 0; padding: 0 3px 10px; background: transparent; color: var(--muted); font-size: .86rem; font-weight: 750; cursor: pointer; }
+    .generator-mode::after { content: ""; position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; background: transparent; }
+    .generator-mode[aria-selected="true"] { color: var(--ink); }
+    .generator-mode[aria-selected="true"]::after { background: var(--accent); }
+    .playground-shell { height: calc(100dvh - 202px); min-height: 560px; max-height: 732px; display: grid; grid-template-columns: minmax(300px, .68fr) minmax(0, 1.32fr); overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: 0 18px 52px rgba(32, 29, 62, .08); }
+    .set-playground-shell { grid-template-columns: minmax(360px, .72fr) minmax(0, 1.28fr); }
+    .controls-panel { min-width: 0; overflow: auto; padding: 26px 28px; border-right: 1px solid var(--line); }
+    .controls-panel h3, .preview-panel h3 { margin: 0; font-size: 1.05rem; letter-spacing: -.025em; }
+    .control-stack { display: grid; gap: 18px; margin-top: 22px; }
+    .control-section { display: grid; gap: 18px; border-top: 1px solid var(--line); padding-top: 22px; }
+    .control-section-first { border-top: 0; padding-top: 0; }
+    .control-section h4 { margin: 0; font-size: .88rem; letter-spacing: -.015em; }
     .field { display: grid; gap: 8px; }
     .field-label { font-size: .88rem; font-weight: 750; }
+    .random-seed-button { min-height: 32px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; border: 1px solid var(--line); border-radius: 9px; padding: 0 10px; background: var(--surface); color: var(--muted); font-size: .72rem; font-weight: 750; cursor: pointer; transition: color .16s ease, border-color .16s ease, background .16s ease, transform .16s ease; }
+    .random-seed-button:hover { border-color: color-mix(in srgb, var(--accent) 46%, var(--line)); background: var(--accent-soft); color: var(--ink); transform: translateY(-1px); }
+    .random-seed-button svg { width: 15px; height: 15px; flex: 0 0 auto; transform-origin: center; }
+    .random-seed-button.is-rolling svg { animation: random-die-roll .48s cubic-bezier(.22, .72, .28, 1); }
+    @keyframes random-die-roll {
+      0% { transform: rotate(0deg) scale(1); }
+      28% { transform: rotate(-38deg) scale(.82); }
+      72% { transform: rotate(300deg) scale(1.12); }
+      100% { transform: rotate(360deg) scale(1); }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .random-seed-button.is-rolling svg { animation: none; }
+    }
     .field-help { margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.45; }
     input, select, textarea { width: 100%; border: 1px solid var(--line); border-radius: var(--radius-sm); outline: none; background: var(--page); transition: border-color .16s ease, box-shadow .16s ease; }
     input, select { min-height: 48px; padding: 0 13px; }
     select { appearance: none; padding-right: 40px; cursor: pointer; }
     .select-wrap { position: relative; }
     .select-wrap::after { content: ""; position: absolute; top: calc(50% + 2px); right: 17px; width: 7px; height: 7px; border-right: 1.5px solid var(--muted); border-bottom: 1.5px solid var(--muted); pointer-events: none; transform: translateY(-50%) rotate(45deg); }
-    textarea { min-height: 150px; resize: vertical; padding: 14px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .72rem; line-height: 1.5; }
-    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent); }
+    textarea { min-height: 138px; resize: vertical; padding: 14px; font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .72rem; line-height: 1.5; }
+    input:focus, select:focus, textarea:focus { border-color: var(--accent); box-shadow: none; }
+    :where(input, select, textarea):focus-visible { outline: none; }
+    :where(button, summary):focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 58%, transparent); outline-offset: 2px; box-shadow: none; }
+    a:focus-visible { outline: none; color: var(--accent-strong); text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .example-list { display: flex; flex-wrap: wrap; gap: 7px; }
-    .example-button { border: 1px solid var(--line); border-radius: 999px; padding: 7px 10px; background: transparent; color: var(--muted); font-size: .72rem; cursor: pointer; }
-    .example-button:hover { border-color: var(--accent); color: var(--ink); }
+    .range-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+    .range-head output { color: var(--muted); font-size: .78rem; font-variant-numeric: tabular-nums; }
+    .range-controls { display: grid; grid-template-columns: minmax(0, 1fr) 76px; align-items: center; gap: 12px; }
+    .range-controls input { min-width: 0; }
+    input[type="range"] { min-height: 28px; border: 0; padding: 0; background: transparent; box-shadow: none; accent-color: var(--accent); cursor: pointer; }
+    input[type="number"] { font-variant-numeric: tabular-nums; }
+    .manifest-source { margin: 0; color: var(--muted); font-size: .74rem; line-height: 1.4; overflow-wrap: anywhere; }
+    .details-stack { display: grid; gap: 16px; margin-top: 16px; }
+    .advanced-settings { margin-top: 2px; }
+    .advanced-settings .control-section { margin-top: 16px; }
 
-    .preview-panel { min-height: 680px; display: grid; grid-template-rows: auto 1fr auto; gap: 24px; padding: clamp(24px, 4vw, 42px); }
+    .preview-panel { min-width: 0; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr) auto; gap: 18px; padding: 26px 28px; }
     .preview-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; }
-    .preview-stage { position: relative; min-height: 390px; display: grid; place-items: center; overflow: hidden; border-radius: 24px; background: var(--surface-soft); }
+    .preview-stage { position: relative; min-height: 0; display: grid; place-items: center; overflow: hidden; border-radius: 24px; background: var(--surface-soft); }
     .preview-stage::before, .preview-stage::after { content: ""; position: absolute; border: 1px solid color-mix(in srgb, var(--line) 72%, transparent); border-radius: 50%; }
     .preview-stage::before { width: 330px; height: 330px; }
     .preview-stage::after { width: 470px; height: 470px; }
     .preview-stage img { position: relative; z-index: 1; width: min(300px, 68vw); height: min(300px, 68vw); visibility: hidden; filter: drop-shadow(0 18px 28px rgba(24, 23, 40, .12)); }
     .preview-stage.is-ready img { visibility: visible; }
-    .identity-caption { position: absolute; z-index: 2; right: 18px; bottom: 18px; left: 18px; display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--line) 80%, transparent); border-radius: 12px; background: color-mix(in srgb, var(--surface) 88%, transparent); backdrop-filter: blur(12px); }
-    .identity-caption strong { display: block; overflow: hidden; text-overflow: ellipsis; font-size: .82rem; white-space: nowrap; }
-    .identity-caption span { color: var(--muted); font-size: .72rem; white-space: nowrap; }
     .preview-footer { display: grid; gap: 14px; }
+    .export-actions { display: grid; grid-template-columns: minmax(150px, 1fr) minmax(150px, 1fr); gap: 9px; }
+    .export-menu { position: relative; border: 0; padding: 0; }
+    .export-menu > summary { width: 100%; list-style: none; }
+    .export-menu > summary::-webkit-details-marker { display: none; }
+    .export-menu > summary[aria-disabled="true"] { cursor: not-allowed; opacity: .48; pointer-events: none; }
+    .export-menu-actions { position: absolute; right: 0; bottom: calc(100% + 8px); z-index: 5; width: min(260px, 80vw); display: grid; gap: 8px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 10px; background: var(--surface); box-shadow: var(--shadow); }
+    .export-menu-actions .button { width: 100%; }
     .action-row { display: flex; flex-wrap: wrap; gap: 9px; }
     .action-row .button { flex: 1 1 140px; }
     .status { min-height: 1.2em; margin: 0; color: var(--muted); font-size: .78rem; }
     .status.is-error { color: var(--danger); }
+    .preview-status:not(.is-error) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
     details { border-top: 1px solid var(--line); padding-top: 14px; }
     summary { cursor: pointer; color: var(--muted); font-size: .8rem; font-weight: 700; }
     details textarea { margin-top: 12px; }
+
+    .single-playground-shell { height: auto; min-height: 0; max-height: none; display: block; overflow: visible; border-radius: var(--radius-md); box-shadow: 0 16px 42px rgba(32, 29, 62, .07); }
+    .single-workspace { display: grid; gap: 16px; padding: 24px; }
+    .single-workspace-head { min-height: 86px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .single-seed-field { width: min(640px, 100%); display: grid; gap: 8px; }
+    .single-seed-field > .field-label, .set-title-block h3 { font-size: .88rem; line-height: 1.2; letter-spacing: 0; }
+    .single-seed-row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+    .single-seed-row input { min-height: 44px; background: var(--surface); font-size: .82rem; }
+    .single-seed-row .random-seed-button { min-height: 44px; padding: 0 14px; background: var(--surface); color: var(--ink); font-size: .78rem; }
+    .single-settings-menu { position: relative; border: 0; padding: 0; }
+    .single-settings-menu > summary { min-height: 44px; list-style: none; background: var(--surface); font-size: .82rem; }
+    .single-settings-menu > summary::-webkit-details-marker { display: none; }
+    .single-settings-popover { position: absolute; top: calc(100% + 8px); right: 0; z-index: 7; width: min(310px, 84vw); display: grid; gap: 16px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 16px; background: var(--surface); box-shadow: var(--shadow); }
+    .single-head-actions { display: flex; align-items: center; gap: 8px; }
+    .single-content { min-width: 0; }
+    .single-preview { min-width: 0; }
+    .single-preview .preview-stage { min-height: 420px; }
+    .single-preview .preview-stage::before { width: 360px; height: 360px; opacity: .72; }
+    .single-preview .preview-stage::after { display: none; }
+    .single-preview .preview-stage img { width: min(320px, 68vw); height: min(320px, 68vw); }
+    .single-export-bar { display: flex; align-items: center; gap: 7px; }
+    .single-download-menu { position: relative; width: 112px; flex: 0 0 112px; margin-left: 0; border: 0; padding: 0; }
+    .single-download-menu > summary { width: 100%; min-width: 0; min-height: 44px; list-style: none; color: var(--surface); font-size: .8rem; }
+    .single-download-menu > summary::-webkit-details-marker { display: none; }
+    .single-download-options { position: absolute; top: calc(100% + 8px); right: 0; bottom: auto; z-index: 8; width: 100%; display: grid; gap: 3px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; background: var(--surface); box-shadow: var(--shadow); }
+    .single-download-section-title { margin: 7px 8px 4px; color: var(--muted); font-size: .61rem; font-weight: 800; letter-spacing: .065em; line-height: 1.2; text-transform: uppercase; }
+    .single-download-svg-title { margin-top: 7px; border-top: 1px solid var(--line); padding-top: 10px; }
+    .single-download-option { min-height: 40px; display: flex; align-items: center; justify-content: space-between; border: 0; border-radius: 8px; padding: 0 8px; background: transparent; color: var(--ink); font-size: .7rem; font-weight: 720; white-space: nowrap; cursor: pointer; }
+    .single-download-option:hover, .single-download-option:focus-visible { background: var(--accent-soft); color: var(--accent-strong); }
+    .single-download-option:disabled { cursor: not-allowed; opacity: .48; }
+    .single-secondary-actions { display: flex; align-items: center; gap: 7px; }
+    .single-secondary-actions .button { width: auto; min-height: 44px; flex: 0 0 auto; padding: 0 12px; font-size: .7rem; }
+    .single-export-bar .status.is-error { flex: 0 0 auto; }
+
+    .set-playground-shell { height: auto; min-height: 0; max-height: none; display: block; overflow: visible; border-radius: var(--radius-md); box-shadow: 0 16px 42px rgba(32, 29, 62, .07); }
+    .set-preview-panel { min-width: 0; display: flex; flex-direction: column; gap: 16px; overflow: visible; padding: 24px; transition: opacity .18s ease; }
+    .set-workspace-head { min-height: 86px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .set-title-block { width: 190px; min-width: 0; flex: 0 0 190px; align-self: flex-start; display: grid; gap: 5px; }
+    .set-title-block h3 { margin: 0; }
+    .set-ready-line { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.2; }
+    .set-count { color: inherit; font-size: inherit; font-variant-numeric: tabular-nums; }
+    .set-size-control { width: clamp(400px, 32vw, 470px); min-width: 400px; max-width: 470px; min-height: 44px; flex: 0 0 clamp(400px, 32vw, 470px); display: grid; grid-template-columns: auto minmax(120px, 1fr) 38px auto; align-items: center; gap: 10px; }
+    .set-size-control .random-seed-button { min-height: 44px; padding-inline: 18px; background: var(--surface); color: var(--ink); font-size: .82rem; }
+    .set-size-control label { color: var(--muted); font-size: .82rem; font-weight: 750; }
+    .set-size-control output { min-height: 44px; display: grid; place-items: center; border: 0; background: transparent; color: var(--accent-strong); font-size: .82rem; font-weight: 800; font-variant-numeric: tabular-nums; }
+    .set-size-control input[type="range"] { width: 100%; min-width: 0; height: 44px; min-height: 44px; margin: 0; appearance: none; }
+    .set-size-control input[type="range"]::-webkit-slider-runnable-track { height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 18%, var(--line)); }
+    .set-size-control input[type="range"]::-webkit-slider-thumb { width: 18px; height: 18px; margin-top: -6px; appearance: none; border: 0; border-radius: 50%; background: var(--accent); box-shadow: none; }
+    .set-size-control input[type="range"]::-moz-range-track { height: 6px; border-radius: 999px; background: color-mix(in srgb, var(--accent) 18%, var(--line)); }
+    .set-size-control input[type="range"]::-moz-range-progress { height: 6px; border-radius: 999px; background: var(--accent); }
+    .set-size-control input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: var(--accent); box-shadow: none; }
+    .set-size-control input[type="range"]:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 46%, transparent); outline-offset: 3px; }
+    .set-workspace-actions, .set-export-actions { display: flex; align-items: center; gap: 9px; }
+    .set-workspace-actions { flex: 0 0 auto; }
+    .set-export-actions .button, .set-workspace-actions > .button { min-height: 44px; font-size: .82rem; }
+    .set-download-menu { width: 112px; flex: 0 0 112px; }
+    .set-download-menu > summary { min-height: 44px; color: #ffffff; font-size: .82rem; }
+    .set-download-menu > summary[aria-disabled="true"] { cursor: not-allowed; opacity: .48; pointer-events: none; }
+    :root[data-ui-theme="dark"] .set-download-menu > summary, .playground-shell.is-dark-avatar-theme .set-download-menu > summary { color: #171923; }
+    .set-secondary-actions { display: flex; align-items: center; gap: 7px; }
+    .set-secondary-actions .button { width: auto; min-height: 44px; flex: 0 0 auto; padding: 0 12px; font-size: .7rem; }
+    .set-preview-panel.is-stale .set-grid { opacity: .48; }
+    .set-output { min-height: 0; }
+    #set-status:not(.is-error):not(.is-notice) { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+    .set-grid-wrap { position: relative; min-height: 0; overflow: visible; }
+    .seed-overview { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--page); }
+    .seed-preview { margin: 0; overflow: hidden; padding: 12px 14px; color: var(--muted); font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .72rem; line-height: 1.5; text-overflow: ellipsis; white-space: nowrap; }
+    .seed-editor-trigger { width: 100%; min-height: 42px; display: flex; align-items: center; justify-content: space-between; gap: 16px; border: 0; border-top: 1px solid var(--line); padding: 0 14px; background: var(--surface); color: var(--ink); font: inherit; cursor: pointer; }
+    .seed-editor-trigger span:first-child { font-size: .8rem; font-weight: 750; }
+    .seed-editor-trigger span:last-child { color: var(--muted); font-size: .72rem; font-weight: 600; }
+    .seed-editor-trigger:hover { background: var(--accent-soft); }
+    .set-settings-dialog { width: min(420px, calc(100% - 24px)); max-width: none; height: min(720px, calc(100dvh - 32px)); max-height: none; margin: auto 16px auto auto; border: 1px solid var(--line); border-radius: var(--radius-md); padding: 0; background: var(--surface); color: var(--ink); box-shadow: var(--shadow); }
+    .set-settings-dialog::backdrop { background: rgba(24, 23, 40, .25); backdrop-filter: blur(3px); }
+    .set-settings-card { height: 100%; min-height: 0; display: grid; grid-template-rows: auto minmax(0, 1fr); }
+    .set-settings-head { display: flex; align-items: center; justify-content: space-between; gap: 20px; border-bottom: 1px solid var(--line); padding: 20px 22px; }
+    .set-settings-head h3 { margin: 0; font-size: 1.08rem; letter-spacing: -.025em; }
+    .set-settings-head p { margin: 4px 0 0; color: var(--muted); font-size: .76rem; }
+    .set-settings-body { min-height: 0; overflow: auto; padding: 22px; }
+    .set-settings-body .control-stack { margin-top: 0; }
+    .seed-dialog { display: grid; gap: 10px; margin-top: 10px; border-top: 1px solid var(--line); padding-top: 12px; }
+    .seed-dialog-card { display: grid; gap: 12px; }
+    .seed-dialog-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .seed-dialog-head h3 { margin: 0; font-size: .92rem; }
+    .seed-dialog-head p { margin: 4px 0 0; color: var(--muted); font-size: .74rem; }
+    .seed-dialog textarea { min-height: 180px; resize: vertical; }
+    .seed-dialog-footer { display: flex; align-items: center; justify-content: space-between; gap: 14px; }
+    .seed-dialog-footer .button { min-width: 84px; min-height: 40px; }
+    html:has(.set-settings-dialog[open]) { overflow: hidden; }
+    .set-empty-state { min-height: 100%; display: grid; place-content: center; justify-items: center; gap: 7px; padding: 32px; text-align: center; }
+    .set-empty-state h4 { margin: 0; font-size: 1rem; letter-spacing: -.02em; }
+    .set-empty-state p { max-width: 340px; margin: 0; color: var(--muted); font-size: .8rem; line-height: 1.5; }
+    .set-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-content: start; transition: opacity .18s ease; }
+    .set-item { position: relative; min-width: 0; min-height: 190px; overflow: hidden; border: 1px solid transparent; border-radius: var(--radius-md); background: var(--surface-soft); transition: border-color .16s ease, background .16s ease, transform .16s ease; }
+    .set-item:hover, .set-item:focus-within, .set-item.is-selected { border-color: color-mix(in srgb, var(--accent) 42%, var(--line)); background: color-mix(in srgb, var(--accent-soft) 42%, var(--surface-soft)); }
+    .set-item:hover { transform: translateY(-2px); }
+    .set-item-main { width: 100%; min-height: 190px; display: grid; place-content: center; justify-items: center; gap: 12px; border: 0; padding: 18px 16px 28px; background: transparent; color: var(--ink); cursor: pointer; }
+    .set-item img { width: 120px; height: 120px; }
+    .set-item strong { max-width: 100%; overflow: hidden; text-overflow: ellipsis; font-size: .84rem; white-space: nowrap; transition: opacity .14s ease, transform .14s ease; }
+    .set-item-actions { position: absolute; right: 10px; bottom: 10px; left: 10px; display: flex; align-items: center; justify-content: center; gap: 6px; opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .16s ease, transform .16s ease; }
+    .set-item:hover .set-item-actions, .set-item:focus-within .set-item-actions, .set-item.is-selected .set-item-actions { opacity: 1; pointer-events: auto; transform: translateY(0); }
+    .set-item:hover .set-item-main strong, .set-item:focus-within .set-item-main strong, .set-item.is-selected .set-item-main strong { opacity: 0; transform: translateY(4px); }
+    .set-item-actions .button { min-width: 0; min-height: 36px; flex: 1 1 0; padding: 0 7px; font-size: .67rem; white-space: nowrap; }
+    .set-item-download-menu { position: relative; min-width: 0; flex: 1 1 0; border: 0; padding: 0; }
+    .set-item-download-menu > summary { width: 100%; min-height: 36px; list-style: none; }
+    .set-item-download-menu > summary::-webkit-details-marker { display: none; }
+    .set-item-download-options { position: absolute; right: 0; bottom: calc(100% + 7px); z-index: 9; width: 128px; display: grid; gap: 3px; border: 1px solid var(--line); border-radius: var(--radius-sm); padding: 6px; background: var(--surface); box-shadow: var(--shadow); }
+    .set-item-download-options .single-download-section-title { margin-inline: 6px; }
+    .set-item-download-options .single-download-option { min-height: 36px; padding-inline: 7px; font-size: .66rem; }
+    .status.is-notice { color: var(--accent-strong); font-weight: 700; }
+    .manifest-output { margin-top: 2px; }
+    button:disabled { cursor: not-allowed; opacity: .48; transform: none !important; }
 
     .feature-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
     .feature { min-height: 250px; padding: 28px; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); }
@@ -190,8 +356,18 @@
       .hero-showcase { min-height: 460px; }
       .showcase-viewport { transform: none; }
       .section-heading { align-items: start; flex-direction: column; }
-      .playground-shell { grid-template-columns: 1fr; }
-      .controls-panel { border-right: 0; border-bottom: 1px solid var(--line); }
+      .generator-section { min-height: auto; padding: 28px 0 64px; }
+      .generator-toolbar { align-items: flex-start; flex-direction: column; gap: 14px; }
+      .playground-shell { height: auto; min-height: 0; max-height: none; grid-template-columns: 1fr; }
+      .controls-panel { overflow: visible; border-right: 0; border-bottom: 1px solid var(--line); }
+      .preview-panel { min-height: 640px; }
+      .set-preview-panel { min-height: 0; overflow: visible; }
+      .single-export-bar { flex-wrap: wrap; }
+      .single-download-menu { margin-left: auto; }
+      .set-workspace-head { flex-wrap: wrap; }
+      .set-size-control { order: 3; width: 100%; max-width: none; }
+      .set-grid-wrap { overflow: visible; }
+      .set-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .feature-grid { grid-template-columns: 1fr; }
       .feature { min-height: auto; }
       .feature-number { margin-bottom: 30px; }
@@ -204,6 +380,7 @@
       .header-inner { min-height: 64px; }
       .brand span { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .nav a:not(.nav-support) { display: none; }
+      .nav .nav-support { display: none; }
       .hero, .hero-copy, .hero-showcase { min-width: 0; }
       .hero { min-height: auto; padding: 60px 0 68px; }
       .hero h1 { max-width: 100%; font-size: clamp(2.55rem, 12.5vw, 4rem); letter-spacing: -.06em; overflow-wrap: anywhere; }
@@ -211,7 +388,8 @@
       .hero-copy > p { font-size: 1rem; }
       .hero-actions { display: grid; grid-template-columns: minmax(0, 1fr); align-items: stretch; }
       .hero-actions .button { width: 100%; }
-      .catalog-stats { grid-template-columns: 1fr; max-width: none; }
+      .section-heading h2 { max-width: 100%; font-size: clamp(2rem, 10vw, 3rem); overflow-wrap: anywhere; }
+      .section-heading p { max-width: 100%; overflow-wrap: anywhere; }
       .hero-showcase { min-height: 360px; }
       .showcase-carousel, .showcase-viewport, .showcase-track { min-width: 0; max-width: 100%; }
       .showcase-page { min-width: 100%; max-width: 100%; flex: 0 0 100%; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; padding: 12px; }
@@ -220,14 +398,48 @@
       .showcase-controls { padding-right: 0; }
       .section { padding: 76px 0; }
       .field-row { grid-template-columns: 1fr; }
+      .single-workspace { gap: 16px; padding: 16px; }
+      .single-workspace-head { grid-template-columns: 1fr; gap: 14px; }
+      .single-head-actions { display: grid; grid-template-columns: 1fr; }
+      .single-settings-menu, .single-settings-menu > summary { width: 100%; }
+      .single-settings-popover { right: auto; left: 0; width: 100%; }
+      .single-preview .preview-stage { min-height: 340px; }
+      .single-export-bar { display: grid; grid-template-columns: 1fr; }
+      .single-download-menu { width: 100%; flex-basis: auto; margin-left: 0; }
+      .single-download-menu > summary { width: 100%; min-width: 0; }
+      .single-download-options { top: calc(100% + 8px); right: 0; bottom: auto; left: 0; width: 100%; }
+      .single-secondary-actions { grid-column: 1 / -1; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); }
+      .single-secondary-actions .button { width: 100%; }
+      .generator-modes { width: 100%; gap: 18px; }
+      .range-controls { grid-template-columns: minmax(0, 1fr) 72px; }
+      .set-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .set-item img { width: 96px; height: 96px; }
+      .set-workspace-head { align-items: flex-start; flex-direction: column; }
+      .single-workspace-head, .set-workspace-head { min-height: 0; }
+      .set-title-block { flex: 0 0 auto; }
+      .set-size-control { order: 0; width: 100%; min-width: 0; flex: 0 0 auto; grid-template-columns: auto minmax(0, 1fr) 40px auto; }
+      .set-workspace-actions { width: 100%; flex-wrap: wrap; }
+      .set-workspace-actions > .button { flex: 1 1 140px; }
+      .export-actions { grid-template-columns: 1fr; }
       .preview-panel { min-height: 610px; }
       .preview-stage { min-height: 340px; }
       .preview-stage::before { width: 260px; height: 260px; }
       .preview-stage::after { width: 380px; height: 380px; }
-      .identity-caption { align-items: start; flex-direction: column; gap: 4px; }
+      .set-export-actions { min-width: 0; flex: 1 1 280px; align-items: center; flex-direction: row; flex-wrap: wrap; }
+      .set-secondary-actions { min-width: 0; flex: 1 1 auto; }
+      .set-settings-dialog { width: calc(100% - 16px); height: calc(100dvh - 16px); margin: auto; }
       .install-command { align-items: stretch; flex-direction: column; width: 100%; }
       .install-command code { overflow-x: auto; padding: 8px 4px; }
       .footer-inner { align-items: start; flex-direction: column; }
+    }
+
+    @media (max-width: 560px) {
+      .set-grid { grid-template-columns: 1fr; }
+      .set-item, .set-item-main { min-height: 184px; }
+    }
+
+    @media (max-width: 430px) {
+      .set-item, .set-item-main { min-height: 176px; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -286,89 +498,210 @@
       </section>
     </section>
 
-    <section class="section" id="playground">
+    <section class="generator-section" id="playground">
       <div class="container">
-        <div class="section-heading">
-          <h2>Build an identity in seconds.</h2>
-          <p>Use a stable seed for the identity and a project namespace to keep the same name distinct across products.</p>
-        </div>
+        <header class="generator-toolbar">
+          <div class="generator-intro">
+            <h2 id="generator-heading">Avatar generator</h2>
+            <p id="generator-description">Change the seed, preview the identity, and save it.</p>
+          </div>
+          <div class="generator-modes" role="tablist" aria-label="Generator mode">
+            <button class="generator-mode" id="single-mode-tab" type="button" role="tab" aria-selected="true" aria-controls="single-generator">Single avatar</button>
+            <button class="generator-mode" id="set-mode-tab" type="button" role="tab" aria-selected="false" aria-controls="set-generator">Identity set</button>
+          </div>
+        </header>
 
-        <div class="catalog-stats" role="group" aria-label="Avatar library statistics">
-          <div class="catalog-stat"><strong id="shape-count">—</strong><span>unique forms</span></div>
-          <div class="catalog-stat"><strong id="background-count">—</strong><span>background palettes</span></div>
-          <div class="catalog-stat"><strong id="combination-count">—</strong><span>maximum combinations</span></div>
-        </div>
-
-        <div class="playground-shell">
-          <section class="controls-panel" aria-labelledby="controls-title">
-            <h3 id="controls-title">Identity settings</h3>
-            <div class="control-stack">
-              <label class="field">
-                <span class="field-label">Identity seed</span>
-                <input id="seed" type="text" value="research-assistant" autocomplete="off" spellcheck="false">
-                <span class="field-help">A stable name or ID, such as a bot name, service key, or user identifier.</span>
-              </label>
-
-              <div class="example-list" role="group" aria-label="Seed examples">
-                <button class="example-button" type="button" data-seed="research-assistant">Research assistant</button>
-                <button class="example-button" type="button" data-seed="support-bot">Support bot</button>
-                <button class="example-button" type="button" data-seed="api-gateway">API gateway</button>
+        <div class="playground-shell single-playground-shell" id="single-generator" role="tabpanel" aria-labelledby="single-mode-tab">
+          <section class="single-workspace" aria-labelledby="controls-title">
+            <h3 class="sr-only" id="controls-title">Single avatar generator</h3>
+            <header class="single-workspace-head">
+              <div class="single-seed-field">
+                <label class="field-label" for="seed">Identity seed</label>
+                <div class="single-seed-row">
+                  <input id="seed" type="text" value="research-assistant" autocomplete="off" spellcheck="false">
+                  <button class="random-seed-button" id="random-seed" type="button">
+                    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"></rect><circle cx="8" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"></circle><circle cx="8" cy="16" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="16" r="1" fill="currentColor" stroke="none"></circle></svg>
+                    Randomize
+                  </button>
+                </div>
               </div>
 
-              <label class="field">
-                <span class="field-label">Project namespace</span>
-                <input id="namespace" type="text" value="My Project" autocomplete="off" spellcheck="false">
-                <span class="field-help">Use one stable project name. It separates identical seeds used by different apps.</span>
-              </label>
+              <div class="single-head-actions">
+                <details class="single-settings-menu">
+                  <summary class="button button-secondary">Customize</summary>
+                  <div class="single-settings-popover">
+                    <div class="field">
+                      <label class="field-label" for="namespace">Project namespace</label>
+                      <input id="namespace" type="text" value="My Project" autocomplete="off" spellcheck="false" aria-describedby="namespace-help">
+                      <span class="field-help" id="namespace-help">Separates the same seed across projects.</span>
+                    </div>
+                    <label class="field">
+                      <span class="field-label">Avatar theme</span>
+                      <span class="select-wrap"><select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select></span>
+                    </label>
+                  </div>
+                </details>
 
-              <div class="field-row">
-                <label class="field">
-                  <span class="field-label">Color theme</span>
-                  <span class="select-wrap"><select id="theme"><option value="light">Light</option><option value="dark">Dark</option></select></span>
-                </label>
+                <div class="single-export-bar" role="group" aria-label="Export avatar">
+                  <details class="single-download-menu" id="single-download-menu">
+                    <summary class="button button-accent single-download-button">Download</summary>
+                    <div class="single-download-options" role="menu" aria-label="Choose download format">
+                      <p class="single-download-section-title">PNG sizes</p>
+                      <button class="single-download-option" type="button" role="menuitem" data-png-size="32">32 &times; 32 px</button>
+                      <button class="single-download-option" type="button" role="menuitem" data-png-size="64">64 &times; 64 px</button>
+                      <button class="single-download-option" type="button" role="menuitem" data-png-size="192">192 &times; 192 px</button>
+                      <button class="single-download-option" type="button" role="menuitem" data-png-size="200">200 &times; 200 px</button>
+                      <p class="single-download-section-title single-download-svg-title">SVG</p>
+                      <button class="single-download-option" id="download-svg" type="button" role="menuitem">Download SVG</button>
+                    </div>
+                  </details>
+                  <div class="single-secondary-actions">
+                    <button class="button button-secondary copy-button" id="copy-png" type="button">Copy PNG</button>
+                    <button class="button button-secondary copy-button" id="copy-svg" type="button">Copy SVG</button>
+                  </div>
+                  <p class="status preview-status" id="status" role="status" aria-live="polite">Ready to export.</p>
+                  <textarea id="svg-output" hidden readonly aria-hidden="true" tabindex="-1"></textarea>
+                </div>
               </div>
+            </header>
 
-              <label class="field">
-                <span class="field-label">PNG export size</span>
-                <span class="select-wrap"><select id="png-size">
-                    <option value="32">32 × 32 px</option>
-                    <option value="64">64 × 64 px</option>
-                    <option value="192">192 × 192 px</option>
-                    <option value="200" selected>200 × 200 px</option>
-                </select></span>
-                <span class="field-help">SVG remains resolution-independent at every size.</span>
-              </label>
+            <div class="single-content">
+              <section class="single-preview" aria-labelledby="preview-title">
+                <h3 class="sr-only" id="preview-title">Avatar preview</h3>
+                <div class="preview-stage" id="preview-stage">
+                  <img id="avatar" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="300" height="300" alt="Generated deterministic avatar">
+                </div>
+              </section>
             </div>
+
           </section>
+        </div>
 
-          <section class="preview-panel" aria-labelledby="preview-title">
-            <div class="preview-head">
-              <h3 id="preview-title">Live preview</h3>
-            </div>
+        <div class="playground-shell set-playground-shell" id="set-generator" role="tabpanel" aria-labelledby="set-mode-tab" hidden>
+          <dialog class="set-settings-dialog" id="set-settings-dialog" aria-labelledby="set-controls-title">
+            <div class="set-settings-card">
+              <header class="set-settings-head">
+                <div><h3 id="set-controls-title">Customize avatars</h3><p>Changes update the gallery automatically.</p></div>
+                <button class="button button-secondary" id="close-set-settings" type="button">Done</button>
+              </header>
+              <div class="set-settings-body">
+                <div class="control-stack">
+              <div class="control-section control-section-first" role="group" aria-labelledby="set-basics-title">
+                <h4 id="set-basics-title">Set</h4>
+                <label class="field">
+                  <span class="field-label">Number of avatars</span>
+                  <input id="set-size-number" type="number" min="2" max="64" step="1" value="6" aria-describedby="set-size-help">
+                  <span class="field-help" id="set-size-help">2–64. Extra names stay in the editor when the count is reduced.</span>
+                </label>
 
-            <div class="preview-stage" id="preview-stage">
-              <img id="avatar" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="300" height="300" alt="Generated deterministic avatar">
-              <div class="identity-caption">
-                <strong id="identity-name">research-assistant</strong>
-                <span id="identity-scope">Project: my-project</span>
+                <div class="field">
+                  <span class="field-label">Names</span>
+                  <div class="seed-overview">
+                    <p class="seed-preview" id="set-seeds-preview">research-assistant · support-bot · api-gateway · +3</p>
+                    <button class="seed-editor-trigger" id="open-set-seed-editor" type="button"><span>Edit names</span><span id="set-seed-editor-count">6 listed</span></button>
+                  </div>
+                  <div class="seed-dialog" id="set-seed-dialog" hidden>
+                    <div class="seed-dialog-card">
+                      <div class="seed-dialog-head">
+                        <div><h3 id="set-seed-dialog-title">Names</h3><p>Changes update the gallery automatically.</p></div>
+                        <button class="button button-secondary" id="close-set-seed-editor" type="button">Done</button>
+                      </div>
+                      <textarea id="set-seeds" spellcheck="false" aria-label="Avatar names" aria-describedby="set-seeds-help">research-assistant
+support-bot
+api-gateway
+release-manager
+data-analyst
+design-agent</textarea>
+                      <div class="seed-dialog-footer"><span class="field-help" id="set-seeds-help">One stable name or ID per line. Use 2–64 unique identities.</span><span class="set-count" id="set-seed-dialog-count">6 listed</span></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="field-row">
+                  <label class="field">
+                    <span class="field-label">Theme</span>
+                    <span class="select-wrap"><select id="set-theme"><option value="light">Light</option><option value="dark">Dark</option></select></span>
+                  </label>
+                  <label class="field">
+                    <span class="field-label">Variation</span>
+                    <span class="select-wrap"><select id="set-separation" aria-describedby="set-separation-help"><option value="basic">Subtle</option><option value="balanced" selected>Balanced</option><option value="strong">Strong</option><option value="adjusted" hidden>Adjusted</option></select></span>
+                  </label>
+                </div>
+                <span class="field-help" id="set-separation-help">Controls how different the avatars look from each other.</span>
+                <details class="advanced-settings">
+                  <summary>Developer details</summary>
+                  <div class="details-stack">
+                    <label class="field">
+                      <span class="field-label">Project namespace</span>
+                      <input id="set-namespace" type="text" value="My Project" autocomplete="off" spellcheck="false">
+                    </label>
+                    <div class="action-row">
+                      <label class="button button-secondary" for="set-manifest-file">Import manifest</label>
+                      <input class="sr-only" id="set-manifest-file" type="file" accept="application/json,.json">
+                      <button class="button button-secondary" id="clear-set-manifest" type="button" disabled>Reset manifest</button>
+                    </div>
+                    <p class="manifest-source" id="set-manifest-source">Current set manifest.</p>
+                    <details class="manifest-output" id="set-manifest-details" hidden>
+                      <summary>View manifest JSON</summary>
+                      <textarea id="set-manifest-output" readonly aria-label="Generated identity set manifest"></textarea>
+                    </details>
+                  </div>
+                </details>
+              </div>
+                </div>
               </div>
             </div>
+          </dialog>
 
-            <div class="preview-footer">
-              <div class="action-row">
-                <button class="button button-secondary copy-button" id="copy-svg" type="button">
-                  <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="8" width="11" height="11" rx="2" fill="none" stroke="currentColor" stroke-width="2" /><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="2" /></svg>
-                  Copy SVG
+          <section class="set-preview-panel" aria-labelledby="set-preview-title">
+            <header class="set-workspace-head">
+              <div class="set-title-block">
+                <h3 id="set-preview-title">Agent avatars</h3>
+                <p class="set-ready-line"><span class="set-count" id="set-count">6 avatars</span></p>
+              </div>
+              <div class="set-size-control" role="group" aria-labelledby="set-size-label">
+                <label id="set-size-label" for="set-size-range">Avatars</label>
+                <input id="set-size-range" type="range" min="2" max="64" step="1" value="6" aria-label="Number of avatars">
+                <output id="set-size-output" for="set-size-range set-size-number">6</output>
+                <button class="random-seed-button" id="random-set-seeds" type="button">
+                  <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"></rect><circle cx="8" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"></circle><circle cx="8" cy="16" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="16" r="1" fill="currentColor" stroke="none"></circle></svg>
+                  Randomize
                 </button>
-                <button class="button button-secondary" id="download-svg" type="button">Save SVG</button>
-                <button class="button button-secondary copy-button" id="copy-png" type="button">Copy PNG</button>
-                <button class="button button-accent" id="download-png" type="button">Save PNG</button>
               </div>
-              <p class="status" id="status" role="status" aria-live="polite">Ready to export.</p>
-              <details>
-                <summary>View generated SVG</summary>
-                <textarea id="svg-output" readonly aria-label="Generated SVG source"></textarea>
-              </details>
+              <div class="set-workspace-actions">
+                <button class="button button-secondary" id="open-set-settings" type="button">Customize</button>
+                <div class="set-export-actions" id="set-export-actions">
+                  <details class="single-download-menu set-download-menu" id="set-download-menu">
+                    <summary class="button button-accent" aria-disabled="true">Download</summary>
+                    <div class="single-download-options" role="menu" aria-label="Identity set download formats">
+                      <p class="single-download-section-title">PNG files (.zip)</p>
+                      <button class="single-download-option" type="button" role="menuitem" data-set-png-size="32" disabled>32 &times; 32 px</button>
+                      <button class="single-download-option" type="button" role="menuitem" data-set-png-size="64" disabled>64 &times; 64 px</button>
+                      <button class="single-download-option" type="button" role="menuitem" data-set-png-size="192" disabled>192 &times; 192 px</button>
+                      <button class="single-download-option" type="button" role="menuitem" data-set-png-size="200" disabled>200 &times; 200 px</button>
+                      <p class="single-download-section-title single-download-svg-title">SVG</p>
+                      <button class="single-download-option" id="download-set-svg" type="button" role="menuitem" disabled>SVG files (.zip)</button>
+                      <p class="single-download-section-title single-download-svg-title">Manifest</p>
+                      <button class="single-download-option copy-button" id="copy-set-manifest" type="button" role="menuitem" disabled>Copy manifest</button>
+                      <button class="single-download-option" id="download-set-manifest" type="button" role="menuitem" disabled>Download JSON</button>
+                    </div>
+                  </details>
+                  <div class="set-secondary-actions">
+                    <button class="button button-secondary copy-button" id="copy-set-png" type="button" disabled>Copy PNG</button>
+                    <button class="button button-secondary copy-button" id="copy-set-svg" type="button" disabled>Copy SVG</button>
+                  </div>
+                </div>
+              </div>
+            </header>
+            <div class="set-output">
+              <p class="status" id="set-status" role="status" aria-live="polite">Preparing set…</p>
+            </div>
+            <div class="set-grid-wrap" id="set-grid-wrap">
+              <div class="set-empty-state" id="set-empty-state">
+                <h4>Your avatars will appear here</h4>
+                <p>Customize the names and appearance whenever you need to.</p>
+              </div>
+              <div class="set-grid" id="set-grid" aria-live="polite"></div>
             </div>
           </section>
         </div>
@@ -407,34 +740,93 @@
   <noscript><p class="sr-only">JavaScript is required to run the avatar generator.</p></noscript>
 
   <script type="module">
-    import { createHashAvatar, getCatalogStats } from "./src/index.mjs";
+    import { createHashAvatar, createHashAvatarFromDescriptor, createIdentitySetWithFallback } from "./src/index.mjs";
     import { copyTextToClipboard } from "./src/browser-clipboard.mjs";
+    import { createStoredZip, uniqueArchiveFilename } from "./src/browser-zip.mjs";
 
     const seed = document.querySelector("#seed");
     const namespace = document.querySelector("#namespace");
     const theme = document.querySelector("#theme");
-    const pngSize = document.querySelector("#png-size");
     const avatar = document.querySelector("#avatar");
     const previewStage = document.querySelector("#preview-stage");
     const svgOutput = document.querySelector("#svg-output");
     const status = document.querySelector("#status");
-    const identityName = document.querySelector("#identity-name");
-    const identityScope = document.querySelector("#identity-scope");
     const brandAvatar = document.querySelector("#brand-avatar");
     const favicon = document.querySelector("#favicon");
-    const shapeCount = document.querySelector("#shape-count");
-    const backgroundCount = document.querySelector("#background-count");
-    const combinationCount = document.querySelector("#combination-count");
-    const exportButtons = [document.querySelector("#copy-svg"), document.querySelector("#download-svg"), document.querySelector("#copy-png"), document.querySelector("#download-png")];
+    const singleSettingsMenu = document.querySelector(".single-settings-menu");
+    const singleDownloadMenu = document.querySelector("#single-download-menu");
+    const singleDownloadOptions = [...document.querySelectorAll("[data-png-size]")];
+    const exportButtons = [document.querySelector("#copy-svg"), document.querySelector("#download-svg"), document.querySelector("#copy-png"), ...singleDownloadOptions];
+    const defaultPngSize = 200;
     const showcaseTrack = document.querySelector("#showcase-track");
     const showcaseCounter = document.querySelector("#showcase-counter");
     const showcasePrevious = document.querySelector("#showcase-prev");
     const showcaseNext = document.querySelector("#showcase-next");
-    const showcaseSeedPool = [
+    const generatorHeading = document.querySelector("#generator-heading");
+    const generatorDescription = document.querySelector("#generator-description");
+    const singleModeTab = document.querySelector("#single-mode-tab");
+    const setModeTab = document.querySelector("#set-mode-tab");
+    const singleGenerator = document.querySelector("#single-generator");
+    const setGenerator = document.querySelector("#set-generator");
+    const setSettingsDialog = document.querySelector("#set-settings-dialog");
+    const openSetSettings = document.querySelector("#open-set-settings");
+    const closeSetSettings = document.querySelector("#close-set-settings");
+    const setSizeRange = document.querySelector("#set-size-range");
+    const setSizeNumber = document.querySelector("#set-size-number");
+    const setSizeOutput = document.querySelector("#set-size-output");
+    const setSeeds = document.querySelector("#set-seeds");
+    const setSeedsPreview = document.querySelector("#set-seeds-preview");
+    const setSeedEditorCount = document.querySelector("#set-seed-editor-count");
+    const setSeedDialogCount = document.querySelector("#set-seed-dialog-count");
+    const setSeedDialog = document.querySelector("#set-seed-dialog");
+    const openSetSeedEditor = document.querySelector("#open-set-seed-editor");
+    const closeSetSeedEditor = document.querySelector("#close-set-seed-editor");
+    const setNamespace = document.querySelector("#set-namespace");
+    const setTheme = document.querySelector("#set-theme");
+    const setSeparation = document.querySelector("#set-separation");
+    const adjustedSeparationOption = setSeparation.querySelector('option[value="adjusted"]');
+    const setManifestFile = document.querySelector("#set-manifest-file");
+    const clearSetManifest = document.querySelector("#clear-set-manifest");
+    const setManifestSource = document.querySelector("#set-manifest-source");
+    const setGrid = document.querySelector("#set-grid");
+    const setCount = document.querySelector("#set-count");
+    const identitySetStatus = document.querySelector("#set-status");
+    const setManifestOutput = document.querySelector("#set-manifest-output");
+    const setManifestDetails = document.querySelector("#set-manifest-details");
+    const setEmptyState = document.querySelector("#set-empty-state");
+    const setDownloadMenu = document.querySelector("#set-download-menu");
+    const setDownloadMenuSummary = setDownloadMenu.querySelector("summary");
+    const setDownloadOptions = [...document.querySelectorAll("[data-set-png-size]")];
+    const copySetManifest = document.querySelector("#copy-set-manifest");
+    const downloadSetManifest = document.querySelector("#download-set-manifest");
+    const downloadSetSvg = document.querySelector("#download-set-svg");
+    const copySetPng = document.querySelector("#copy-set-png");
+    const copySetSvg = document.querySelector("#copy-set-svg");
+    const randomSeedButton = document.querySelector("#random-seed");
+    const randomSetSeedsButton = document.querySelector("#random-set-seeds");
+    const identitySeedPool = [
       "research-assistant", "support-bot", "api-gateway", "release-manager",
       "data-analyst", "design-agent", "security-monitor", "workflow-orchestrator",
-      "code-reviewer", "knowledge-index", "customer-success", "runtime-service"
+      "code-reviewer", "knowledge-index", "customer-success", "runtime-service",
+      "billing-agent", "release-coordinator", "incident-responder", "quality-auditor",
+      "task-planner", "deployment-runner", "uptime-monitor", "job-scheduler",
+      "request-router", "event-notifier", "content-moderator", "search-indexer",
+      "fraud-detector", "capacity-planner", "backup-operator", "access-controller",
+      "schema-validator", "log-collector", "trace-analyzer", "metrics-reporter",
+      "cache-manager", "queue-worker", "email-dispatcher", "webhook-handler",
+      "document-parser", "translation-agent", "test-runner", "dependency-bot",
+      "policy-checker", "cost-optimizer", "data-curator", "feature-evaluator",
+      "experiment-manager", "feedback-triager", "onboarding-guide", "account-assistant",
+      "inventory-watcher", "order-coordinator", "payment-processor", "refund-agent",
+      "risk-assessor", "compliance-reviewer", "secret-rotator", "certificate-monitor",
+      "database-operator", "migration-planner", "report-builder", "forecast-agent",
+      "meeting-assistant", "calendar-coordinator", "knowledge-curator", "archive-manager"
     ];
+    const separationPresets = Object.freeze({
+      basic: Object.freeze({ minimumShapeDistance: 0, minimumPaletteDistance: 0, distanceMode: "either" }),
+      balanced: Object.freeze({ minimumShapeDistance: 4, minimumPaletteDistance: 20, distanceMode: "either" }),
+      strong: Object.freeze({ minimumShapeDistance: 8, minimumPaletteDistance: 32, distanceMode: "either" }),
+    });
     const copyStates = new WeakMap();
     const brandSeedPool = [
       "brand-constellation", "brand-orbit", "brand-signal", "brand-spark",
@@ -447,36 +839,423 @@
     let brandAvatarIndex = 0;
     let brandAvatarTheme = "";
     let faviconTheme = "";
+    let activeGeneratorMode = "single";
+    let activeSetManifest;
+    let activeSetManifestOrigin;
+    let currentSetResult;
+    let selectedSetSeed;
+    let desiredSetSize = 6;
+    let setGenerationTimer;
 
     function options(size) {
       return { size, namespace: namespace.value, theme: theme.value };
+    }
+
+    function syncGeneratorSurfaceTheme(generator, avatarTheme) {
+      generator.classList.toggle("is-dark-avatar-theme", avatarTheme === "dark");
     }
 
     function svgDataUri(svg) {
       return `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`;
     }
 
-    function renderCatalogStats() {
-      const stats = getCatalogStats();
-      const format = (value) => value.toLocaleString("en-US");
-      shapeCount.textContent = format(stats.validShapes);
-      backgroundCount.textContent = format(stats.availablePalettes);
-      combinationCount.textContent = format(stats.signatureStates);
-    }
-
     function setStatus(message, error = false) {
       status.textContent = message;
       status.classList.toggle("is-error", error);
+      status.setAttribute("role", error ? "alert" : "status");
+    }
+
+    function setIdentitySetStatus(message, error = false, notice = false) {
+      identitySetStatus.textContent = message;
+      identitySetStatus.classList.toggle("is-error", error);
+      identitySetStatus.classList.toggle("is-notice", !error && notice);
+      identitySetStatus.setAttribute("role", error ? "alert" : "status");
+    }
+
+    function parseListedSetSeeds() {
+      return setSeeds.value.split(/\r?\n/).map((value) => value.trim()).filter(Boolean);
+    }
+
+    function parseSetSeeds() {
+      return parseListedSetSeeds().slice(0, desiredSetSize);
+    }
+
+    function formatIdentityCount(count) {
+      return `${count} ${count === 1 ? "identity" : "identities"}`;
+    }
+
+    function updateSetSizeDisplay() {
+      const listedSeeds = parseListedSetSeeds();
+      const listedCount = listedSeeds.length;
+      setSizeOutput.textContent = String(desiredSetSize);
+      setSizeNumber.value = String(desiredSetSize);
+      setSizeRange.value = String(desiredSetSize);
+      setCount.textContent = `${desiredSetSize} avatars`;
+      const previewSeeds = listedSeeds.slice(0, Math.min(desiredSetSize, 3));
+      const hiddenCount = Math.max(0, Math.min(desiredSetSize, listedCount) - previewSeeds.length);
+      setSeedsPreview.textContent = previewSeeds.length > 0
+        ? `${previewSeeds.join(" · ")}${hiddenCount > 0 ? ` · +${hiddenCount}` : ""}`
+        : "No valid identity seeds";
+      setSeedEditorCount.textContent = `${listedCount} listed`;
+      setSeedDialogCount.textContent = `${listedCount} listed`;
+    }
+
+    function defaultSetSeed(index, used) {
+      const base = identitySeedPool[index] ?? `agent-${String(index + 1).padStart(2, "0")}`;
+      let candidate = base;
+      let suffix = 2;
+      while (used.has(candidate)) candidate = `${base}-${suffix++}`;
+      return candidate;
+    }
+
+    function randomPoolIndex(max) {
+      if (globalThis.crypto?.getRandomValues) {
+        const values = new Uint32Array(1);
+        globalThis.crypto.getRandomValues(values);
+        return Math.floor((values[0] / 4_294_967_296) * max);
+      }
+      return Math.floor(Math.random() * max);
+    }
+
+    function randomIdentitySeed(excluded = new Set()) {
+      const available = identitySeedPool.filter((value) => !excluded.has(value));
+      const pool = available.length > 0 ? available : identitySeedPool;
+      return pool[randomPoolIndex(pool.length)];
+    }
+
+    function randomIdentitySeeds(count) {
+      const available = [...identitySeedPool];
+      for (let index = available.length - 1; index > 0; index -= 1) {
+        const swapIndex = randomPoolIndex(index + 1);
+        [available[index], available[swapIndex]] = [available[swapIndex], available[index]];
+      }
+      return available.slice(0, count);
+    }
+
+    function animateRandomizeButton(button) {
+      if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+      const icon = button.querySelector("svg");
+      button.classList.remove("is-rolling");
+      void icon.offsetWidth;
+      button.classList.add("is-rolling");
+      icon.addEventListener("animationend", () => button.classList.remove("is-rolling"), { once: true });
+    }
+
+    function resizeSetSeeds(size) {
+      if (!Number.isInteger(size) || size < 2 || size > 64) return;
+      desiredSetSize = size;
+      const next = parseListedSetSeeds();
+      const used = new Set(next);
+      while (next.length < size) {
+        const candidate = defaultSetSeed(next.length, used);
+        used.add(candidate);
+        next.push(candidate);
+      }
+      setSeeds.value = next.join("\n");
+      updateSetSizeDisplay();
+      markSetDirty();
+    }
+
+    function setPolicyValues(policy) {
+      return {
+        minimumShapeDistance: policy?.minimumShapeDistance ?? 0,
+        minimumPaletteDistance: policy?.minimumPaletteDistance ?? 0,
+        distanceMode: policy?.mode ?? "either",
+      };
+    }
+
+    function policyMatchesPreset(policy, preset) {
+      const values = setPolicyValues(policy);
+      return values.minimumShapeDistance === preset.minimumShapeDistance
+        && values.minimumPaletteDistance === preset.minimumPaletteDistance
+        && values.distanceMode === preset.distanceMode;
+    }
+
+    function applySetPolicy(policy) {
+      const match = Object.entries(separationPresets).find(([, preset]) => policyMatchesPreset(policy, preset));
+      adjustedSeparationOption.hidden = Boolean(match);
+      setSeparation.value = match?.[0] ?? "adjusted";
+    }
+
+    function lockSetPolicy(locked) {
+      setSeparation.disabled = locked;
+    }
+
+    function clearActiveManifest(message = "No manifest loaded. The next update will create new assignments.") {
+      activeSetManifest = undefined;
+      activeSetManifestOrigin = undefined;
+      setManifestFile.value = "";
+      clearSetManifest.disabled = true;
+      lockSetPolicy(false);
+      if (setSeparation.value === "adjusted") {
+        adjustedSeparationOption.hidden = true;
+        setSeparation.value = "balanced";
+      }
+      setManifestSource.textContent = message;
+    }
+
+    function invalidateSetResult(message = "Updating set…") {
+      copySetManifest.disabled = true;
+      downloadSetManifest.disabled = true;
+      downloadSetSvg.disabled = true;
+      copySetPng.disabled = true;
+      copySetSvg.disabled = true;
+      for (const option of setDownloadOptions) option.disabled = true;
+      setDownloadMenu.open = false;
+      setDownloadMenuSummary.setAttribute("aria-disabled", "true");
+      setManifestDetails.hidden = true;
+      setEmptyState.hidden = Boolean(currentSetResult);
+      setGenerator.querySelector(".set-preview-panel").classList.toggle("is-stale", Boolean(currentSetResult));
+      setIdentitySetStatus(message, false, Boolean(currentSetResult));
+    }
+
+    function scheduleIdentitySetGeneration(delay = 140) {
+      window.clearTimeout(setGenerationTimer);
+      setGenerationTimer = window.setTimeout(generateIdentitySet, delay);
+    }
+
+    function markSetDirty(delay = 140) {
+      syncGeneratorSurfaceTheme(setGenerator, setTheme.value);
+      invalidateSetResult();
+      scheduleIdentitySetGeneration(delay);
+    }
+
+    function handlePolicyChange() {
+      if (activeSetManifestOrigin === "generated") {
+        clearActiveManifest("The separation policy changed, so previous assignments will not be reused.");
+      }
+      markSetDirty();
+    }
+
+    function handleNamespaceChange() {
+      if (activeSetManifest) {
+        clearActiveManifest("The project namespace changed, so the previous manifest was detached.");
+      }
+      markSetDirty();
+    }
+
+    function setGeneratorMode(mode) {
+      activeGeneratorMode = mode;
+      const showSet = mode === "set";
+      singleModeTab.setAttribute("aria-selected", String(!showSet));
+      setModeTab.setAttribute("aria-selected", String(showSet));
+      singleGenerator.hidden = showSet;
+      setGenerator.hidden = !showSet;
+      generatorHeading.textContent = showSet ? "Agent avatar gallery" : "Avatar generator";
+      generatorDescription.textContent = showSet
+        ? "Browse the full set first, then customize or export when needed."
+        : "Change the seed, preview the identity, and save it.";
+      if (showSet && !currentSetResult) markSetDirty(0);
+      if (window.matchMedia("(min-width: 901px)").matches) {
+        window.requestAnimationFrame(() => document.querySelector("#playground").scrollIntoView({ block: "start" }));
+      }
+    }
+
+    function readSetOptions() {
+      const preset = setSeparation.value === "adjusted"
+        ? setPolicyValues(activeSetManifest?.distinguishability)
+        : separationPresets[setSeparation.value];
+      const options = {
+        namespace: setNamespace.value,
+        theme: setTheme.value,
+        size: 128,
+        ensureUnique: true,
+        includeSvg: true,
+        ...preset,
+      };
+      if (activeSetManifest) options.manifest = activeSetManifest;
+      return options;
+    }
+
+    function safeFilename(value) {
+      const normalized = String(value).trim().replace(/[^a-zA-Z0-9._-]+/g, "-").replace(/^-+|-+$/g, "");
+      return normalized || "avatar";
+    }
+
+    function getDisplayedSetItems(result) {
+      return [...result.items].reverse();
+    }
+
+    function renderSetItems(result) {
+      setGrid.replaceChildren();
+      for (const item of getDisplayedSetItems(result)) {
+        const svg = item.svg ?? createHashAvatarFromDescriptor(item.descriptor, 128);
+        const itemName = String(item.input);
+        const card = document.createElement("article");
+        card.className = "set-item";
+        card.dataset.avatarName = itemName;
+        const main = document.createElement("button");
+        main.className = "set-item-main";
+        main.type = "button";
+        main.setAttribute("aria-pressed", String(selectedSetSeed === itemName));
+        main.setAttribute("aria-label", `Select ${itemName} avatar`);
+        const image = document.createElement("img");
+        image.src = svgDataUri(svg);
+        image.width = 120;
+        image.height = 120;
+        image.alt = "";
+        const name = document.createElement("strong");
+        name.textContent = itemName;
+        name.title = itemName;
+        main.append(image, name);
+
+        const actions = document.createElement("div");
+        actions.className = "set-item-actions";
+        const downloadMenu = document.createElement("details");
+        downloadMenu.className = "set-item-download-menu";
+        const downloadSummary = document.createElement("summary");
+        downloadSummary.className = "button button-secondary";
+        downloadSummary.textContent = "Download";
+        const downloadOptions = document.createElement("div");
+        downloadOptions.className = "set-item-download-options";
+        downloadOptions.setAttribute("role", "menu");
+        downloadOptions.setAttribute("aria-label", `${itemName} download formats`);
+        const pngTitle = document.createElement("p");
+        pngTitle.className = "single-download-section-title";
+        pngTitle.textContent = "PNG sizes";
+        downloadOptions.append(pngTitle);
+        for (const size of [32, 64, 192, 200]) {
+          const option = document.createElement("button");
+          option.className = "single-download-option";
+          option.type = "button";
+          option.setAttribute("role", "menuitem");
+          option.textContent = `${size} × ${size} px`;
+          option.addEventListener("click", async () => {
+            downloadMenu.open = false;
+            try {
+              const blob = await createPngBlobFromSvg(svg, size, size);
+              download(blob, `${safeFilename(itemName)}-${size}.png`);
+              setIdentitySetStatus(`${itemName} ${size} × ${size} px PNG download started.`);
+            } catch (error) {
+              setIdentitySetStatus(error instanceof Error ? error.message : String(error), true);
+            }
+          });
+          downloadOptions.append(option);
+        }
+        const svgTitle = document.createElement("p");
+        svgTitle.className = "single-download-section-title single-download-svg-title";
+        svgTitle.textContent = "SVG";
+        const downloadSvgButton = document.createElement("button");
+        downloadSvgButton.className = "single-download-option";
+        downloadSvgButton.type = "button";
+        downloadSvgButton.setAttribute("role", "menuitem");
+        downloadSvgButton.textContent = "Download SVG";
+        downloadSvgButton.addEventListener("click", () => {
+          downloadMenu.open = false;
+          download(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }), `${safeFilename(itemName)}.svg`);
+          setIdentitySetStatus(`${itemName} SVG download started.`);
+        });
+        downloadOptions.append(svgTitle, downloadSvgButton);
+        downloadMenu.append(downloadSummary, downloadOptions);
+
+        const copyPngButton = document.createElement("button");
+        copyPngButton.className = "button button-secondary copy-button";
+        copyPngButton.type = "button";
+        copyPngButton.textContent = "Copy PNG";
+        copyPngButton.addEventListener("click", () => copyPngImage(svg, defaultPngSize, copyPngButton, `${itemName} ${defaultPngSize} × ${defaultPngSize} px PNG copied.`, setIdentitySetStatus));
+        const copySvgButton = document.createElement("button");
+        copySvgButton.className = "button button-secondary copy-button";
+        copySvgButton.type = "button";
+        copySvgButton.textContent = "Copy SVG";
+        copySvgButton.addEventListener("click", () => copyText(svg, `${itemName} SVG copied.`, copySvgButton, setIdentitySetStatus));
+        downloadMenu.addEventListener("toggle", () => {
+          if (!downloadMenu.open) return;
+          for (const otherMenu of setGrid.querySelectorAll(".set-item-download-menu[open]")) {
+            if (otherMenu !== downloadMenu) otherMenu.open = false;
+          }
+        });
+        actions.append(downloadMenu, copyPngButton, copySvgButton);
+
+        main.addEventListener("click", () => {
+          selectedSetSeed = itemName;
+          for (const nextCard of setGrid.querySelectorAll(".set-item")) {
+            const selected = nextCard.dataset.avatarName === selectedSetSeed;
+            nextCard.classList.toggle("is-selected", selected);
+            nextCard.querySelector(".set-item-main")?.setAttribute("aria-pressed", String(selected));
+          }
+          setIdentitySetStatus(`${itemName} selected.`);
+        });
+        card.classList.toggle("is-selected", selectedSetSeed === itemName);
+        card.append(main, actions);
+        setGrid.append(card);
+      }
+    }
+
+    function applyGeneratedSet(result, manifestOrigin = activeSetManifestOrigin ?? "generated") {
+      currentSetResult = result;
+      activeSetManifest = result.manifest;
+      activeSetManifestOrigin = manifestOrigin;
+      const manifestEntries = Object.keys(result.manifest.entries).length;
+      renderSetItems(result);
+      setGenerator.querySelector(".set-preview-panel").classList.remove("is-stale");
+      setCount.textContent = `${result.items.length} avatars ready`;
+      setManifestOutput.value = JSON.stringify(result.manifest, null, 2);
+      copySetManifest.disabled = false;
+      downloadSetManifest.disabled = false;
+      downloadSetSvg.disabled = false;
+      copySetPng.disabled = false;
+      copySetSvg.disabled = false;
+      for (const option of setDownloadOptions) option.disabled = false;
+      setDownloadMenuSummary.setAttribute("aria-disabled", "false");
+      setManifestDetails.hidden = false;
+      setEmptyState.hidden = true;
+      clearSetManifest.disabled = false;
+      setManifestSource.textContent = manifestOrigin === "uploaded"
+        ? `Imported manifest · ${manifestEntries} assignments.`
+        : `Current set manifest · ${manifestEntries} assignments.`;
+    }
+
+    function generateIdentitySet() {
+      window.clearTimeout(setGenerationTimer);
+      setGenerationTimer = undefined;
+      const listedSeeds = parseListedSetSeeds();
+      const seeds = parseSetSeeds();
+      updateSetSizeDisplay();
+      if (listedSeeds.length < 2 || listedSeeds.length > 64 || seeds.length < 2) {
+        setIdentitySetStatus("Enter between 2 and 64 non-empty identity seeds for this demo.", true);
+        return;
+      }
+
+      try {
+        const manifestOrigin = activeSetManifestOrigin ?? "generated";
+        const requestedSeparation = setSeparation.selectedOptions[0]?.textContent ?? "Selected";
+        const result = createIdentitySetWithFallback(seeds, readSetOptions());
+        applyGeneratedSet(result, manifestOrigin);
+        if (result.policyAdjustment?.reason === "manifest-policy") {
+          applySetPolicy(result.policyAdjustment.applied);
+          lockSetPolicy(manifestOrigin === "uploaded");
+          setIdentitySetStatus("The imported manifest's separation settings were applied.", false, true);
+        } else if (result.policyAdjustment?.reason === "capacity") {
+          applySetPolicy(result.policyAdjustment.applied);
+          setIdentitySetStatus(`${requestedSeparation} separation was reduced to fit ${seeds.length} identities.`, false, true);
+        } else {
+          setIdentitySetStatus(`Generated ${result.items.length} deterministic assignments.`);
+        }
+      } catch (error) {
+        if (activeSetManifest) {
+          clearActiveManifest("The manifest could not be reused. It was removed from this session; the original file was not changed.");
+          try {
+            const result = createIdentitySetWithFallback(seeds, readSetOptions());
+            applyGeneratedSet(result);
+            setIdentitySetStatus("The manifest was incompatible, so a new valid set was generated. The original file was not changed.", false, true);
+            return;
+          } catch (retryError) {
+            setIdentitySetStatus(retryError instanceof Error ? retryError.message : String(retryError), true);
+            return;
+          }
+        }
+        setIdentitySetStatus(error instanceof Error ? error.message : String(error), true);
+      }
     }
 
     function renderFavicon() {
       const svg = createHashAvatar("site-favicon", {
         size: 64,
         namespace: "site-favicon",
-        theme: theme.value
+        theme: "light"
       });
       favicon.href = svgDataUri(svg);
-      faviconTheme = theme.value;
+      faviconTheme = "light";
     }
 
     function updateShowcaseControls() {
@@ -490,17 +1269,17 @@
       const svg = createHashAvatar(brandSeedPool[brandAvatarIndex], {
         size: 34,
         namespace: "site-brand",
-        theme: theme.value,
+        theme: "light",
       });
       brandAvatar.src = svgDataUri(svg);
       brandAvatar.classList.remove("is-changing");
       void brandAvatar.offsetWidth;
       brandAvatar.classList.add("is-changing");
-      brandAvatarTheme = theme.value;
+      brandAvatarTheme = "light";
     }
 
     function renderShowcase() {
-      const renderKey = theme.value;
+      const renderKey = "light";
       if (renderKey === showcaseRenderKey) {
         updateShowcaseControls();
         return;
@@ -510,13 +1289,13 @@
       const seen = new Set();
       const cards = [];
 
-      for (const baseSeed of showcaseSeedPool) {
+      for (const baseSeed of identitySeedPool.slice(0, 12)) {
         let candidate = baseSeed;
         let attempt = 0;
         let svg = "";
 
         do {
-          svg = createHashAvatar(candidate, { size: 150, namespace: "public-showcase", theme: theme.value });
+          svg = createHashAvatar(candidate, { size: 150, namespace: "public-showcase", theme: "light" });
           candidate = `${baseSeed}-${++attempt}`;
         } while (seen.has(svg));
 
@@ -547,18 +1326,16 @@
     }
 
     function render() {
-      document.documentElement.dataset.uiTheme = theme.value;
+      syncGeneratorSurfaceTheme(singleGenerator, theme.value);
       try {
-        if (brandAvatarTheme !== theme.value) renderBrandAvatar();
-        if (faviconTheme !== theme.value) renderFavicon();
+        if (brandAvatarTheme !== "light") renderBrandAvatar();
+        if (faviconTheme !== "light") renderFavicon();
         currentSvg = createHashAvatar(seed.value, options(300));
         avatar.src = svgDataUri(currentSvg);
         svgOutput.value = currentSvg;
-        identityName.textContent = seed.value || "Empty seed";
-        identityScope.textContent = `Project: ${namespace.value}`;
         previewStage.classList.add("is-ready");
         for (const button of exportButtons) button.disabled = false;
-        setStatus(`Ready to export · ${pngSize.value} × ${pngSize.value} px PNG`);
+        setStatus("Ready to export.");
         renderShowcase();
       } catch (error) {
         currentSvg = "";
@@ -595,13 +1372,13 @@
       }, 1800);
     }
 
-    async function copyText(text, successMessage, button) {
+    async function copyText(text, successMessage, button, report = setStatus) {
       try {
         await copyTextToClipboard(text);
         showCopySuccess(button);
-        setStatus(successMessage);
+        report(successMessage);
       } catch (error) {
-        setStatus(error instanceof Error ? error.message : String(error), true);
+        report(error instanceof Error ? error.message : String(error), true);
       }
     }
 
@@ -614,30 +1391,121 @@
       setTimeout(() => URL.revokeObjectURL(url), 0);
     }
 
-    async function createPngBlob(size) {
-      const svg = createHashAvatar(seed.value, options(size));
+    function escapeXml(value) {
+      return String(value).replace(/[&<>"']/g, (character) => ({
+        "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;"
+      })[character]);
+    }
+
+    function getSetSheetLayout(result, avatarSize = 128) {
+      const padding = Math.max(12, Math.round(avatarSize * .1875));
+      const labelHeight = Math.max(24, Math.round(avatarSize * .328));
+      const tileWidth = avatarSize + padding * 2;
+      const tileHeight = avatarSize + labelHeight;
+      const columns = Math.min(4, Math.max(1, Math.ceil(Math.sqrt(result.items.length))));
+      const rows = Math.ceil(result.items.length / columns);
+      return {
+        avatarSize,
+        padding,
+        labelHeight,
+        tileWidth,
+        tileHeight,
+        columns,
+        width: columns * tileWidth,
+        height: rows * tileHeight,
+        fontSize: Math.max(9, Math.round(avatarSize * .094)),
+      };
+    }
+
+    function createSetSvgSheet(result, avatarSize = 128) {
+      const layout = getSetSheetLayout(result, avatarSize);
+      const background = setTheme.value === "dark" ? "#181b25" : "#f7f8fc";
+      const textColor = setTheme.value === "dark" ? "#f3f4f8" : "#171923";
+      const tiles = getDisplayedSetItems(result).map((item, index) => {
+        const x = (index % layout.columns) * layout.tileWidth;
+        const y = Math.floor(index / layout.columns) * layout.tileHeight;
+        const svg = item.svg ?? createHashAvatarFromDescriptor(item.descriptor, avatarSize);
+        const imageY = Math.max(6, Math.round(layout.padding / 2));
+        const labelY = imageY + avatarSize + Math.round(layout.labelHeight * .58);
+        return `<g transform="translate(${x} ${y})"><image href="${svgDataUri(svg)}" x="${layout.padding}" y="${imageY}" width="${avatarSize}" height="${avatarSize}"/><text x="${layout.tileWidth / 2}" y="${labelY}" text-anchor="middle" font-family="system-ui, sans-serif" font-size="${layout.fontSize}" fill="${textColor}">${escapeXml(item.input)}</text></g>`;
+      }).join("");
+      return `<svg xmlns="http://www.w3.org/2000/svg" width="${layout.width}" height="${layout.height}" viewBox="0 0 ${layout.width} ${layout.height}"><rect width="100%" height="100%" fill="${background}"/>${tiles}</svg>`;
+    }
+
+    async function createPngBlobFromSvg(svg, width, height = width) {
       const sourceUrl = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml;charset=utf-8" }));
       try {
         const image = new Image();
         image.src = sourceUrl;
         await image.decode();
         const canvas = document.createElement("canvas");
-        canvas.width = size;
-        canvas.height = size;
-        canvas.getContext("2d").drawImage(image, 0, 0, size, size);
+        canvas.width = width;
+        canvas.height = height;
+        canvas.getContext("2d").drawImage(image, 0, 0, width, height);
         return await new Promise((resolve, reject) => canvas.toBlob((value) => value ? resolve(value) : reject(new Error("PNG export failed.")), "image/png"));
       } finally {
         URL.revokeObjectURL(sourceUrl);
       }
     }
 
+    function createPngBlob(size) {
+      return createPngBlobFromSvg(createHashAvatar(seed.value, options(size)), size, size);
+    }
+
+    function createSetPngBlob(result, avatarSize) {
+      const layout = getSetSheetLayout(result, avatarSize);
+      return createPngBlobFromSvg(createSetSvgSheet(result, avatarSize), layout.width, layout.height);
+    }
+
+    async function createSetPngArchive(result, size) {
+      const files = [];
+      const usedNames = new Set();
+      for (const item of getDisplayedSetItems(result)) {
+        const svg = item.svg ?? createHashAvatarFromDescriptor(item.descriptor, size);
+        const blob = await createPngBlobFromSvg(svg, size, size);
+        files.push({
+          name: uniqueArchiveFilename(item.input, "png", usedNames),
+          data: new Uint8Array(await blob.arrayBuffer()),
+        });
+      }
+      files.push({ name: "manifest.json", data: new TextEncoder().encode(setManifestOutput.value) });
+      return createStoredZip(files);
+    }
+
+    function createSetSvgArchive(result) {
+      const encoder = new TextEncoder();
+      const usedNames = new Set();
+      const files = getDisplayedSetItems(result).map((item) => ({
+        name: uniqueArchiveFilename(item.input, "svg", usedNames),
+        data: encoder.encode(item.svg ?? createHashAvatarFromDescriptor(item.descriptor, 128)),
+      }));
+      files.push({ name: "manifest.json", data: encoder.encode(setManifestOutput.value) });
+      return createStoredZip(files);
+    }
+
+    async function copyPngImage(svg, size, button, successMessage, report = setStatus) {
+      try {
+        if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
+          throw new Error("PNG clipboard is not supported in this browser.");
+        }
+        const blob = await createPngBlobFromSvg(svg, size, size);
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        showCopySuccess(button);
+        report(successMessage);
+      } catch (error) {
+        report(error instanceof Error ? error.message : String(error), true);
+      }
+    }
+
     document.querySelector("#copy-svg").addEventListener("click", (event) => copyText(currentSvg, "SVG copied to clipboard.", event.currentTarget));
     document.querySelector("#download-svg").addEventListener("click", () => {
+      singleDownloadMenu.open = false;
       download(new Blob([currentSvg], { type: "image/svg+xml;charset=utf-8" }), "avatar.svg");
       setStatus("SVG download started.");
     });
-    document.querySelector("#download-png").addEventListener("click", async () => {
-      const size = Number(pngSize.value);
+    for (const option of singleDownloadOptions) option.addEventListener("click", async (event) => {
+      const size = Number(event.currentTarget.dataset.pngSize);
+      singleDownloadMenu.open = false;
       try {
         const blob = await createPngBlob(size);
         download(blob, `avatar-${size}.png`);
@@ -648,7 +1516,7 @@
     });
     document.querySelector("#copy-png").addEventListener("click", async (event) => {
       const button = event.currentTarget;
-      const size = Number(pngSize.value);
+      const size = defaultPngSize;
       try {
         if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
           throw new Error("PNG clipboard is not supported in this browser.");
@@ -677,12 +1545,175 @@
       renderBrandAvatar();
     }, 2600);
 
-    for (const input of [seed, namespace, theme, pngSize]) input.addEventListener("input", render);
+    singleModeTab.addEventListener("click", () => setGeneratorMode("single"));
+    setModeTab.addEventListener("click", () => setGeneratorMode("set"));
+    openSetSettings.addEventListener("click", () => setSettingsDialog.showModal());
+    closeSetSettings.addEventListener("click", () => setSettingsDialog.close());
+    setSettingsDialog.addEventListener("click", (event) => {
+      if (event.target === setSettingsDialog) setSettingsDialog.close();
+    });
+    for (const details of document.querySelectorAll("#playground details.advanced-settings")) {
+      details.addEventListener("toggle", () => {
+        if (window.matchMedia("(min-width: 901px)").matches) {
+          window.requestAnimationFrame(() => document.querySelector("#playground").scrollIntoView({ block: "start" }));
+        }
+      });
+    }
+
+    setSizeRange.addEventListener("input", () => resizeSetSeeds(Number(setSizeRange.value)));
+    setSizeNumber.addEventListener("input", () => {
+      const value = Number(setSizeNumber.value);
+      if (Number.isInteger(value) && value >= 2 && value <= 64) resizeSetSeeds(value);
+    });
+    setSizeNumber.addEventListener("change", () => {
+      const value = Number(setSizeNumber.value);
+      if (!Number.isInteger(value) || value < 2 || value > 64) updateSetSizeDisplay();
+    });
+    setSeeds.addEventListener("input", () => {
+      const count = parseListedSetSeeds().length;
+      if (count >= 2 && count <= 64) desiredSetSize = count;
+      updateSetSizeDisplay();
+      if (count < 2 || count > 64) {
+        window.clearTimeout(setGenerationTimer);
+        invalidateSetResult();
+        setIdentitySetStatus("Enter between 2 and 64 non-empty identity seeds for this demo.", true);
+      }
+      else markSetDirty();
+    });
+    randomSetSeedsButton.addEventListener("click", () => {
+      animateRandomizeButton(randomSetSeedsButton);
+      setSeeds.value = randomIdentitySeeds(desiredSetSize).join("\n");
+      updateSetSizeDisplay();
+      markSetDirty();
+    });
+    openSetSeedEditor.addEventListener("click", () => {
+      setSeedDialog.hidden = false;
+      setSeeds.focus();
+    });
+    closeSetSeedEditor.addEventListener("click", () => {
+      setSeedDialog.hidden = true;
+      openSetSeedEditor.focus();
+    });
+
+    setSeparation.addEventListener("input", handlePolicyChange);
+    setNamespace.addEventListener("input", handleNamespaceChange);
+
+    theme.addEventListener("input", () => {
+      render();
+      singleSettingsMenu.open = false;
+    });
+    setTheme.addEventListener("input", markSetDirty);
+
+    setManifestFile.addEventListener("change", async () => {
+      const file = setManifestFile.files?.[0];
+      if (!file) return;
+      try {
+        activeSetManifest = JSON.parse(await file.text());
+        activeSetManifestOrigin = "uploaded";
+        clearSetManifest.disabled = false;
+        const policy = activeSetManifest?.distinguishability;
+        if (policy && policy.schema === "visual-distance/v1"
+          && Number.isInteger(policy.minimumShapeDistance)
+          && Number.isFinite(policy.minimumPaletteDistance)
+          && (policy.mode === "either" || policy.mode === "both")) {
+          applySetPolicy(policy);
+          lockSetPolicy(true);
+        } else if (activeSetManifest && !Object.hasOwn(activeSetManifest, "distinguishability")) {
+          applySetPolicy(null);
+          lockSetPolicy(true);
+        }
+        setManifestSource.textContent = `Loaded ${file.name}. Its stored separation policy has priority.`;
+        invalidateSetResult("Validating manifest…");
+        scheduleIdentitySetGeneration(0);
+      } catch (error) {
+        setIdentitySetStatus(`Manifest JSON could not be read: ${error instanceof Error ? error.message : String(error)}`, true);
+        setManifestFile.value = "";
+      }
+    });
+    clearSetManifest.addEventListener("click", () => {
+      clearActiveManifest();
+      markSetDirty();
+    });
+
+    singleSettingsMenu.addEventListener("toggle", () => {
+      if (singleSettingsMenu.open) singleDownloadMenu.open = false;
+    });
+    singleDownloadMenu.addEventListener("toggle", () => {
+      if (singleDownloadMenu.open) singleSettingsMenu.open = false;
+    });
+    document.addEventListener("pointerdown", (event) => {
+      if (setDownloadMenu.open && !setDownloadMenu.contains(event.target)) setDownloadMenu.open = false;
+      for (const menu of setGrid.querySelectorAll(".set-item-download-menu[open]")) {
+        if (!menu.contains(event.target)) menu.open = false;
+      }
+      if (singleSettingsMenu.open && !singleSettingsMenu.contains(event.target)) singleSettingsMenu.open = false;
+      if (singleDownloadMenu.open && !singleDownloadMenu.contains(event.target)) singleDownloadMenu.open = false;
+    });
+
+    for (const option of setDownloadOptions) option.addEventListener("click", async (event) => {
+      if (!currentSetResult) return;
+      const size = Number(event.currentTarget.dataset.setPngSize);
+      setDownloadMenu.open = false;
+      try {
+        setIdentitySetStatus(`Preparing ${size} × ${size} px PNG archive…`, false, true);
+        const blob = await createSetPngArchive(currentSetResult, size);
+        download(blob, `${safeFilename(setNamespace.value)}-identity-set-png-${size}.zip`);
+        setIdentitySetStatus(`ZIP download started with ${currentSetResult.items.length} PNG avatars.`);
+      } catch (error) {
+        setIdentitySetStatus(error instanceof Error ? error.message : String(error), true);
+      }
+    });
+    copySetPng.addEventListener("click", async () => {
+      if (!currentSetResult) return;
+      try {
+        if (!navigator.clipboard?.write || typeof ClipboardItem === "undefined") {
+          throw new Error("PNG clipboard is not supported in this browser.");
+        }
+        const blob = await createSetPngBlob(currentSetResult, defaultPngSize);
+        await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+        showCopySuccess(copySetPng);
+        setIdentitySetStatus(`Identity set PNG copied with ${defaultPngSize} × ${defaultPngSize} px avatars.`);
+      } catch (error) {
+        setIdentitySetStatus(error instanceof Error ? error.message : String(error), true);
+      }
+    });
+    copySetSvg.addEventListener("click", () => {
+      if (!currentSetResult) return;
+      copyText(createSetSvgSheet(currentSetResult), "Identity set SVG copied.", copySetSvg, setIdentitySetStatus);
+    });
+    copySetManifest.addEventListener("click", (event) => {
+      setDownloadMenu.open = false;
+      copyText(setManifestOutput.value, "Manifest copied to clipboard.", event.currentTarget, setIdentitySetStatus);
+    });
+    downloadSetManifest.addEventListener("click", () => {
+      setDownloadMenu.open = false;
+      download(new Blob([setManifestOutput.value], { type: "application/json;charset=utf-8" }), "agent-avatars-manifest.json");
+      setIdentitySetStatus("Manifest download started.");
+    });
+    downloadSetSvg.addEventListener("click", () => {
+      if (!currentSetResult || downloadSetSvg.disabled) return;
+      setDownloadMenu.open = false;
+      const archive = createSetSvgArchive(currentSetResult);
+      download(archive, `${safeFilename(setNamespace.value)}-identity-set-svg.zip`);
+      setIdentitySetStatus(`ZIP download started with ${currentSetResult.items.length} SVG avatars.`);
+    });
+
+    for (const input of [seed, namespace]) input.addEventListener("input", render);
+    randomSeedButton.addEventListener("click", () => {
+      animateRandomizeButton(randomSeedButton);
+      seed.value = randomIdentitySeed(new Set([seed.value.trim()]));
+      render();
+      seed.focus();
+      seed.select();
+    });
     for (const button of document.querySelectorAll("[data-seed]")) button.addEventListener("click", () => { seed.value = button.dataset.seed; render(); });
     for (const button of [document.querySelector("#copy-install-top"), document.querySelector("#copy-install-bottom")]) button.addEventListener("click", () => copyText("npm install agent-avatars", "Install command copied.", button));
 
-    renderCatalogStats();
+    updateSetSizeDisplay();
     render();
+    if (window.location.hash === "#playground") {
+      window.requestAnimationFrame(() => document.querySelector("#playground").scrollIntoView({ block: "start" }));
+    }
   </script>
 
 </body>

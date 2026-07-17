@@ -4,6 +4,17 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and this project follows [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- Added `createIdentitySetWithFallback()` for interactive tools that may safely adopt a stored manifest policy or deterministically relax an infeasible new allocation policy.
+- Added interactive Identity set generation with per-avatar SVG/PNG copy and download actions plus ZIP export containing individual avatar files and `manifest.json`.
+
+### Changed
+
+- Redesigned the Single avatar and Identity set demo workspaces around avatar preview, compact customization, and consistent export controls.
+
 ## [1.0.0] - 2026-07-14
 
 ### Added

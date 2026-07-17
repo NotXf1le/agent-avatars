@@ -218,6 +218,7 @@ const marker = true;`, new Map([
     "visual distinguishability",
     "minimumShapeDistance",
     "minimumPaletteDistance",
+    "createIdentitySetWithFallback",
     "distanceMode",
     "either",
     "both",
@@ -299,6 +300,12 @@ const marker = true;`, new Map([
   assert.equal(cjsMismatch.name, "TypeError");
   assert.match(esmMismatch.message, /manifest.*distinguishability policy.*does not match/i);
   assert.match(cjsMismatch.message, /manifest.*distinguishability policy.*does not match/i);
+
+  const esmFallback = esm.createIdentitySetWithFallback([], mismatchedPolicy);
+  const cjsFallback = cjs.createIdentitySetWithFallback([], mismatchedPolicy);
+  assert.deepEqual(esmFallback, cjsFallback);
+  assert.equal(esmFallback.policyAdjustment.reason, "manifest-policy");
+  assert.deepEqual(esmFallback.policyAdjustment.applied, esmPolicySet.manifest.distinguishability);
 
   const invalidPairBase = esm.createIdentitySet([], policyOptions);
   const invalidPair = findInvalidDescriptorPair(esm, "package-invalid", policyOptions);

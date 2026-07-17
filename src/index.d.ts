@@ -172,6 +172,16 @@ export interface IdentitySetResult<T = unknown> {
   stateSpace: number;
 }
 
+export interface IdentitySetPolicyAdjustment {
+  reason: "manifest-policy" | "capacity";
+  requested: IdentityDistinguishabilityPolicy | null;
+  applied: IdentityDistinguishabilityPolicy | null;
+}
+
+export interface IdentitySetFallbackResult<T = unknown> extends IdentitySetResult<T> {
+  policyAdjustment?: IdentitySetPolicyAdjustment;
+}
+
 export const STYLE_VERSION: AvatarStyleVersion;
 export const GRID_W: 5;
 export const GRID_H: 4;
@@ -195,3 +205,4 @@ export function avatarDataUri(seed: unknown, size?: number | `${number}`, option
 export function avatarDataUri(seed: unknown, options?: AvatarOptions): string;
 
 export function createIdentitySet<T>(seeds: readonly T[], options?: IdentitySetOptions): IdentitySetResult<T>;
+export function createIdentitySetWithFallback<T>(seeds: readonly T[], options?: IdentitySetOptions): IdentitySetFallbackResult<T>;

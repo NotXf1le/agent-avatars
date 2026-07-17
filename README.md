@@ -303,6 +303,25 @@ Allocation uses a greedy deterministic allocator. It considers identities in a s
 
 If deterministic allocation attempts are exhausted, the error reports the accepted count, thresholds, mode, and attempt limit. Try lowering one or both thresholds, adding palettes, or increasing `maxAttempts`. Allocation also fails early if the requested exact-unique set is larger than the configured signature state space.
 
+Interactive tools can use `createIdentitySetWithFallback()` when returning a usable set is more important than preserving an impossible request verbatim:
+
+```js
+import { createIdentitySetWithFallback } from "agent-avatars";
+
+const team = createIdentitySetWithFallback(seeds, {
+  minimumShapeDistance: 8,
+  minimumPaletteDistance: 30,
+  distanceMode: "both",
+  manifest: previousManifest,
+});
+
+if (team.policyAdjustment) {
+  console.info(team.policyAdjustment.reason, team.policyAdjustment.applied);
+}
+```
+
+The strict `createIdentitySet()` API is unchanged. The fallback helper first honors a manifest's stored policy when the requested controls conflict with it. For a new set that exhausts deterministic allocation, it makes at most ten proportional reductions of both distance thresholds and reports the requested and applied policies in `policyAdjustment`. It never relaxes the policy of an existing manifest, because doing so would invalidate historical assignments.
+
 To bound synchronous aggregate work, one call accepts at most 256 custom palettes, 10,000 seeds, and 10,000 manifest entries. A PNG set accepts at most 64 sizes and at most 16,777,216 high-resolution render pixels in total after supersampling. Inputs over these limits are rejected before entries are normalized or images are rendered.
 
 Custom palettes participate in the same rules. Exact signatures use a 32-bit key derived from the palette colors; selected custom palettes with different colors but a colliding palette signature key are rejected rather than treated as interchangeable.
