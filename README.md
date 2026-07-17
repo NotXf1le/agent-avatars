@@ -4,6 +4,10 @@
 
 # Agent Avatars
 
+[![npm version](https://img.shields.io/npm/v/agent-avatars)](https://www.npmjs.com/package/agent-avatars)
+[![npm downloads](https://img.shields.io/npm/dm/agent-avatars)](https://www.npmjs.com/package/agent-avatars)
+[![license](https://img.shields.io/npm/l/agent-avatars)](https://github.com/NotXf1le/agent-avatars/blob/main/LICENSE)
+
 Deterministic visual identities for AI agents, bots, services, and users.
 
 - **Zero dependencies.** Generate SVG, data URI, and PNG avatars locally.
