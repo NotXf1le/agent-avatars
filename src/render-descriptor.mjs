@@ -9,24 +9,38 @@ function normalizeHexColor(value, label) {
   return value.toUpperCase();
 }
 
+function snapshotNumericRows(rows, label = "rows") {
+  if (!Array.isArray(rows) || rows.length !== GRID_HEIGHT) {
+    throw new TypeError(
+      label + " must contain " + GRID_HEIGHT + " integers in [0, " + MAX_ROW_VALUE + "]."
+    );
+  }
+
+  const snapshot = new Array(GRID_HEIGHT);
+  for (let index = 0; index < GRID_HEIGHT; index++) {
+    if (!Object.hasOwn(rows, index)) {
+      throw new TypeError(
+        label + " must contain " + GRID_HEIGHT + " integers in [0, " + MAX_ROW_VALUE + "]."
+      );
+    }
+    const row = rows[index];
+    if (!Number.isInteger(row) || row < 0 || row > MAX_ROW_VALUE) {
+      throw new TypeError(
+        label + " must contain " + GRID_HEIGHT + " integers in [0, " + MAX_ROW_VALUE + "]."
+      );
+    }
+    snapshot[index] = row;
+  }
+  return snapshot;
+}
+
 function snapshotRenderableDescriptor(descriptor) {
   if (!descriptor || descriptor.styleVersion !== AVATAR_STYLE_VERSION) {
     throw new TypeError("descriptor must be a " + AVATAR_STYLE_VERSION + " avatar descriptor.");
   }
 
-  const rows = descriptor.rows;
-  if (
-    !Array.isArray(rows)
-    || rows.length !== GRID_HEIGHT
-    || rows.some((row) => !Number.isInteger(row) || row < 0 || row > MAX_ROW_VALUE)
-  ) {
-    throw new TypeError(
-      "descriptor.rows must contain " + GRID_HEIGHT + " integers in [0, " + MAX_ROW_VALUE + "]."
-    );
-  }
-
   // Snapshot rows before reading colors so accessors cannot mutate the rendered bitmap after validation.
-  const safeRows = rows.slice();
+  const safeRows = snapshotNumericRows(descriptor.rows, "descriptor.rows");
   const colors = descriptor.colors;
   const background = normalizeHexColor(colors?.background, "descriptor.colors.background");
   const foreground = normalizeHexColor(colors?.foreground, "descriptor.colors.foreground");
@@ -37,4 +51,4 @@ function snapshotRenderableDescriptor(descriptor) {
   };
 }
 
-export { normalizeHexColor, snapshotRenderableDescriptor };
+export { normalizeHexColor, snapshotNumericRows, snapshotRenderableDescriptor };

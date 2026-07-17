@@ -9,6 +9,7 @@ import { buildPaletteDistanceMatrix, shapeHammingDistance } from "./visual-dista
 import { createBoundedLruCache } from "./catalog-cache.mjs";
 import {
   normalizeHexColor as normalizeColor,
+  snapshotNumericRows,
   snapshotRenderableDescriptor,
 } from "./render-descriptor.mjs";
 
@@ -66,7 +67,6 @@ const STANDARD_CONSTRAINTS = Object.freeze({
 const UTF8 = new TextEncoder();
 const POP5 = Object.freeze(Array.from({ length: 32 }, (_, value) => popCount(value)));
 const CATALOG_CACHE = createBoundedLruCache(64);
-const SHAPE_NEIGHBOR_CACHES = new WeakMap();
 const PALETTE_NEIGHBOR_CACHES = new WeakMap();
 
 function palette(id, lightBackground, lightForeground, darkBackground, darkForeground) {
@@ -101,8 +101,11 @@ function trimNumber(value) {
 
 function normalizeSize(value) {
   const number = typeof value === "string" && value.trim() !== "" ? Number(value) : value;
-  if (typeof number !== "number" || !Number.isFinite(number) || number <= 0 || number > MAX_SIZE) {
+  if (typeof number !== "number" || !Number.isFinite(number)) {
     throw new TypeError(`Avatar size must be a finite number in (0, ${MAX_SIZE}].`);
+  }
+  if (number <= 0 || number > MAX_SIZE) {
+    throw new RangeError(`Avatar size must be a finite number in (0, ${MAX_SIZE}].`);
   }
   const normalized = trimNumber(number);
   if (Number(normalized) <= 0) {
@@ -225,7 +228,7 @@ function rowsFromSymmetricMask(mask) {
 }
 
 function symmetricMaskFromRows(rows) {
-  const normalizedRows = normalizeNumericRows(rows);
+  const normalizedRows = snapshotNumericRows(rows, "rows");
   if (!isMirroredRows(normalizedRows)) {
     throw new TypeError("Rows are not mirrored across the vertical axis.");
   }
@@ -250,37 +253,51 @@ function rowsToGrid(rows) {
 }
 
 function gridToRows(grid) {
-  if (
-    !Array.isArray(grid)
-    || grid.length !== GRID_H
-    || grid.some((row) => (
-      !Array.isArray(row)
-      || row.length !== GRID_W
-      || row.some((cell) => typeof cell !== "boolean")
-    ))
-  ) {
+  if (!Array.isArray(grid) || grid.length !== GRID_H) {
     throw new TypeError(`grid must be a ${GRID_H}x${GRID_W} boolean matrix.`);
   }
 
   const rows = Array(GRID_H).fill(0);
   for (let y = 0; y < GRID_H; y++) {
+    if (!Object.hasOwn(grid, y)) {
+      throw new TypeError(`grid must be a ${GRID_H}x${GRID_W} boolean matrix.`);
+    }
+    const row = grid[y];
+    if (!Array.isArray(row) || row.length !== GRID_W) {
+      throw new TypeError(`grid must be a ${GRID_H}x${GRID_W} boolean matrix.`);
+    }
     for (let x = 0; x < GRID_W; x++) {
-      if (grid[y][x]) rows[y] |= rowMask(x);
+      if (!Object.hasOwn(row, x)) {
+        throw new TypeError(`grid must be a ${GRID_H}x${GRID_W} boolean matrix.`);
+      }
+      const cell = row[x];
+      if (typeof cell !== "boolean") {
+        throw new TypeError(`grid must be a ${GRID_H}x${GRID_W} boolean matrix.`);
+      }
+      if (cell) rows[y] |= rowMask(x);
     }
   }
   return rows;
 }
 
-function normalizeNumericRows(input) {
-  if (!Array.isArray(input) || input.length !== GRID_H || input.some((row) => !Number.isInteger(row) || row < 0 || row > 31)) {
-    throw new TypeError(`rows must contain ${GRID_H} integers in [0, 31].`);
-  }
-  return input.slice();
-}
-
 function normalizeRows(input) {
-  if (Array.isArray(input?.[0])) return gridToRows(input);
-  return normalizeNumericRows(input);
+  if (!Array.isArray(input) || input.length !== GRID_H || !Object.hasOwn(input, 0)) {
+    return snapshotNumericRows(input, "rows");
+  }
+
+  const first = input[0];
+  const snapshot = new Array(GRID_H);
+  snapshot[0] = first;
+  for (let index = 1; index < GRID_H; index++) {
+    if (!Object.hasOwn(input, index)) {
+      if (Array.isArray(first)) {
+        throw new TypeError(`grid must be a ${GRID_H}x${GRID_W} boolean matrix.`);
+      }
+      throw new TypeError(`rows must contain ${GRID_H} integers in [0, 31].`);
+    }
+    snapshot[index] = input[index];
+  }
+  return Array.isArray(first) ? gridToRows(snapshot) : snapshotNumericRows(snapshot, "rows");
 }
 
 function cellCountRows(rows) {
@@ -458,35 +475,50 @@ function analyzeRows(rows) {
 
 function normalizeConstraints(options = {}) {
   const base = STANDARD_CONSTRAINTS;
-  const minPixels = Number(options.minPixels ?? base.minPixels);
-  const maxPixels = Number(options.maxPixels ?? base.maxPixels);
-  const minDensity = Number(options.minDensity ?? base.minDensity);
-  const maxDensity = Number(options.maxDensity ?? base.maxDensity);
-  const maxDiagonalConnections = Number(options.maxDiagonalConnections ?? base.maxDiagonalConnections);
-  const connectivity = Number(options.connectivity ?? base.connectivity);
-  const maxHolesValue = options.maxHoles ?? base.maxHoles;
-  const maxHoles = maxHolesValue === Infinity ? Infinity : Number(maxHolesValue);
+  const minPixels = options.minPixels === undefined ? base.minPixels : options.minPixels;
+  const maxPixels = options.maxPixels === undefined ? base.maxPixels : options.maxPixels;
+  const minDensity = options.minDensity === undefined ? base.minDensity : options.minDensity;
+  const maxDensity = options.maxDensity === undefined ? base.maxDensity : options.maxDensity;
+  const maxDiagonalConnections = options.maxDiagonalConnections === undefined
+    ? base.maxDiagonalConnections
+    : options.maxDiagonalConnections;
+  const connectivity = options.connectivity === undefined ? base.connectivity : options.connectivity;
+  const maxHoles = options.maxHoles === undefined ? base.maxHoles : options.maxHoles;
 
+  if (typeof minPixels !== "number" || !Number.isFinite(minPixels)
+    || typeof maxPixels !== "number" || !Number.isFinite(maxPixels)) {
+    throw new TypeError("minPixels and maxPixels must be finite numbers.");
+  }
   if (!Number.isInteger(minPixels) || !Number.isInteger(maxPixels)) {
-    throw new TypeError("minPixels and maxPixels must be integers.");
+    throw new RangeError("minPixels and maxPixels must be integers.");
   }
   if (minPixels < 1 || maxPixels < minPixels || maxPixels > GRID_W * GRID_H) {
     throw new RangeError(`Pixel limits must satisfy 1 <= minPixels <= maxPixels <= ${GRID_W * GRID_H}.`);
   }
-  if (!Number.isFinite(minDensity) || !Number.isFinite(maxDensity)) {
+  if (typeof minDensity !== "number" || !Number.isFinite(minDensity)
+    || typeof maxDensity !== "number" || !Number.isFinite(maxDensity)) {
     throw new TypeError("minDensity and maxDensity must be finite numbers.");
   }
   if (minDensity < 0 || maxDensity > 1 || maxDensity < minDensity) {
     throw new RangeError("Density limits must satisfy 0 <= minDensity <= maxDensity <= 1.");
   }
+  if (typeof maxDiagonalConnections !== "number" || !Number.isFinite(maxDiagonalConnections)) {
+    throw new TypeError("maxDiagonalConnections must be a finite number.");
+  }
   if (!Number.isInteger(maxDiagonalConnections) || maxDiagonalConnections < 0) {
-    throw new TypeError("maxDiagonalConnections must be a non-negative integer.");
+    throw new RangeError("maxDiagonalConnections must be a non-negative integer.");
+  }
+  if (typeof connectivity !== "number" || !Number.isFinite(connectivity)) {
+    throw new TypeError("connectivity must be 4 or 8.");
   }
   if (connectivity !== 4 && connectivity !== 8) {
     throw new TypeError("connectivity must be 4 or 8.");
   }
-  if (maxHoles !== Infinity && (!Number.isInteger(maxHoles) || maxHoles < 0)) {
+  if (typeof maxHoles !== "number" || Number.isNaN(maxHoles) || maxHoles === -Infinity) {
     throw new TypeError("maxHoles must be a non-negative integer or Infinity.");
+  }
+  if (maxHoles !== Infinity && (!Number.isInteger(maxHoles) || maxHoles < 0)) {
+    throw new RangeError("maxHoles must be a non-negative integer or Infinity.");
   }
 
   return Object.freeze({
@@ -620,7 +652,17 @@ function normalizeOptionalBoolean(value, defaultValue, label) {
   return value;
 }
 
-function normalizePaletteEntry(input, index, options, allowLowContrast) {
+function normalizeMinimumContrast(value) {
+  if (typeof value !== "number" || !Number.isFinite(value)) {
+    throw new TypeError("minimumContrast must be a finite number in [1, 21].");
+  }
+  if (value < 1 || value > 21) {
+    throw new RangeError("minimumContrast must be a finite number in [1, 21].");
+  }
+  return value;
+}
+
+function normalizePaletteEntry(input, index, minimumContrast, allowLowContrast) {
   if (Array.isArray(input)) {
     input = { light: input, dark: input };
   }
@@ -636,11 +678,6 @@ function normalizePaletteEntry(input, index, options, allowLowContrast) {
   const common = input.background || input.foreground ? input : undefined;
   const light = normalizeThemeColors(input.light ?? common, undefined, `palettes[${index}].light`);
   const dark = normalizeThemeColors(input.dark ?? input.light ?? common, light, `palettes[${index}].dark`);
-  const minimumContrast = Number(options.minimumContrast ?? MIN_CUSTOM_CONTRAST);
-  if (!Number.isFinite(minimumContrast) || minimumContrast < 1 || minimumContrast > 21) {
-    throw new TypeError("minimumContrast must be a finite number in [1, 21].");
-  }
-
   if (!allowLowContrast) {
     const lightContrast = contrastRatio(light.background, light.foreground);
     const darkContrast = contrastRatio(dark.background, dark.foreground);
@@ -662,20 +699,36 @@ function normalizePaletteEntry(input, index, options, allowLowContrast) {
 function normalizePaletteCollection(options, allowLowContrast) {
   let palettes;
   let paletteValue = options.palette ?? "auto";
+  const minimumContrastValue = options.minimumContrast === undefined
+    ? MIN_CUSTOM_CONTRAST
+    : options.minimumContrast;
 
   if (paletteValue && typeof paletteValue === "object" && !Array.isArray(paletteValue)) {
-    palettes = Object.freeze([normalizePaletteEntry(paletteValue, 0, options, allowLowContrast)]);
+    const minimumContrast = normalizeMinimumContrast(minimumContrastValue);
+    palettes = Object.freeze([normalizePaletteEntry(paletteValue, 0, minimumContrast, allowLowContrast)]);
     paletteValue = 0;
   } else if (options.palettes !== undefined) {
-    if (!Array.isArray(options.palettes) || options.palettes.length === 0) {
+    const paletteInputs = options.palettes;
+    if (!Array.isArray(paletteInputs) || paletteInputs.length === 0) {
       throw new TypeError("palettes must be a non-empty array.");
     }
-    if (options.palettes.length > MAX_CUSTOM_PALETTES) {
+    if (paletteInputs.length > MAX_CUSTOM_PALETTES) {
       throw new RangeError(`palettes must contain at most ${MAX_CUSTOM_PALETTES} entries.`);
     }
-    palettes = Object.freeze(options.palettes.map((entry, index) => (
-      normalizePaletteEntry(entry, index, options, allowLowContrast)
-    )));
+    const minimumContrast = normalizeMinimumContrast(minimumContrastValue);
+    const normalizedPalettes = new Array(paletteInputs.length);
+    for (let index = 0; index < paletteInputs.length; index++) {
+      if (!Object.hasOwn(paletteInputs, index)) {
+        throw new TypeError("palettes must not contain holes.");
+      }
+      normalizedPalettes[index] = normalizePaletteEntry(
+        paletteInputs[index],
+        index,
+        minimumContrast,
+        allowLowContrast
+      );
+    }
+    palettes = Object.freeze(normalizedPalettes);
   } else {
     palettes = BUILTIN_PALETTES;
   }
@@ -728,14 +781,20 @@ function normalizeChoice(value, names, label) {
 
 function normalizeDistinguishability(options) {
   let minimumShapeDistance = options.minimumShapeDistance === undefined ? 0 : options.minimumShapeDistance;
-  if (typeof minimumShapeDistance !== "number" || !Number.isInteger(minimumShapeDistance) || minimumShapeDistance < 0 || minimumShapeDistance > 20) {
+  if (typeof minimumShapeDistance !== "number" || !Number.isFinite(minimumShapeDistance)) {
     throw new TypeError("minimumShapeDistance must be an integer in [0, 20].");
+  }
+  if (!Number.isInteger(minimumShapeDistance) || minimumShapeDistance < 0 || minimumShapeDistance > 20) {
+    throw new RangeError("minimumShapeDistance must be an integer in [0, 20].");
   }
   if (minimumShapeDistance === 0) minimumShapeDistance = 0;
 
   let minimumPaletteDistance = options.minimumPaletteDistance === undefined ? 0 : options.minimumPaletteDistance;
-  if (typeof minimumPaletteDistance !== "number" || !Number.isFinite(minimumPaletteDistance) || minimumPaletteDistance < 0 || minimumPaletteDistance > 100) {
+  if (typeof minimumPaletteDistance !== "number" || !Number.isFinite(minimumPaletteDistance)) {
     throw new TypeError("minimumPaletteDistance must be a finite number in [0, 100].");
+  }
+  if (minimumPaletteDistance < 0 || minimumPaletteDistance > 100) {
+    throw new RangeError("minimumPaletteDistance must be a finite number in [0, 100].");
   }
   if (minimumPaletteDistance === 0) minimumPaletteDistance = 0;
 
@@ -781,9 +840,12 @@ function normalizeOptions(options = {}) {
   if (theme !== "light" && theme !== "dark") {
     throw new TypeError(`Unsupported theme: ${theme}. Expected "light" or "dark".`);
   }
-  const collisionNonce = Number(options.collisionNonce ?? 0);
-  if (!Number.isSafeInteger(collisionNonce) || collisionNonce < 0) {
+  const collisionNonce = options.collisionNonce === undefined ? 0 : options.collisionNonce;
+  if (typeof collisionNonce !== "number" || !Number.isFinite(collisionNonce)) {
     throw new TypeError("collisionNonce must be a non-negative safe integer.");
+  }
+  if (!Number.isSafeInteger(collisionNonce) || collisionNonce < 0) {
+    throw new RangeError("collisionNonce must be a non-negative safe integer.");
   }
 
   const paletteSelection = normalizePaletteCollection(options, allowLowContrast);
@@ -921,12 +983,12 @@ function createHashAvatarFromDescriptor(descriptor, size = 96) {
 function optionsFromArgs(sizeOrOptions, explicitOptions) {
   if (typeof sizeOrOptions === "object" && sizeOrOptions !== null) {
     return {
-      size: sizeOrOptions.size ?? 96,
+      size: sizeOrOptions.size === undefined ? 96 : sizeOrOptions.size,
       options: { ...sizeOrOptions },
     };
   }
   return {
-    size: sizeOrOptions ?? 96,
+    size: sizeOrOptions === undefined ? 96 : sizeOrOptions,
     options: { ...(explicitOptions ?? {}) },
   };
 }
@@ -1143,24 +1205,6 @@ function hydrateManifestEntries(entries, normalized, ensureUnique) {
   return { manifestEntries, resolvedEntries, usedSignatures };
 }
 
-function cachedNearShapes(catalog, minimumDistance) {
-  let cache = SHAPE_NEIGHBOR_CACHES.get(catalog);
-  if (!cache) {
-    cache = createBoundedLruCache(4);
-    SHAPE_NEIGHBOR_CACHES.set(catalog, cache);
-  }
-  const cached = cache.get(minimumDistance);
-  if (cached) return cached;
-  const nearShapes = Object.freeze(catalog.map((left) => {
-    const near = [];
-    for (let right = 0; right < catalog.length; right++) {
-      if (shapeHammingDistance(left.rows, catalog[right].rows) < minimumDistance) near.push(right);
-    }
-    return Object.freeze(near);
-  }));
-  return cache.set(minimumDistance, nearShapes);
-}
-
 function cachedNearPalettes(palettes, choices, minimumDistance) {
   let cache = PALETTE_NEIGHBOR_CACHES.get(palettes);
   if (!cache) {
@@ -1190,9 +1234,6 @@ function createDistanceAllocator(normalized, resolvedEntries) {
   const shapeEnabled = policy.minimumShapeDistance > 0;
   const paletteEnabled = policy.minimumPaletteDistance > 0;
   const palettePositionByIndex = new Map(normalized.paletteChoices.map((paletteIndex, position) => [paletteIndex, position]));
-  const nearShapes = shapeEnabled
-    ? cachedNearShapes(normalized.catalog, policy.minimumShapeDistance)
-    : undefined;
   const nearPalettes = paletteEnabled
     ? cachedNearPalettes(normalized.palettes, normalized.paletteChoices, policy.minimumPaletteDistance)
     : undefined;
@@ -1203,7 +1244,11 @@ function createDistanceAllocator(normalized, resolvedEntries) {
   }
 
   function blockShapeBand(shapeIndex) {
-    for (const nearShape of nearShapes[shapeIndex]) {
+    const acceptedRows = normalized.catalog[shapeIndex].rows;
+    for (let nearShape = 0; nearShape < shapeCount; nearShape++) {
+      if (shapeHammingDistance(acceptedRows, normalized.catalog[nearShape].rows) >= policy.minimumShapeDistance) {
+        continue;
+      }
       const offset = nearShape * paletteCount;
       blockedStates.fill(1, offset, offset + paletteCount);
     }
@@ -1223,7 +1268,11 @@ function createDistanceAllocator(normalized, resolvedEntries) {
     } else if (!shapeEnabled && paletteEnabled) {
       blockPaletteBand(palettePosition);
     } else if (policy.mode === "either") {
-      for (const nearShape of nearShapes[shapeIndex]) {
+      const acceptedRows = normalized.catalog[shapeIndex].rows;
+      for (let nearShape = 0; nearShape < shapeCount; nearShape++) {
+        if (shapeHammingDistance(acceptedRows, normalized.catalog[nearShape].rows) >= policy.minimumShapeDistance) {
+          continue;
+        }
         for (const nearPalette of nearPalettes[palettePosition]) {
           blockedStates[stateIndex(nearShape, nearPalette)] = 1;
         }
@@ -1260,6 +1309,11 @@ function createIdentitySet(seeds, options = {}) {
   if (seeds.length > MAX_IDENTITY_SET_ITEMS) {
     throw new RangeError(`seeds must contain at most ${MAX_IDENTITY_SET_ITEMS} entries.`);
   }
+  for (let index = 0; index < seeds.length; index++) {
+    if (!Object.hasOwn(seeds, index)) {
+      throw new TypeError("seeds must not contain holes.");
+    }
+  }
   const includeSvg = normalizeOptionalBoolean(options.includeSvg, true, "includeSvg");
   const ensureUnique = normalizeOptionalBoolean(options.ensureUnique, true, "ensureUnique");
   if (options.collisionNonce !== undefined) {
@@ -1269,7 +1323,7 @@ function createIdentitySet(seeds, options = {}) {
   if (normalized.distinguishability && !ensureUnique) {
     throw new TypeError("ensureUnique must not be false when a distinguishability policy is enabled.");
   }
-  const size = options.size ?? 96;
+  const size = options.size === undefined ? 96 : options.size;
   const suppliedManifest = validateManifest(options.manifest, normalized);
   const hydratedManifest = hydrateManifestEntries(suppliedManifest.entries, normalized, ensureUnique);
   const manifestEntries = hydratedManifest.manifestEntries;
@@ -1277,11 +1331,13 @@ function createIdentitySet(seeds, options = {}) {
   const namespaceKey = namespaceFingerprint(normalized.namespace);
   const usedSignatures = hydratedManifest.usedSignatures;
 
-  const records = seeds.map((input, index) => {
+  const records = new Array(seeds.length);
+  for (let index = 0; index < seeds.length; index++) {
+    const input = seeds[index];
     const canonical = canonicalSeed(input, normalized.seedMode);
     const identityKey = hashHex128(domainMessage("identity-key", canonical, normalized.namespace, 0));
-    return { input, index, canonical, identityKey };
-  });
+    records[index] = { input, index, canonical, identityKey };
+  }
 
   const uniqueRecords = new Map();
   for (const record of records) {
@@ -1301,9 +1357,12 @@ function createIdentitySet(seeds, options = {}) {
   const sortedUnique = Array.from(uniqueRecords.values()).sort((a, b) => a.identityKey.localeCompare(b.identityKey));
   const maxAttempts = options.maxAttempts === undefined
     ? Math.min(Math.max(4096, sortedUnique.length * 128), Math.max(4096, normalized.stateSpace * 2))
-    : Number(options.maxAttempts);
-  if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1) {
+    : options.maxAttempts;
+  if (typeof maxAttempts !== "number" || !Number.isFinite(maxAttempts)) {
     throw new TypeError("maxAttempts must be a positive safe integer.");
+  }
+  if (!Number.isSafeInteger(maxAttempts) || maxAttempts < 1) {
+    throw new RangeError("maxAttempts must be a positive safe integer.");
   }
   const distanceAllocator = normalized.distinguishability
     ? createDistanceAllocator(normalized, hydratedManifest.resolvedEntries)

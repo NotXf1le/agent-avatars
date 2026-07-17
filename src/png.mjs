@@ -1,7 +1,7 @@
 import { deflateSync } from "node:zlib";
-import { mkdirSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { createAvatarDescriptor } from "./index.mjs";
+import { replaceFileSetSync } from "./file-set-transaction.mjs";
 import { snapshotRenderableDescriptor } from "./render-descriptor.mjs";
 import { normalizePngSize, normalizeSupersample } from "./png-options.mjs";
 
@@ -246,12 +246,12 @@ function createAvatarPngFromDescriptor(descriptor, size = 96, options = {}) {
 function optionsFromArgs(sizeOrOptions, explicitOptions) {
   if (typeof sizeOrOptions === "object" && sizeOrOptions !== null) {
     return {
-      size: sizeOrOptions.size ?? 96,
+      size: sizeOrOptions.size === undefined ? 96 : sizeOrOptions.size,
       options: { ...sizeOrOptions },
     };
   }
   return {
-    size: sizeOrOptions ?? 96,
+    size: sizeOrOptions === undefined ? 96 : sizeOrOptions,
     options: { ...(explicitOptions ?? {}) },
   };
 }
@@ -267,12 +267,16 @@ function avatarPngDataUri(seed, sizeOrOptions = 96, explicitOptions = {}) {
 }
 
 function normalizeSizes(value, supersampleValue) {
-  const sizes = value ?? PLATFORM_PNG_SIZES;
+  const sizes = value === undefined ? PLATFORM_PNG_SIZES : value;
   if (!Array.isArray(sizes) || sizes.length === 0) throw new TypeError("sizes must be a non-empty array.");
   if (sizes.length > MAX_PNG_SET_SIZES) {
     throw new RangeError(`sizes must contain at most ${MAX_PNG_SET_SIZES} entries.`);
   }
-  const normalized = sizes.map(normalizePngSize);
+  const normalized = new Array(sizes.length);
+  for (let index = 0; index < sizes.length; index++) {
+    if (!Object.hasOwn(sizes, index)) throw new TypeError("sizes must not contain holes.");
+    normalized[index] = normalizePngSize(sizes[index]);
+  }
   if (new Set(normalized).size !== normalized.length) throw new TypeError("sizes must not contain duplicates.");
   let renderPixels = 0;
   for (const size of normalized) {
@@ -304,13 +308,11 @@ function writeAvatarPngSet(seed, directory, options = {}) {
   }
 
   const outputDirectory = resolve(directory);
-  mkdirSync(outputDirectory, { recursive: true });
   const generated = createAvatarPngSet(seed, options);
   const paths = {};
 
-  for (const [size, data] of Object.entries(generated.files)) {
+  for (const size of Object.keys(generated.files)) {
     const path = join(outputDirectory, `${baseName}-${size}.png`);
-    writeFileSync(path, data);
     paths[size] = path;
   }
 
@@ -325,7 +327,19 @@ function writeAvatarPngSet(seed, directory, options = {}) {
     files: Object.fromEntries(Object.entries(paths).map(([size, path]) => [size, path.split(/[\\/]/).pop()])),
   };
   const manifestPath = join(outputDirectory, `${baseName}-manifest.json`);
-  writeFileSync(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`, "utf8");
+  replaceFileSetSync(outputDirectory, [
+    ...Object.entries(generated.files).map(([size, data]) => ({
+      name: `${baseName}-${size}.png`,
+      data,
+      commitLast: false,
+    })),
+    {
+      name: `${baseName}-manifest.json`,
+      data: `${JSON.stringify(manifest, null, 2)}\n`,
+      encoding: "utf8",
+      commitLast: true,
+    },
+  ]);
 
   return { ...generated, paths, manifestPath, manifest };
 }

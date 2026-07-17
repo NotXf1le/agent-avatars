@@ -214,11 +214,11 @@ writeAvatarPngSet(seed, "./avatars", {
 
 SVG generation works in browsers and Node.js. PNG generation and filesystem export use Node.js built-ins.
 
-PNG rendering caps its high-resolution RGBA buffer at 64 MiB. When `supersample` is omitted, large outputs automatically use the highest safe value up to the default of 4. If an explicit `supersample` value exceeds that budget, the API throws a `RangeError`; lower the output size or the supersampling value.
+PNG rendering caps its high-resolution RGBA buffer at 64 MiB. When `supersample` is omitted or `null`, large outputs automatically use the highest safe value up to the default of 4. If an explicit `supersample` value exceeds that budget, the API throws a `RangeError`; lower the output size or the supersampling value.
 
 PNG generation is synchronous. Do not forward an untrusted request size directly to the PNG API: apply an application-level allowlist (typically no more than 512 or 1024 pixels) and run unusually large exports in a worker or background job.
 
-PNG-only options are `supersample` (integer `1..8`), `sizes` (unique integer output sizes), and `baseName` for filesystem export. `createAvatarPngFromDescriptor` accepts only `supersample`, because palette, namespace, and identity selection are already fixed by the descriptor.
+PNG-only options are `supersample` (integer `1..8`, or `null` for automatic selection), `sizes` (unique integer or numeric-string output sizes), and `baseName` for filesystem export. SVG and PNG `size` values accept numbers and numeric strings. `createAvatarPngFromDescriptor` accepts only `supersample`, because palette, namespace, and identity selection are already fixed by the descriptor.
 
 ### Options
 
@@ -242,7 +242,7 @@ Avatar generation uses the Standard shape catalog. The demo does not expose alte
 
 Custom colors must be six-digit hexadecimal values. Contrast is validated by default.
 
-Malformed types and unsupported enum values throw `TypeError`. Values outside documented capacity or resource bounds throw `RangeError`. Deterministic allocation exhaustion and incompatible persisted assignments throw `Error`; callers should treat manifests as versioned data and keep the prior valid snapshot when growth fails.
+Malformed types, non-finite numbers, and unsupported enum values throw `TypeError`. Finite values outside documented ranges, capacity, or resource bounds throw `RangeError`. Numeric strings are accepted only for SVG and PNG sizes. Deterministic allocation exhaustion and incompatible persisted assignments throw `Error`; callers should treat manifests as versioned data and keep the prior valid snapshot when growth fails.
 
 ### Batch allocation details
 

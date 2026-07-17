@@ -72,7 +72,7 @@ async function createPrivateAvatarDescriptor(seed, options = {}) {
 
 async function createPrivateHashAvatar(seed, options = {}) {
   const descriptor = await createPrivateAvatarDescriptor(seed, options);
-  return createHashAvatarFromDescriptor(descriptor, options.size ?? 96);
+  return createHashAvatarFromDescriptor(descriptor, options.size === undefined ? 96 : options.size);
 }
 
 export {

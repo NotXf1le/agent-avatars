@@ -1,13 +1,15 @@
 import type { AvatarDescriptor, AvatarOptions } from "./index.d.ts";
 
+export type PngSize = number | `${number}`;
+
 export interface PngRenderOptions {
-  supersample?: number;
+  supersample?: number | null;
 }
 
 export interface PngOptions extends AvatarOptions, PngRenderOptions {}
 
 export interface PngSetOptions extends PngOptions {
-  sizes?: readonly number[];
+  sizes?: readonly PngSize[];
   baseName?: string;
 }
 
@@ -32,10 +34,10 @@ export interface WrittenAvatarPngSet extends AvatarPngSet {
 }
 
 export const PLATFORM_PNG_SIZES: readonly [32, 64, 192, 200];
-export function createAvatarPngFromDescriptor(descriptor: AvatarDescriptor, size?: number, options?: PngRenderOptions): Uint8Array;
-export function createAvatarPng(seed: unknown, size?: number, options?: PngOptions): Uint8Array;
+export function createAvatarPngFromDescriptor(descriptor: AvatarDescriptor, size?: PngSize, options?: PngRenderOptions): Uint8Array;
+export function createAvatarPng(seed: unknown, size?: PngSize, options?: PngOptions): Uint8Array;
 export function createAvatarPng(seed: unknown, options?: PngOptions): Uint8Array;
-export function avatarPngDataUri(seed: unknown, size?: number, options?: PngOptions): string;
+export function avatarPngDataUri(seed: unknown, size?: PngSize, options?: PngOptions): string;
 export function avatarPngDataUri(seed: unknown, options?: PngOptions): string;
 export function createAvatarPngSet(seed: unknown, options?: PngSetOptions): AvatarPngSet;
 export function writeAvatarPngSet(seed: unknown, directory: string, options?: PngSetOptions): WrittenAvatarPngSet;

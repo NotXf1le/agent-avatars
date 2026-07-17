@@ -65,6 +65,10 @@ const invalidIdentityNonce: IdentitySetOptions = { collisionNonce: 1 };
 const signature: string = result.items[0].signature;
 const png: Uint8Array = createAvatarPng("agent", { ...options, size: 32 });
 const descriptorPng: Uint8Array = createAvatarPngFromDescriptor(descriptor, 32, { supersample: 2 });
+const numericStringPng: Uint8Array = createAvatarPng("agent", "32", options);
+const automaticDescriptorPng: Uint8Array = createAvatarPngFromDescriptor(descriptor, "32", { supersample: null });
+// @ts-expect-error numeric constraints do not accept numeric strings
+const invalidNumericOptions: AvatarOptions = { minPixels: "6" };
 // @ts-expect-error descriptor rendering does not reselect an avatar namespace
 const invalidDescriptorPng: Uint8Array = createAvatarPngFromDescriptor(descriptor, 32, { namespace: "other" });
 const reactProps: AgentAvatarProps = { seed: "agent", size: 40, options, alt: "Agent" };
@@ -85,11 +89,14 @@ void invalidIdentityOptions;
 void invalidIdentityNonce;
 void png;
 void descriptorPng;
+void numericStringPng;
+void automaticDescriptorPng;
+void invalidNumericOptions;
 void invalidDescriptorPng;
 void invalidReactOptions;
 void png.byteLength;
 void version;
 void hash;
 void svg;
-void writeAvatarPngSet("agent", "./icons", options);
+void writeAvatarPngSet("agent", "./icons", { ...options, sizes: [32, "64"], supersample: null });
 void derivePrivateSeed("person@example.com", { ...options, secret: "0123456789abcdef0123456789abcdef" });

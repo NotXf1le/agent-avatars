@@ -6,6 +6,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Fixed
+
+- Bounded visual-distance allocation memory by removing retained quadratic shape-neighbor tables.
+- Rejected sparse arrays consistently at public rows, grids, seeds, palettes, descriptor, and PNG-size boundaries.
+- Aligned numeric runtime validation, TypeScript declarations, and documented error classes.
+- Made PNG set replacement exception-atomic with staging, rollback, and a manifest-last commit.
+
 ## [1.0.1] - 2026-07-17
 
 ### Added
