@@ -130,7 +130,7 @@ const marker = true;`, new Map([
   assert.equal(packageJson.module, "./dist/index.mjs");
   assert.equal(packageJson.types, "./dist/index.d.mts");
   assert.equal(packageJson.name, "agent-avatars");
-  assert.equal(packageJson.version, "1.0.0");
+  assert.equal(packageJson.version, "1.0.1");
   assert.equal(packageJson.description, "Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.");
   assert.deepEqual(packageJson.repository, {
     type: "git",
