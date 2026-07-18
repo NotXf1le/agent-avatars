@@ -150,6 +150,7 @@ function build() {
     "visual-distance.mjs",
     "render-descriptor.mjs",
     "png-options.mjs",
+    "file-set-transaction.mjs",
     "png.mjs",
     "react.mjs",
     "private.mjs",
@@ -163,6 +164,10 @@ function build() {
   buildCommonJs("visual-distance");
   buildCommonJs("render-descriptor");
   buildCommonJs("png-options");
+  buildCommonJs("file-set-transaction", (source) => transformCommonJsImports(source, new Map([
+    ["node:fs", "node:fs"],
+    ["node:path", "node:path"],
+  ]), "./file-set-transaction.mjs"));
   buildCommonJs("index", (source) => transformCommonJsImports(source, new Map([
     ["./visual-distance.mjs", "./visual-distance.cjs"],
     ["./render-descriptor.mjs", "./render-descriptor.cjs"],
@@ -173,6 +178,7 @@ function build() {
     ["node:fs", "node:fs"],
     ["node:path", "node:path"],
     ["./index.mjs", "./index.cjs"],
+    ["./file-set-transaction.mjs", "./file-set-transaction.cjs"],
     ["./render-descriptor.mjs", "./render-descriptor.cjs"],
     ["./png-options.mjs", "./png-options.cjs"],
   ]), "./png.mjs"));

@@ -361,6 +361,8 @@ const marker = true;`, new Map([
     "../dist/render-descriptor.cjs",
     "../dist/png-options.mjs",
     "../dist/png-options.cjs",
+    "../dist/file-set-transaction.mjs",
+    "../dist/file-set-transaction.cjs",
     "../LICENSE",
   ]) {
     assert.ok(readFileSync(new URL(file, import.meta.url), "utf8").length > 100, `${file} is missing or empty`);
@@ -462,6 +464,8 @@ const marker = true;`, new Map([
     "dist/render-descriptor.mjs",
     "dist/png-options.cjs",
     "dist/png-options.mjs",
+    "dist/file-set-transaction.cjs",
+    "dist/file-set-transaction.mjs",
   ]) {
     assert.ok(packedFiles.has(file), "Packed file is missing: " + file);
   }

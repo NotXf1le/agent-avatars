@@ -496,16 +496,28 @@ export async function runCoreTests() {
   assert.equal(relaxedDistanceSet.policyAdjustment.requested.minimumPaletteDistance, 20);
   assert.equal(relaxedDistanceSet.policyAdjustment.applied, null);
 
-  for (const value of [1.5, -1, 21, NaN, Infinity, -Infinity, "1", null, true]) {
+  for (const value of [NaN, Infinity, -Infinity, "1", null, true]) {
     assert.throws(
       () => api.createIdentitySet(["distance"], { minimumShapeDistance: value }),
       (error) => error instanceof TypeError && /minimumShapeDistance/.test(error.message)
     );
   }
-  for (const value of [-1, 101, NaN, Infinity, -Infinity, "1", null, true]) {
+  for (const value of [1.5, -1, 21]) {
+    assert.throws(
+      () => api.createIdentitySet(["distance"], { minimumShapeDistance: value }),
+      (error) => error instanceof RangeError && /minimumShapeDistance/.test(error.message)
+    );
+  }
+  for (const value of [NaN, Infinity, -Infinity, "1", null, true]) {
     assert.throws(
       () => api.createIdentitySet(["distance"], { minimumPaletteDistance: value }),
       (error) => error instanceof TypeError && /minimumPaletteDistance/.test(error.message)
+    );
+  }
+  for (const value of [-1, 101]) {
+    assert.throws(
+      () => api.createIdentitySet(["distance"], { minimumPaletteDistance: value }),
+      (error) => error instanceof RangeError && /minimumPaletteDistance/.test(error.message)
     );
   }
   assert.throws(
