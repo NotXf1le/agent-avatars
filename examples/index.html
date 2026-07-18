@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Avatar Examples for Vite, Next.js, React &amp; Node</title>
+  <meta name="description" content="Copy practical deterministic avatar examples for Vite, Next.js, React, and Node.js, including SVG, PNG, SSR, broken-image fallback, and identity sets.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://notxf1le.github.io/agent-avatars/examples/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <meta property="og:type" content="article"><meta property="og:site_name" content="Agent Avatars">
+  <meta property="og:title" content="Agent Avatar Examples for Vite, Next.js, React &amp; Node">
+  <meta property="og:description" content="Production-oriented SVG, PNG, React, SSR, fallback, and group identity examples.">
+  <meta property="og:url" content="https://notxf1le.github.io/agent-avatars/examples/">
+  <meta property="og:image" content="https://notxf1le.github.io/agent-avatars/examples/deterministic-output.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../assets/docs.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"CollectionPage","name":"Agent Avatar integration examples","description":"Examples for Vite, Next.js, React, Node.js, SVG, PNG, and identity sets.","url":"https://notxf1le.github.io/agent-avatars/examples/","isPartOf":{"@type":"WebSite","name":"Agent Avatars","url":"https://notxf1le.github.io/agent-avatars/"}}
+  </script>
+</head>
+<body>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="../" aria-label="Agent Avatars home"><img class="brand-mark" data-brand-avatar src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="34" height="34" alt="" aria-hidden="true"><span>Agent Avatars</span></a><nav class="nav" aria-label="Main navigation"><a href="../docs/">Docs</a><a href="../react/">React</a><a href="../compare/">Compare</a><a href="https://github.com/NotXf1le/agent-avatars">GitHub</a></nav></div></header>
+  <main>
+    <div class="container breadcrumbs"><a href="../">Home</a><span aria-hidden="true">/</span><span>Examples</span></div>
+    <section class="container hero"><p class="eyebrow">Integration examples</p><h1>Put deterministic identity into the interface.</h1><p>Start with a stable seed and namespace, then choose a browser SVG, React image component, Node.js PNG export, or manifest-backed group.</p><div class="actions"><a class="button button-primary" href="#vite" data-track="examples_vite">Browser example</a><a class="button" href="#node" data-track="examples_node">Node.js example</a></div></section>
+    <nav class="container section-nav" aria-label="On this page"><a href="#vite">Vite</a><a href="#next">Next.js</a><a href="#node">Node.js</a><a href="#fallback">Fallback</a><a href="#sets">Identity sets</a></nav>
+
+    <section class="section" id="vite"><div class="container"><div class="section-heading"><h2>Vite or browser-bundled SVG.</h2><p>The root entry point uses no Node.js built-ins. Generate a local SVG data URI and assign it to an image element.</p></div><pre><code>import { avatarDataUri } from "agent-avatars";
+
+const image = document.querySelector("#agent-avatar");
+image.src = avatarDataUri("research-assistant", {
+  namespace: "my-product/agents",
+  theme: "light",
+  size: 64,
+});</code></pre><p class="callout">The package test suite builds real browser consumers with Vite, webpack, and esbuild.</p></div></section>
+
+    <section class="section" id="next"><div class="container"><div class="section-heading"><h2>Next.js client component with SSR output.</h2><p>A client component is still pre-rendered by Next.js. Keep seed and options stable so its server and browser markup agree.</p></div><pre><code>"use client";
+
+import { AgentAvatar } from "agent-avatars/react";
+
+export function AgentBadge({ agent }) {
+  return (
+    &lt;AgentAvatar
+      seed={agent.id}
+      size={48}
+      options={{ namespace: "my-product/agents" }}
+      alt={`${agent.name} avatar`}
+    /&gt;
+  );
+}</code></pre><p>See the <a href="../react/">React and SSR guide</a> for fallback behavior, image URL props, and TypeScript module resolution.</p></div></section>
+
+    <section class="section" id="node"><div class="container"><div class="section-heading"><h2>Node.js SVG and PNG files.</h2><p>SVG output comes from the root entry. Import the Node.js-only PNG subpath for byte generation and platform-size file sets.</p></div><pre><code>import { writeFileSync } from "node:fs";
+import { createHashAvatar } from "agent-avatars";
+import { writeAvatarPngSet } from "agent-avatars/png";
+
+const seed = "release-agent";
+const options = { namespace: "my-product/agents", theme: "dark" };
+
+writeFileSync("release-agent.svg", createHashAvatar(seed, options));
+
+writeAvatarPngSet(seed, "./public/avatars", {
+  ...options,
+  sizes: [32, 64, 192, 200],
+  baseName: "release-agent",
+});</code></pre></div></section>
+
+    <section class="section" id="fallback"><div class="container"><div class="section-heading"><h2>Fallback after a real image fails.</h2><p>Do not replace a configured image preemptively. Track the source that failed, then render the deterministic component for that specific missing or broken value.</p></div><pre><code>const [failedSrc, setFailedSrc] = useState();
+
+return !src || failedSrc === src
+  ? &lt;AgentAvatar seed={agent.id} size={40} alt={`${agent.name} avatar`} /&gt;
+  : &lt;img src={src} width="40" height="40" alt={`${agent.name} avatar`}
+      onError={() =&gt; setFailedSrc(src)} /&gt;;</code></pre></div></section>
+
+    <section class="section" id="sets"><div class="container"><div class="section-heading"><h2>A roster with durable assignments.</h2><p>Create the group once, persist its manifest, and pass the manifest back before adding new agent identities.</p></div><pre><code>import { createIdentitySet } from "agent-avatars";
+
+const result = createIdentitySet(agentIds, {
+  namespace: "my-product/agents",
+  minimumShapeDistance: 4,
+  minimumPaletteDistance: 20,
+  distanceMode: "either",
+  manifest: storedManifest,
+});
+
+await saveManifest(result.manifest);</code></pre><p>Read the <a href="../identity-sets/">multi-agent identity guide</a> before choosing distance thresholds.</p></div></section>
+
+    <section class="container cta"><h2>Generate a real sample set.</h2><p>Use the live workspace to change seeds, themes, palettes, group size, and separation before copying code or downloading assets.</p><div class="actions"><a class="button" href="../#playground" data-track="examples_generator">Open generator</a><a class="button" href="../docs/" data-track="examples_docs">API documentation</a></div></section>
+  </main>
+  <footer class="site-footer"><div class="container footer-inner"><p>Agent Avatars · browser and Node.js examples</p><div class="footer-links"><a href="../docs/">Docs</a><a href="../react/">React</a><a href="../identity-sets/">Identity sets</a><a href="../private-avatars/">Private avatars</a></div></div></footer>
+  <script type="module" src="../assets/site-attribution.mjs"></script>
+  <script type="module" src="../assets/site-brand.mjs"></script>
+</body>
+</html>

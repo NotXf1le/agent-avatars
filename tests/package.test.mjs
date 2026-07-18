@@ -212,6 +212,13 @@ const marker = true;`, new Map([
     "LICENSE",
   ]);
   const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
+  assert.match(readme, /\[Try the live avatar generator →\]\(https:\/\/notxf1le\.github\.io\/agent-avatars\/\)/);
+  for (const landingPath of ["docs", "react", "identity-sets", "private-avatars", "examples"]) {
+    assert.ok(
+      readme.includes(`https://notxf1le.github.io/agent-avatars/${landingPath}/`),
+      `README must link to the ${landingPath} landing page.`,
+    );
+  }
   assert.match(readme, /PNG rendering caps its high-resolution RGBA buffer at 64 MiB/);
   assert.match(readme, /explicit `supersample` value exceeds that budget, the API throws a `RangeError`/);
   for (const discoverableTerm of [

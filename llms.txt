@@ -1,0 +1,41 @@
+# Agent Avatars
+
+> Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users. The package supports stable individual identities, visually distinct multi-agent sets, React 18/19 SSR, Node.js PNG export, and server-side HMAC-derived private seeds.
+
+Canonical site: https://notxf1le.github.io/agent-avatars/
+Source: https://github.com/NotXf1le/agent-avatars
+npm: https://www.npmjs.com/package/agent-avatars
+License: MIT
+
+## Install
+
+`npm install agent-avatars`
+
+## Core APIs
+
+- `createHashAvatar(seed, options)`: deterministic SVG string in browsers or Node.js.
+- `avatarDataUri(seed, options)`: local SVG data URI for image URL fields.
+- `createAvatarDescriptor(seed, options)`: selected shape, palette, metrics, and stable signature.
+- `createIdentitySet(seeds, options)`: deterministic group allocation with exact signature uniqueness, optional visual-distance policy, and reusable manifest.
+- `createIdentitySetWithFallback(seeds, options)`: interactive group allocation with a reported bounded policy adjustment for a new infeasible set.
+- `agent-avatars/react`: React 18/19 `AgentAvatar` image component with SSR support.
+- `agent-avatars/png`: Node.js PNG bytes, data URIs, platform-size sets, and filesystem export.
+- `agent-avatars/private`: Node.js HMAC-SHA-256 seed derivation and private avatar helpers. Never ship the secret to browser code.
+
+## Documentation
+
+- API and installation: https://notxf1le.github.io/agent-avatars/docs/
+- React and SSR: https://notxf1le.github.io/agent-avatars/react/
+- Multi-agent identity sets: https://notxf1le.github.io/agent-avatars/identity-sets/
+- Private deterministic avatars: https://notxf1le.github.io/agent-avatars/private-avatars/
+- Vite, Next.js, React, and Node.js examples: https://notxf1le.github.io/agent-avatars/examples/
+- Requirements-first comparison: https://notxf1le.github.io/agent-avatars/compare/
+- Interactive generator: https://notxf1le.github.io/agent-avatars/#playground
+
+## Important constraints
+
+- Ordinary deterministic output is not anonymization; known seeds can be reproduced.
+- A namespace separates collections but is not a secret.
+- Persist identity-set manifests when a roster grows so historical assignments remain stable.
+- Runtime consumers support Node.js 18 and newer. React 18 or 19 is optional.
+- SVG generation is browser-safe. PNG and private entry points use Node.js built-ins.

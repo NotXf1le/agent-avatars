@@ -15,7 +15,11 @@ Deterministic visual identities for AI agents, bots, services, and users.
 - **Portable.** Browser, Node.js, React 18/19, ESM, CommonJS, and SSR.
 - **Group-aware.** Keep agent identities visually distinct with `createIdentitySet()`.
 
-The GitHub Pages-ready demo is `index.html`. Run it locally through a static server:
+**[Try the live avatar generator →](https://notxf1le.github.io/agent-avatars/)**
+
+[Documentation](https://notxf1le.github.io/agent-avatars/docs/) · [React and SSR](https://notxf1le.github.io/agent-avatars/react/) · [Identity sets](https://notxf1le.github.io/agent-avatars/identity-sets/) · [Private avatars](https://notxf1le.github.io/agent-avatars/private-avatars/) · [Examples](https://notxf1le.github.io/agent-avatars/examples/)
+
+The live demo source is `index.html`. Run it locally through a static server:
 
 ```bash
 npm run demo

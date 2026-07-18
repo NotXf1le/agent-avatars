@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Agent Avatars Documentation: SVG, PNG &amp; API</title>
+  <meta name="description" content="Install agent-avatars and generate deterministic SVG or PNG identities for agents, bots, services, and users with browser, Node.js, and TypeScript APIs.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://notxf1le.github.io/agent-avatars/docs/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <meta property="og:type" content="article">
+  <meta property="og:site_name" content="Agent Avatars">
+  <meta property="og:title" content="Agent Avatars Documentation: SVG, PNG &amp; API">
+  <meta property="og:description" content="Install the package and use its browser, Node.js, TypeScript, React, PNG, and private identity entry points.">
+  <meta property="og:url" content="https://notxf1le.github.io/agent-avatars/docs/">
+  <meta property="og:image" content="https://notxf1le.github.io/agent-avatars/examples/hero-agent-dashboard.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../assets/docs.css">
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "TechArticle",
+    "headline": "Agent Avatars documentation",
+    "description": "Installation, quick start, entry points, and API guidance for deterministic agent avatars.",
+    "url": "https://notxf1le.github.io/agent-avatars/docs/",
+    "isPartOf": { "@type": "WebSite", "name": "Agent Avatars", "url": "https://notxf1le.github.io/agent-avatars/" },
+    "codeRepository": "https://github.com/NotXf1le/agent-avatars",
+    "license": "https://opensource.org/license/mit"
+  }
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <div class="container header-inner">
+      <a class="brand" href="../" aria-label="Agent Avatars home"><img class="brand-mark" data-brand-avatar src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="34" height="34" alt="" aria-hidden="true"><span>Agent Avatars</span></a>
+      <nav class="nav" aria-label="Main navigation"><a href="../#playground">Generator</a><a href="../examples/">Examples</a><a href="../compare/">Compare</a><a href="https://github.com/NotXf1le/agent-avatars">GitHub</a></nav>
+    </div>
+  </header>
+
+  <main>
+    <div class="container breadcrumbs"><a href="../">Home</a><span aria-hidden="true">/</span><span>Documentation</span></div>
+    <section class="container hero">
+      <p class="eyebrow">Documentation</p>
+      <h1>Deterministic avatars, from first import to production.</h1>
+      <p>Use one small package to render stable SVG identities in browsers, export PNG files in Node.js, allocate visually distinct agent sets, and protect sensitive seeds on the server.</p>
+      <div class="actions"><a class="button button-primary" href="#quick-start" data-track="docs_quick_start">Start with SVG</a><a class="button" href="https://www.npmjs.com/package/agent-avatars" data-track="docs_npm">View on npm</a></div>
+    </section>
+
+    <nav class="container section-nav" aria-label="On this page"><a href="#quick-start">Quick start</a><a href="#entry-points">Entry points</a><a href="#core-api">Core API</a><a href="#measurement">Attribution</a><a href="#faq">FAQ</a></nav>
+
+    <section class="section" id="quick-start">
+      <div class="container">
+        <div class="section-heading"><h2>Install and render.</h2><p>The root entry point has no runtime dependencies and works in a browser or Node.js. A stable seed plus stable options produces the same result.</p></div>
+        <pre><code>npm install agent-avatars</code></pre>
+        <pre><code>import { createHashAvatar } from "agent-avatars";
+
+const svg = createHashAvatar("research-assistant", {
+  namespace: "my-product/agents",
+  theme: "dark",
+  size: 96,
+});</code></pre>
+        <p class="callout">Prefer a durable internal agent ID as the seed. The namespace separates products or identity collections, but it is not a secret.</p>
+      </div>
+    </section>
+
+    <section class="section" id="entry-points">
+      <div class="container">
+        <div class="section-heading"><h2>Four focused entry points.</h2><p>Import only the environment-specific surface you need. ESM, CommonJS, and TypeScript declarations are included.</p></div>
+        <div class="grid two">
+          <article class="card"><h3><code>agent-avatars</code></h3><p>Browser and Node.js SVG generation, data URIs, descriptors, catalog inspection, validation, and identity-set allocation.</p></article>
+          <article class="card"><h3><code>agent-avatars/react</code></h3><p>A React 18/19 image component that also renders during SSR. See the <a href="../react/">React integration guide</a>.</p></article>
+          <article class="card"><h3><code>agent-avatars/png</code></h3><p>Node.js PNG byte generation, data URIs, platform-size sets, and atomic filesystem export.</p></article>
+          <article class="card"><h3><code>agent-avatars/private</code></h3><p>Asynchronous HMAC-derived seeds and avatars for server-side use. See <a href="../private-avatars/">private identities</a>.</p></article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="core-api">
+      <div class="container">
+        <div class="section-heading"><h2>Choose the API by outcome.</h2><p>The public surface separates individual rendering, batch identity allocation, bitmap inspection, and file export.</p></div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>Outcome</th><th>API</th><th>Notes</th></tr></thead>
+            <tbody>
+              <tr><td>SVG string</td><td><code>createHashAvatar()</code></td><td>Browser-safe and deterministic.</td></tr>
+              <tr><td>Image URL value</td><td><code>avatarDataUri()</code></td><td>Local SVG data URI for APIs that expect a <code>src</code>.</td></tr>
+              <tr><td>Inspect identity</td><td><code>createAvatarDescriptor()</code></td><td>Returns the selected shape, palette, metrics, and stable signature.</td></tr>
+              <tr><td>Distinct group</td><td><code>createIdentitySet()</code></td><td>Exact signature uniqueness with optional visual-distance rules and reusable manifests.</td></tr>
+              <tr><td>Interactive group</td><td><code>createIdentitySetWithFallback()</code></td><td>Can report a deterministic policy adjustment when a new requested set is infeasible.</td></tr>
+              <tr><td>PNG bytes or files</td><td><code>createAvatarPng()</code>, <code>writeAvatarPngSet()</code></td><td>Node.js-only entry point with bounded supersampling.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="measurement">
+      <div class="container">
+        <div class="section-heading"><h2>Privacy-safe traffic attribution.</h2><p>The documentation site exposes provider-neutral browser events without transmitting or persisting visitor data. Connect them to analytics only after choosing a consent and data policy.</p></div>
+        <div class="prose">
+          <p><code>agent-avatars:visit</code> includes normalized UTM values, landing path, and an <code>aiReferral</code> flag for known assistant referrers. <code>agent-avatars:conversion</code> adds the clicked action from a marked link or button.</p>
+          <pre><code>window.addEventListener("agent-avatars:visit", ({ detail }) =&gt; {
+  analytics.track("Docs visit", detail);
+});
+
+window.addEventListener("agent-avatars:conversion", ({ detail }) =&gt; {
+  analytics.track("Docs conversion", detail);
+});</code></pre>
+          <p>OpenAI documents ChatGPT referral URLs with <code>utm_source=chatgpt.com</code>; the local classifier recognizes that value as an AI referral.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="faq">
+      <div class="container">
+        <div class="section-heading"><h2>Common questions.</h2><p>Short answers to the integration decisions that affect stable identity.</p></div>
+        <div class="faq">
+          <details><summary>Does the same seed always produce the same avatar?</summary><p>Yes, when the package style version, seed, namespace, and identity-affecting options remain the same. Persist identity-set manifests when a group grows.</p></details>
+          <details><summary>Can I use an email address as a seed?</summary><p>Do not expose sensitive identifiers through ordinary deterministic output. Derive a private seed on the server with the private entry point and keep the HMAC secret out of browser code.</p></details>
+          <details><summary>Does SVG generation call a remote service?</summary><p>No. The root package generates output locally. A Content Security Policy may need to permit <code>data:</code> images if you use <code>avatarDataUri()</code>.</p></details>
+          <details><summary>Which Node.js and React versions are supported?</summary><p>Runtime consumers support Node.js 18 and newer. React 18 or 19 is an optional peer dependency.</p></details>
+        </div>
+      </div>
+    </section>
+
+    <section class="container cta"><h2>Try the real output.</h2><p>Use the interactive generator for single avatars or a visually separated identity set, then copy or download SVG and PNG assets.</p><div class="actions"><a class="button" href="../#playground" data-track="docs_generator">Open generator</a><a class="button" href="../examples/" data-track="docs_examples">Browse examples</a></div></section>
+  </main>
+
+  <footer class="site-footer"><div class="container footer-inner"><p>Agent Avatars · MIT License · 2026 Felix Koba</p><div class="footer-links"><a href="../react/">React</a><a href="../identity-sets/">Identity sets</a><a href="../private-avatars/">Private avatars</a><a href="../compare/">Compare</a></div></div></footer>
+  <script type="module" src="../assets/site-attribution.mjs"></script>
+  <script type="module" src="../assets/site-brand.mjs"></script>
+</body>
+</html>

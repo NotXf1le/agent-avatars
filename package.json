@@ -82,7 +82,7 @@
     "test": "npm run build && npm run test:runtime && tsc -p tests/tsconfig.json && npm run test:html && node tests/package.test.mjs && node tests/release-policy.test.mjs && node tests/consumer.test.mjs",
     "test:runtime": "node tests/run-all.mjs",
     "test:types": "npm run build && tsc -p tests/tsconfig.json",
-    "test:html": "html-validate index.html",
+    "test:html": "html-validate index.html docs/index.html react/index.html identity-sets/index.html private-avatars/index.html examples/index.html compare/index.html",
     "test:browser": "npm run build && node tests/browser.test.mjs",
     "test:package": "npm run build && node tests/package.test.mjs",
     "test:packed-runtime": "npm run build && node tests/packed-runtime.test.mjs",
