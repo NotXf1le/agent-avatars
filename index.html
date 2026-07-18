@@ -3,28 +3,72 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Generate deterministic SVG and PNG avatars for AI agents, bots, services, and users.">
+  <title>Deterministic Avatar Generator for AI Agents | Agent Avatars</title>
+  <meta name="description" content="Generate stable SVG and PNG avatars for AI agents, bots, and users. Zero dependencies, local rendering, TypeScript, React 18/19, and Node.js.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
   <meta name="theme-color" content="#f7f8fc">
+  <link rel="canonical" href="https://notxf1le.github.io/agent-avatars/">
   <link id="favicon" rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%2F%3E">
-  <title>Agent Avatars</title>
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Agent Avatars">
+  <meta property="og:title" content="Deterministic Avatar Generator for AI Agents">
+  <meta property="og:description" content="Generate stable SVG and PNG avatars for AI agents, bots, and users. Zero dependencies, local rendering, TypeScript, React 18/19, and Node.js.">
+  <meta property="og:url" content="https://notxf1le.github.io/agent-avatars/">
+  <meta property="og:image" content="https://notxf1le.github.io/agent-avatars/examples/hero-agent-dashboard.png">
+  <meta property="og:image:type" content="image/png">
+  <meta property="og:image:width" content="1280">
+  <meta property="og:image:height" content="720">
+  <meta property="og:image:alt" content="Deterministic avatars in an AI agent dashboard">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Deterministic Avatar Generator for AI Agents">
+  <meta name="twitter:description" content="Generate stable SVG and PNG avatars for AI agents, bots, and users. Zero dependencies, local rendering, TypeScript, React 18/19, and Node.js.">
+  <meta name="twitter:image" content="https://notxf1le.github.io/agent-avatars/examples/hero-agent-dashboard.png">
+  <meta name="twitter:image:alt" content="Deterministic avatars in an AI agent dashboard">
+  <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "Agent Avatars",
+      "alternateName": "agent-avatars",
+      "url": "https://notxf1le.github.io/agent-avatars/",
+      "description": "Zero-dependency deterministic SVG and PNG avatars for AI agents, bots, services, and users.",
+      "applicationCategory": "DeveloperApplication",
+      "operatingSystem": "Browser and Node.js",
+      "downloadUrl": "https://www.npmjs.com/package/agent-avatars",
+      "codeRepository": "https://github.com/NotXf1le/agent-avatars",
+      "license": "https://opensource.org/license/mit",
+      "image": "https://notxf1le.github.io/agent-avatars/examples/hero-agent-dashboard.png",
+      "isAccessibleForFree": true,
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "author": {
+        "@type": "Person",
+        "name": "Felix Koba",
+        "url": "https://github.com/NotXf1le"
+      }
+    }
+  </script>
   <style>
     :root {
       color-scheme: light;
-      --page: #f7f8fc;
+      --page: #f5f3ed;
       --surface: #ffffff;
-      --surface-soft: #f0f1f7;
+      --surface-soft: #eeece5;
       --ink: #171923;
-      --muted: #666b7a;
-      --line: #dfe2eb;
-      --accent: #5b4df5;
-      --accent-strong: #4638dc;
-      --accent-soft: #ece9ff;
+      --muted: #61636c;
+      --line: #d8d5cc;
+      --accent: #7357ff;
+      --accent-strong: #4d33da;
+      --accent-soft: #ebe7ff;
       --success: #26845b;
       --danger: #c33e4d;
-      --shadow: 0 24px 70px rgba(32, 29, 62, .11);
-      --radius-lg: 28px;
-      --radius-md: 18px;
-      --radius-sm: 12px;
+      --shadow: 0 24px 60px rgba(25, 27, 38, .09);
+      --radius-lg: 36px;
+      --radius-md: 24px;
+      --radius-sm: 14px;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
     }
 
@@ -71,7 +115,7 @@
     a { color: inherit; }
     img { display: block; }
 
-    .container { width: min(1180px, calc(100% - 40px)); margin-inline: auto; }
+    .container { width: min(calc(100% - 40px), 1080px); margin-inline: auto; }
 
     .site-header {
       position: sticky;
@@ -83,7 +127,7 @@
     }
 
     .header-inner { min-height: 72px; display: flex; align-items: center; justify-content: space-between; gap: 28px; }
-    .brand { display: inline-flex; align-items: center; gap: 11px; color: inherit; text-decoration: none; font-weight: 760; letter-spacing: -.025em; }
+    .brand { display: inline-flex; align-items: center; gap: 11px; color: inherit; text-decoration: none; font-weight: 800; letter-spacing: -.02em; }
     .brand-mark { width: 34px; height: 34px; flex: 0 0 auto; border-radius: 50%; transition: opacity .35s ease, transform .35s ease; }
     .brand-mark.is-changing { animation: brand-avatar-change .62s ease; }
     @keyframes brand-avatar-change {
@@ -96,12 +140,12 @@
     .nav a:hover { color: var(--ink); }
     .nav .nav-support { padding: 9px 14px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink); background: var(--surface); }
 
-    .hero { min-height: 650px; display: grid; grid-template-columns: 1.04fr .96fr; align-items: center; gap: clamp(42px, 7vw, 94px); padding: 92px 0 86px; }
-    .hero h1 { max-width: 760px; margin: 0; font-size: clamp(3.1rem, 7.2vw, 6.6rem); line-height: .94; letter-spacing: -.072em; }
-    .hero h1 span { color: var(--accent); }
-    .hero-copy > p { max-width: 630px; margin: 28px 0 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.7; }
-    .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 34px; }
-    .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: var(--radius-sm); padding: 0 18px; font-weight: 720; text-decoration: none; cursor: pointer; transition: transform .16s ease, background .16s ease, border-color .16s ease; }
+    .hero { min-height: 650px; display: grid; grid-template-columns: 1.04fr .96fr; align-items: center; gap: clamp(42px, 7vw, 88px); padding: 92px 0 86px; }
+    .hero h1 { max-width: 760px; margin: 0; font-size: clamp(3.1rem, 7vw, 6.2rem); line-height: .96; letter-spacing: -.065em; }
+    .hero h1 span { color: inherit; }
+    .hero-copy > p { max-width: 630px; margin: 26px 0 0; color: var(--muted); font-size: clamp(1.05rem, 2vw, 1.25rem); line-height: 1.68; }
+    .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 32px; }
+    .button { min-height: 48px; display: inline-flex; align-items: center; justify-content: center; gap: 9px; border: 1px solid transparent; border-radius: 999px; padding: 0 20px; font-size: .9rem; font-weight: 780; text-decoration: none; cursor: pointer; transition: transform .16s ease, background .16s ease, border-color .16s ease; }
     .button:hover { transform: translateY(-1px); }
     .button-primary { background: var(--ink); color: var(--page); }
     .button-secondary { border-color: var(--line); background: var(--surface); color: var(--ink); }
@@ -119,7 +163,7 @@
 
     .hero-showcase { position: relative; min-height: 500px; }
     .showcase-carousel { position: absolute; inset: 0; display: grid; grid-template-rows: minmax(0, 1fr) auto; gap: 14px; }
-    .showcase-viewport { min-height: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 36px; background: var(--surface); box-shadow: var(--shadow); transform: rotate(2deg); }
+    .showcase-viewport { min-height: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: var(--shadow); }
     .showcase-track { display: flex; height: 100%; transition: transform .42s cubic-bezier(.22, .75, .25, 1); will-change: transform; }
     .showcase-page { min-width: 100%; display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 20px; }
     .avatar-tile { min-height: 210px; display: grid; place-items: center; overflow: hidden; border-radius: 24px; background: var(--surface-soft); }
@@ -134,10 +178,10 @@
     .showcase-control:disabled { cursor: not-allowed; opacity: .4; }
     .showcase-control svg { width: 18px; height: 18px; }
 
-    .section { padding: 104px 0; }
+    .section { padding: 76px 0; }
     .section-heading { display: flex; align-items: end; justify-content: space-between; gap: 32px; margin-bottom: 34px; }
-    .section-heading h2 { max-width: 720px; margin: 0; font-size: clamp(2.2rem, 5vw, 4.6rem); line-height: 1; letter-spacing: -.06em; }
-    .section-heading p { max-width: 430px; margin: 0; color: var(--muted); line-height: 1.65; }
+    .section-heading h2 { max-width: 720px; margin: 0; font-size: clamp(2rem, 4vw, 3.5rem); line-height: 1; letter-spacing: -.05em; }
+    .section-heading p { max-width: 430px; margin: 0; color: var(--muted); line-height: 1.7; }
 
     .generator-section { min-height: calc(100dvh - 72px); scroll-margin-top: 72px; padding: 24px 0 28px; }
     .generator-toolbar { min-height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 32px; margin-bottom: 14px; }
@@ -148,7 +192,7 @@
     .generator-mode::after { content: ""; position: absolute; right: 0; bottom: -1px; left: 0; height: 2px; background: transparent; }
     .generator-mode[aria-selected="true"] { color: var(--ink); }
     .generator-mode[aria-selected="true"]::after { background: var(--accent); }
-    .playground-shell { height: calc(100dvh - 202px); min-height: 560px; max-height: 732px; display: grid; grid-template-columns: minmax(300px, .68fr) minmax(0, 1.32fr); overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--surface); box-shadow: 0 18px 52px rgba(32, 29, 62, .08); }
+    .playground-shell { height: calc(100dvh - 202px); min-height: 560px; max-height: 732px; display: grid; grid-template-columns: minmax(300px, .68fr) minmax(0, 1.32fr); overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius-md); background: var(--surface); box-shadow: var(--shadow); }
     .set-playground-shell { grid-template-columns: minmax(360px, .72fr) minmax(0, 1.28fr); }
     .controls-panel { min-width: 0; overflow: auto; padding: 26px 28px; border-right: 1px solid var(--line); }
     .controls-panel h3, .preview-panel h3 { margin: 0; font-size: 1.05rem; letter-spacing: -.025em; }
@@ -219,7 +263,7 @@
     summary { cursor: pointer; color: var(--muted); font-size: .8rem; font-weight: 700; }
     details textarea { margin-top: 12px; }
 
-    .single-playground-shell { height: auto; min-height: 0; max-height: none; display: block; overflow: visible; border-radius: var(--radius-md); box-shadow: 0 16px 42px rgba(32, 29, 62, .07); }
+    .single-playground-shell { height: auto; min-height: 0; max-height: none; display: block; overflow: visible; border-radius: var(--radius-md); box-shadow: var(--shadow); }
     .single-workspace { display: grid; gap: 16px; padding: 24px; }
     .single-workspace-head { min-height: 86px; display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 12px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
     .single-seed-field { width: min(640px, 100%); display: grid; gap: 8px; }
@@ -252,14 +296,14 @@
     .single-secondary-actions .button { width: auto; min-height: 44px; flex: 0 0 auto; padding: 0 12px; font-size: .7rem; }
     .single-export-bar .status.is-error { flex: 0 0 auto; }
 
-    .set-playground-shell { height: auto; min-height: 0; max-height: none; display: block; overflow: visible; border-radius: var(--radius-md); box-shadow: 0 16px 42px rgba(32, 29, 62, .07); }
+    .set-playground-shell { height: auto; min-height: 0; max-height: none; display: block; overflow: visible; border-radius: var(--radius-md); box-shadow: var(--shadow); }
     .set-preview-panel { min-width: 0; display: flex; flex-direction: column; gap: 16px; overflow: visible; padding: 24px; transition: opacity .18s ease; }
-    .set-workspace-head { min-height: 86px; display: flex; align-items: flex-end; justify-content: space-between; gap: 24px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
-    .set-title-block { width: 190px; min-width: 0; flex: 0 0 190px; align-self: flex-start; display: grid; gap: 5px; }
+    .set-workspace-head { min-height: 86px; display: flex; align-items: flex-end; justify-content: flex-start; gap: 16px; border-bottom: 1px solid var(--line); padding-bottom: 16px; }
+    .set-title-block { width: 170px; min-width: 0; flex: 0 0 170px; align-self: flex-start; display: grid; gap: 5px; }
     .set-title-block h3 { margin: 0; }
     .set-ready-line { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; margin: 0; color: var(--muted); font-size: .76rem; line-height: 1.2; }
     .set-count { color: inherit; font-size: inherit; font-variant-numeric: tabular-nums; }
-    .set-size-control { width: clamp(400px, 32vw, 470px); min-width: 400px; max-width: 470px; min-height: 44px; flex: 0 0 clamp(400px, 32vw, 470px); display: grid; grid-template-columns: auto minmax(120px, 1fr) 38px auto; align-items: center; gap: 10px; }
+    .set-size-control { width: clamp(330px, 28vw, 400px); min-width: 330px; max-width: 400px; min-height: 44px; flex: 0 0 clamp(330px, 28vw, 400px); display: grid; grid-template-columns: auto minmax(100px, 1fr) 32px auto; align-items: center; gap: 8px; }
     .set-size-control .random-seed-button { min-height: 44px; padding-inline: 18px; background: var(--surface); color: var(--ink); font-size: .82rem; }
     .set-size-control label { color: var(--muted); font-size: .82rem; font-weight: 750; }
     .set-size-control output { min-height: 44px; display: grid; place-items: center; border: 0; background: transparent; color: var(--accent-strong); font-size: .82rem; font-weight: 800; font-variant-numeric: tabular-nums; }
@@ -270,8 +314,8 @@
     .set-size-control input[type="range"]::-moz-range-progress { height: 6px; border-radius: 999px; background: var(--accent); }
     .set-size-control input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border: 0; border-radius: 50%; background: var(--accent); box-shadow: none; }
     .set-size-control input[type="range"]:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 46%, transparent); outline-offset: 3px; }
-    .set-workspace-actions, .set-export-actions { display: flex; align-items: center; gap: 9px; }
-    .set-workspace-actions { flex: 0 0 auto; }
+    .set-workspace-actions, .set-export-actions { display: flex; align-items: center; gap: 8px; }
+    .set-workspace-actions { flex: 0 0 auto; margin-left: auto; }
     .set-export-actions .button, .set-workspace-actions > .button { min-height: 44px; font-size: .82rem; }
     .set-download-menu { width: 112px; flex: 0 0 112px; }
     .set-download-menu > summary { min-height: 44px; color: #ffffff; font-size: .82rem; }
@@ -336,7 +380,7 @@
     .feature h3 { margin: 0; font-size: 1.35rem; letter-spacing: -.035em; }
     .feature p { margin: 12px 0 0; color: var(--muted); line-height: 1.65; }
 
-    .install-card { display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 30px; padding: clamp(28px, 5vw, 58px); border-radius: var(--radius-lg); background: var(--ink); color: var(--page); }
+    .install-card { width: min(calc(100% - 20px), calc(50% + 540px)); margin-right: auto; margin-left: 0; display: grid; grid-template-columns: 1fr auto; align-items: center; gap: 30px; padding: clamp(30px, 6vw, 64px); border-radius: 0 var(--radius-lg) var(--radius-lg) 0; background: var(--ink); color: var(--page); }
     .install-card h2 { margin: 0; font-size: clamp(2rem, 4vw, 3.7rem); letter-spacing: -.055em; }
     .install-card p { max-width: 560px; margin: 12px 0 0; opacity: .7; line-height: 1.6; }
     .install-command { display: flex; align-items: center; gap: 10px; border: 1px solid color-mix(in srgb, var(--page) 28%, transparent); border-radius: 14px; padding: 8px; background: color-mix(in srgb, var(--page) 8%, transparent); }
@@ -346,10 +390,15 @@
     .site-footer { padding: 34px 0 44px; border-top: 1px solid var(--line); color: var(--muted); font-size: .82rem; }
     .footer-inner { display: flex; align-items: center; justify-content: space-between; gap: 24px; }
     .footer-inner p { margin: 0; }
-    .footer-links { display: flex; gap: 20px; }
+    .footer-links { display: flex; flex-wrap: wrap; gap: 20px; }
     .footer-links a { text-underline-offset: 3px; }
 
     .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; }
+
+    @media (max-width: 1020px) {
+      .set-workspace-head { flex-wrap: wrap; }
+      .set-size-control { order: 3; width: 100%; max-width: none; flex-basis: 100%; }
+    }
 
     @media (max-width: 900px) {
       .hero { grid-template-columns: 1fr; padding-top: 72px; }
@@ -364,8 +413,6 @@
       .set-preview-panel { min-height: 0; overflow: visible; }
       .single-export-bar { flex-wrap: wrap; }
       .single-download-menu { margin-left: auto; }
-      .set-workspace-head { flex-wrap: wrap; }
-      .set-size-control { order: 3; width: 100%; max-width: none; }
       .set-grid-wrap { overflow: visible; }
       .set-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .feature-grid { grid-template-columns: 1fr; }
@@ -376,7 +423,8 @@
     }
 
     @media (max-width: 640px) {
-      .container { width: min(calc(100% - 24px), 1180px); }
+      .container { width: min(calc(100% - 24px), 1080px); }
+      .install-card { width: calc(100% - 12px); }
       .header-inner { min-height: 64px; }
       .brand span { max-width: 180px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
       .nav a:not(.nav-support) { display: none; }
@@ -458,10 +506,11 @@
         <span>Agent Avatars</span>
       </a>
       <nav class="nav" aria-label="Main navigation">
+        <a href="./docs/">Docs</a>
         <a href="#playground">Generator</a>
         <a href="#how-it-works">How it works</a>
-        <a href="https://github.com/NotXf1le/agent-avatars" target="_blank" rel="noreferrer">GitHub</a>
-        <a class="nav-support" href="https://ko-fi.com/felixkoba" target="_blank" rel="noreferrer">Support</a>
+        <a href="https://github.com/NotXf1le/agent-avatars" target="_blank" rel="noreferrer" data-track="nav_github">GitHub</a>
+        <a class="nav-support" href="https://ko-fi.com/felixkoba" target="_blank" rel="noreferrer" data-track="nav_support">Support</a>
       </nav>
     </div>
   </header>
@@ -469,14 +518,14 @@
   <main>
     <section class="container hero">
       <div class="hero-copy">
-        <h1>One seed.<br><span>One identity.</span></h1>
-        <p>Generate consistent SVG and PNG avatars for assistants, bots, services, and users — locally, instantly, and without runtime dependencies.</p>
+        <h1>Deterministic<br><span>agent avatars.</span></h1>
+        <p>Generate consistent SVG and PNG avatars for AI agents, assistants, bots, services, and users — locally, instantly, and without runtime dependencies.</p>
         <div class="hero-actions">
-          <a class="button button-primary" href="#playground">
+          <a class="button button-primary" href="#playground" data-track="hero_generator">
             Try the generator
             <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h13m-5-5 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" /></svg>
           </a>
-          <button class="button button-secondary copy-button" id="copy-install-top" type="button">Copy install command</button>
+          <button class="button button-secondary copy-button" id="copy-install-top" type="button" data-track="hero_copy_install">Copy install command</button>
         </div>
       </div>
 
@@ -506,8 +555,8 @@
             <p id="generator-description">Change the seed, preview the identity, and save it.</p>
           </div>
           <div class="generator-modes" role="tablist" aria-label="Generator mode">
-            <button class="generator-mode" id="single-mode-tab" type="button" role="tab" aria-selected="true" aria-controls="single-generator">Single avatar</button>
-            <button class="generator-mode" id="set-mode-tab" type="button" role="tab" aria-selected="false" aria-controls="set-generator">Identity set</button>
+            <button class="generator-mode" id="single-mode-tab" type="button" role="tab" aria-selected="true" aria-controls="single-generator" data-track="generator_single_mode">Single avatar</button>
+            <button class="generator-mode" id="set-mode-tab" type="button" role="tab" aria-selected="false" aria-controls="set-generator" data-track="generator_set_mode">Identity set</button>
           </div>
         </header>
 
@@ -519,7 +568,7 @@
                 <label class="field-label" for="seed">Identity seed</label>
                 <div class="single-seed-row">
                   <input id="seed" type="text" value="research-assistant" autocomplete="off" spellcheck="false">
-                  <button class="random-seed-button" id="random-seed" type="button">
+                  <button class="random-seed-button" id="random-seed" type="button" data-track="generator_random_seed">
                     <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"></rect><circle cx="8" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"></circle><circle cx="8" cy="16" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="16" r="1" fill="currentColor" stroke="none"></circle></svg>
                     Randomize
                   </button>
@@ -552,7 +601,7 @@
                       <button class="single-download-option" type="button" role="menuitem" data-png-size="192">192 &times; 192 px</button>
                       <button class="single-download-option" type="button" role="menuitem" data-png-size="200">200 &times; 200 px</button>
                       <p class="single-download-section-title single-download-svg-title">SVG</p>
-                      <button class="single-download-option" id="download-svg" type="button" role="menuitem">Download SVG</button>
+                      <button class="single-download-option" id="download-svg" type="button" role="menuitem" data-track="generator_download_svg">Download SVG</button>
                     </div>
                   </details>
                   <div class="single-secondary-actions">
@@ -663,7 +712,7 @@ design-agent</textarea>
                 <label id="set-size-label" for="set-size-range">Avatars</label>
                 <input id="set-size-range" type="range" min="2" max="64" step="1" value="6" aria-label="Number of avatars">
                 <output id="set-size-output" for="set-size-range set-size-number">6</output>
-                <button class="random-seed-button" id="random-set-seeds" type="button">
+                <button class="random-seed-button" id="random-set-seeds" type="button" data-track="generator_random_set">
                   <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="3.5" width="17" height="17" rx="3"></rect><circle cx="8" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="8" r="1" fill="currentColor" stroke="none"></circle><circle cx="12" cy="12" r="1" fill="currentColor" stroke="none"></circle><circle cx="8" cy="16" r="1" fill="currentColor" stroke="none"></circle><circle cx="16" cy="16" r="1" fill="currentColor" stroke="none"></circle></svg>
                   Randomize
                 </button>
@@ -680,7 +729,7 @@ design-agent</textarea>
                       <button class="single-download-option" type="button" role="menuitem" data-set-png-size="192" disabled>192 &times; 192 px</button>
                       <button class="single-download-option" type="button" role="menuitem" data-set-png-size="200" disabled>200 &times; 200 px</button>
                       <p class="single-download-section-title single-download-svg-title">SVG</p>
-                      <button class="single-download-option" id="download-set-svg" type="button" role="menuitem" disabled>SVG files (.zip)</button>
+                      <button class="single-download-option" id="download-set-svg" type="button" role="menuitem" data-track="generator_download_set_svg" disabled>SVG files (.zip)</button>
                       <p class="single-download-section-title single-download-svg-title">Manifest</p>
                       <button class="single-download-option copy-button" id="copy-set-manifest" type="button" role="menuitem" disabled>Copy manifest</button>
                       <button class="single-download-option" id="download-set-manifest" type="button" role="menuitem" disabled>Download JSON</button>
@@ -725,7 +774,7 @@ design-agent</textarea>
     <section class="section">
       <div class="container install-card">
         <div><h2>Add it to your project.</h2><p>ESM, CommonJS, TypeScript declarations, React, SVG, and Node.js PNG exports are included.</p></div>
-        <div class="install-command"><code>npm install agent-avatars</code><button class="copy-button" id="copy-install-bottom" type="button">Copy</button></div>
+        <div class="install-command"><code>npm install agent-avatars</code><button class="copy-button" id="copy-install-bottom" type="button" data-track="install_copy">Copy</button></div>
       </div>
     </section>
   </main>
@@ -733,12 +782,13 @@ design-agent</textarea>
   <footer class="site-footer">
     <div class="container footer-inner">
       <p>Agent Avatars · MIT License · 2026 Felix Koba</p>
-      <div class="footer-links"><a href="https://github.com/NotXf1le/agent-avatars" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.npmjs.com/package/agent-avatars" target="_blank" rel="noreferrer">npm</a><a href="https://ko-fi.com/felixkoba" target="_blank" rel="noreferrer">Ko-fi</a></div>
+      <div class="footer-links"><a href="./docs/">Docs</a><a href="./examples/">Examples</a><a href="./compare/">Compare</a><a href="https://github.com/NotXf1le/agent-avatars" target="_blank" rel="noreferrer" data-track="footer_github">GitHub</a><a href="https://www.npmjs.com/package/agent-avatars" target="_blank" rel="noreferrer" data-track="footer_npm">npm</a><a href="https://ko-fi.com/felixkoba" target="_blank" rel="noreferrer" data-track="footer_support">Ko-fi</a></div>
     </div>
   </footer>
 
   <noscript><p class="sr-only">JavaScript is required to run the avatar generator.</p></noscript>
 
+  <script type="module" src="./assets/site-attribution.mjs"></script>
   <script type="module">
     import { createHashAvatar, createHashAvatarFromDescriptor, createIdentitySetWithFallback } from "./src/index.mjs";
     import { copyTextToClipboard } from "./src/browser-clipboard.mjs";

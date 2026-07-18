@@ -6,6 +6,17 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+### Added
+
+- Added canonical, social preview, crawler discovery, sitemap, and structured software metadata to the GitHub Pages demo.
+- Added a prominent live-generator link to the package README.
+- Added indexable documentation, React, identity-set, private-avatar, examples, and comparison pages with contextual internal links.
+- Added `llms.txt` plus provider-neutral AI referral and conversion events that do not transmit visitor data.
+
+### Changed
+
+- Unified the main demo and documentation pages around the same warm neutral palette, typography, pill controls, radii, shadows, and animated brand avatar.
+
 ### Fixed
 
 - Bounded visual-distance allocation memory by removing retained quadratic shape-neighbor tables.

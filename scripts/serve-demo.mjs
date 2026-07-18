@@ -1,6 +1,6 @@
 import { createReadStream, statSync } from "node:fs";
 import { createServer } from "node:http";
-import { extname, resolve, sep } from "node:path";
+import { extname, join, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("../", import.meta.url)));
@@ -16,16 +16,25 @@ const contentTypes = new Map([
   [".mjs", "text/javascript; charset=utf-8"],
   [".png", "image/png"],
   [".svg", "image/svg+xml"],
+  [".txt", "text/plain; charset=utf-8"],
+  [".xml", "application/xml; charset=utf-8"],
 ]);
 
 const server = createServer((request, response) => {
   try {
     const requestUrl = new URL(request.url ?? "/", "http://127.0.0.1");
     const relativePath = decodeURIComponent(requestUrl.pathname === "/" ? "/index.html" : requestUrl.pathname);
-    const path = resolve(root, `.${relativePath}`);
+    let path = resolve(root, `.${relativePath}`);
     if (path !== root && !path.startsWith(`${root}${sep}`)) {
       response.writeHead(403).end("Forbidden");
       return;
+    }
+    if (statSync(path).isDirectory()) {
+      if (!requestUrl.pathname.endsWith("/")) {
+        response.writeHead(301, { Location: `${requestUrl.pathname}/${requestUrl.search}` }).end();
+        return;
+      }
+      path = join(path, "index.html");
     }
     if (!statSync(path).isFile()) throw new Error("Not a file");
     response.writeHead(200, {

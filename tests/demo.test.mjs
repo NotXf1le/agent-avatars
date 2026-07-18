@@ -1,7 +1,9 @@
 import assert from "node:assert/strict";
 import { existsSync, readFileSync } from "node:fs";
+import { pageFiles } from "../scripts/build-pages.mjs";
 import { copyTextToClipboard } from "../src/browser-clipboard.mjs";
 import { createStoredZip, uniqueArchiveFilename } from "../src/browser-zip.mjs";
+import { getTrafficAttribution } from "../assets/site-attribution.mjs";
 
 function testCrc32(bytes) {
   let crc = 0xffffffff;
@@ -75,19 +77,122 @@ export async function runDemoTests() {
   const demoUrl = new URL("../index.html", import.meta.url);
   const oldDemoUrl = new URL("../examples/demo.html", import.meta.url);
   const noJekyllUrl = new URL("../.nojekyll", import.meta.url);
+  const robotsUrl = new URL("../robots.txt", import.meta.url);
+  const sitemapUrl = new URL("../sitemap.xml", import.meta.url);
+  const llmsUrl = new URL("../llms.txt", import.meta.url);
+  const socialPreviewUrl = new URL("../examples/hero-agent-dashboard.png", import.meta.url);
+  const demoServerUrl = new URL("../scripts/serve-demo.mjs", import.meta.url);
+  const publicPages = Object.freeze([
+    ["docs/index.html", "https://notxf1le.github.io/agent-avatars/docs/"],
+    ["react/index.html", "https://notxf1le.github.io/agent-avatars/react/"],
+    ["identity-sets/index.html", "https://notxf1le.github.io/agent-avatars/identity-sets/"],
+    ["private-avatars/index.html", "https://notxf1le.github.io/agent-avatars/private-avatars/"],
+    ["examples/index.html", "https://notxf1le.github.io/agent-avatars/examples/"],
+    ["compare/index.html", "https://notxf1le.github.io/agent-avatars/compare/"],
+  ]);
 
   assert.equal(existsSync(demoUrl), true, "GitHub Pages root index.html is missing.");
   assert.equal(existsSync(oldDemoUrl), false, "Only one public demo page should exist.");
   assert.equal(existsSync(noJekyllUrl), true, ".nojekyll is required for static GitHub Pages delivery.");
+  assert.equal(existsSync(robotsUrl), true, "robots.txt is required for crawler policy and sitemap discovery.");
+  assert.equal(existsSync(sitemapUrl), true, "sitemap.xml is required for canonical URL discovery.");
+  assert.equal(existsSync(llmsUrl), true, "llms.txt is required for concise agent-readable discovery.");
+  assert.equal(existsSync(socialPreviewUrl), true, "The social preview image is missing.");
+  for (const publicFile of [
+    "assets/docs.css",
+    "assets/favicon.svg",
+    "assets/site-attribution.mjs",
+    "assets/site-brand.mjs",
+    "llms.txt",
+    "robots.txt",
+    "sitemap.xml",
+    "examples/batch-uniqueness.png",
+    "examples/deterministic-output.png",
+    "examples/hero-agent-dashboard.png",
+    "examples/private-seed-flow.png",
+    ...publicPages.map(([path]) => path),
+  ]) {
+    assert.ok(pageFiles.includes(publicFile), `GitHub Pages artifact must include ${publicFile}.`);
+  }
+
+  const publicTitles = new Set();
+  for (const [relativePath, canonical] of publicPages) {
+    const pageUrl = new URL(`../${relativePath}`, import.meta.url);
+    assert.equal(existsSync(pageUrl), true, `${relativePath} is missing.`);
+    const pageHtml = readFileSync(pageUrl, "utf8");
+    const title = pageHtml.match(/<title>([^<]+)<\/title>/)?.[1];
+    assert.ok(title, `${relativePath} must have a non-empty title.`);
+    assert.equal(publicTitles.has(title), false, `${relativePath} must have a unique title.`);
+    publicTitles.add(title);
+    assert.equal((pageHtml.match(/<h1(?:\s[^>]*)?>/g) ?? []).length, 1, `${relativePath} must have exactly one h1.`);
+    assert.equal((pageHtml.match(/rel="canonical"/g) ?? []).length, 1, `${relativePath} must have exactly one canonical.`);
+    assert.ok(pageHtml.includes(`<link rel="canonical" href="${canonical}">`), `${relativePath} has the wrong canonical.`);
+    assert.match(pageHtml, /<meta name="description" content="[^"]{80,}">/);
+    assert.match(pageHtml, /<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">/);
+    assert.match(pageHtml, /<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/);
+    const jsonLd = pageHtml.match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/)?.[1];
+    assert.doesNotThrow(() => JSON.parse(jsonLd), `${relativePath} must contain valid JSON-LD.`);
+    assert.match(pageHtml, /src="\.\.\/assets\/site-attribution\.mjs"/);
+    assert.match(pageHtml, /src="\.\.\/assets\/site-brand\.mjs"/);
+    assert.match(pageHtml, /href="\.\.\/assets\/docs\.css"/);
+    assert.match(pageHtml, /href="\.\.\/assets\/favicon\.svg"/);
+    assert.match(pageHtml, /<img class="brand-mark" data-brand-avatar/);
+  }
 
   const html = readFileSync(demoUrl, "utf8");
+  const robots = readFileSync(robotsUrl, "utf8");
+  const sitemap = readFileSync(sitemapUrl, "utf8");
+  const llms = readFileSync(llmsUrl, "utf8");
+  const demoServer = readFileSync(demoServerUrl, "utf8");
   const moduleMatch = html.match(/from\s*["']([^"']*src\/index\.mjs)["']/);
+  const structuredDataMatch = html.match(/<script type="application\/ld\+json">\s*([\s\S]*?)\s*<\/script>/);
 
+  assert.match(html, /<title>Deterministic Avatar Generator for AI Agents \| Agent Avatars<\/title>/);
+  assert.match(html, /<meta name="description" content="Generate stable SVG and PNG avatars for AI agents/);
+  assert.match(html, /<meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">/);
+  assert.match(html, /<link rel="canonical" href="https:\/\/notxf1le\.github\.io\/agent-avatars\/">/);
+  assert.equal((html.match(/rel="canonical"/g) ?? []).length, 1, "Demo must declare exactly one canonical URL.");
+  assert.match(html, /<meta property="og:image" content="https:\/\/notxf1le\.github\.io\/agent-avatars\/examples\/hero-agent-dashboard\.png">/);
+  assert.match(html, /<meta name="twitter:card" content="summary_large_image">/);
+  assert.match(html, /<h1>Deterministic<br><span>agent avatars\.<\/span><\/h1>/);
+  assert.ok(structuredDataMatch, "Demo must include JSON-LD software metadata.");
+  const structuredData = JSON.parse(structuredDataMatch[1]);
+  assert.equal(structuredData["@type"], "SoftwareApplication");
+  assert.equal(structuredData.url, "https://notxf1le.github.io/agent-avatars/");
+  assert.equal(structuredData.codeRepository, "https://github.com/NotXf1le/agent-avatars");
+  assert.equal(structuredData.offers.price, "0");
+  assert.match(robots, /^User-agent: \*\r?\nAllow: \/$/m);
+  assert.match(robots, /^User-agent: OAI-SearchBot\r?\nAllow: \/$/m);
+  assert.match(robots, /^User-agent: PerplexityBot\r?\nAllow: \/$/m);
+  assert.match(robots, /^Sitemap: https:\/\/notxf1le\.github\.io\/agent-avatars\/sitemap\.xml$/m);
+  assert.match(sitemap, /<loc>https:\/\/notxf1le\.github\.io\/agent-avatars\/<\/loc>/);
+  assert.equal((sitemap.match(/<loc>/g) ?? []).length, publicPages.length + 1, "Sitemap must contain every canonical page URL.");
+  for (const [, canonical] of publicPages) assert.ok(sitemap.includes(`<loc>${canonical}</loc>`));
+  assert.match(llms, /^# Agent Avatars$/m);
+  assert.match(llms, /npm install agent-avatars/);
+  for (const [, canonical] of publicPages) assert.ok(llms.includes(canonical));
+  assert.match(demoServer, /\["\.txt", "text\/plain; charset=utf-8"\]/);
+  assert.match(demoServer, /\["\.xml", "application\/xml; charset=utf-8"\]/);
+  assert.match(demoServer, /statSync\(path\)\.isDirectory\(\)/);
+  assert.match(demoServer, /Location: `\$\{requestUrl\.pathname\}\/\$\{requestUrl\.search\}`/);
+  assert.match(html, /src="\.\/assets\/site-attribution\.mjs"/);
+  assert.match(html, /href="\.\/docs\/"/);
+  assert.match(html, /href="\.\/examples\/"/);
+  assert.match(html, /href="\.\/compare\/"/);
   assert.ok(moduleMatch, "Demo must import the source module with a relative path.");
   assert.equal(moduleMatch[1], "./src/index.mjs");
   assert.match(html, /from "\.\/src\/browser-zip\.mjs"/);
   assert.equal(html.includes("/dist/"), false, "Demo must not depend on generated dist files.");
   assert.equal(html.includes("width: min(100% - 24px, 1180px)"), false, "Mobile container math must use calc().");
+  assert.match(html, /--page:\s*#f5f3ed;/);
+  assert.match(html, /--surface-soft:\s*#eeece5;/);
+  assert.match(html, /--accent:\s*#7357ff;/);
+  assert.match(html, /--radius-lg:\s*36px;/);
+  assert.match(html, /\.container\s*\{[^}]*1080px/);
+  assert.match(html, /\.button\s*\{[^}]*border-radius:\s*999px/);
+  assert.match(html, /\.install-card\s*\{[^}]*width:\s*min\(calc\(100% - 20px\), calc\(50% \+ 540px\)\);[^}]*margin-left:\s*0/);
+  assert.match(html, /@media \(max-width: 640px\)[\s\S]*\.install-card \{ width:\s*calc\(100% - 12px\); \}/);
+  assert.match(html, /\.hero h1 span\s*\{\s*color:\s*inherit;/);
   assert.match(html, /grid-template-columns:\s*repeat\(2, minmax\(0, 1fr\)\)/);
   assert.match(html, /\.showcase-page\s*\{[^}]*flex:\s*0 0 100%/);
   assert.match(html, /copyTextToClipboard/);
@@ -102,6 +207,12 @@ export async function runDemoTests() {
   assert.match(html, /\.single-export-bar\s*\{[^}]*display:\s*flex;[^}]*align-items:\s*center/);
   assert.match(html, /\.single-workspace-head\s*\{[^}]*min-height:\s*86px/);
   assert.match(html, /\.set-workspace-head\s*\{[^}]*min-height:\s*86px/);
+  assert.match(html, /\.set-workspace-head\s*\{[^}]*justify-content:\s*flex-start;[^}]*gap:\s*16px/);
+  assert.match(html, /\.set-title-block\s*\{[^}]*flex:\s*0 0 170px/);
+  assert.match(html, /\.set-size-control\s*\{[^}]*min-width:\s*330px;[^}]*max-width:\s*400px/);
+  assert.match(html, /\.set-workspace-actions, \.set-export-actions\s*\{[^}]*gap:\s*8px/);
+  assert.match(html, /\.set-workspace-actions\s*\{[^}]*margin-left:\s*auto/);
+  assert.match(html, /@media \(max-width: 1020px\)[\s\S]*\.set-workspace-head \{ flex-wrap:\s*wrap; \}[\s\S]*\.set-size-control \{[^}]*flex-basis:\s*100%/);
   assert.match(html, /\.set-preview-panel\s*\{[^}]*gap:\s*16px/);
   assert.match(html, /\.single-seed-field > \.field-label, \.set-title-block h3\s*\{[^}]*font-size:\s*\.88rem/);
   assert.match(html, /id="preview-title">Avatar preview<\/h3>/);
@@ -220,6 +331,26 @@ export async function runDemoTests() {
   assert.equal(identitySet.items.length, 2);
   assert.equal(Object.keys(identitySet.manifest.entries).length, 2);
 
+  assert.deepEqual(getTrafficAttribution(
+    "https://notxf1le.github.io/agent-avatars/docs/?utm_source=chatgpt.com&utm_campaign=answer",
+  ), {
+    source: "chatgpt",
+    medium: "referral",
+    campaign: "answer",
+    landingPath: "/agent-avatars/docs/",
+    aiReferral: true,
+  });
+  assert.deepEqual(getTrafficAttribution(
+    "https://notxf1le.github.io/agent-avatars/react/",
+    "https://www.perplexity.ai/search/example",
+  ), {
+    source: "perplexity",
+    medium: "referral",
+    campaign: "none",
+    landingPath: "/agent-avatars/react/",
+    aiReferral: true,
+  });
+
   const encoder = new TextEncoder();
   const zip = createStoredZip([
     { name: "avatar.svg", data: encoder.encode("<svg/>") },
@@ -269,6 +400,11 @@ export async function runDemoTests() {
     entry: "index.html",
     sourceModule: moduleMatch[1],
     githubPagesRoot: true,
+    seoMetadata: true,
+    crawlerDiscovery: true,
+    contentLandingPages: publicPages.length,
+    aiAttribution: true,
+    socialPreview: true,
     friendlyDefaults: true,
     thirdPartyScripts: false,
     clipboardFallback: true,

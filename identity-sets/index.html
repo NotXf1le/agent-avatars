@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Visually Distinct Avatar Sets for Multi-Agent Systems</title>
+  <meta name="description" content="Create deterministic, visually distinct avatar sets for multi-agent systems with exact signature uniqueness, distance policies, and reusable manifests.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://notxf1le.github.io/agent-avatars/identity-sets/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <meta property="og:type" content="article"><meta property="og:site_name" content="Agent Avatars">
+  <meta property="og:title" content="Visually Distinct Avatar Sets for Multi-Agent Systems">
+  <meta property="og:description" content="Allocate stable agent identities as a group and preserve them as the roster grows.">
+  <meta property="og:url" content="https://notxf1le.github.io/agent-avatars/identity-sets/">
+  <meta property="og:image" content="https://notxf1le.github.io/agent-avatars/examples/batch-uniqueness.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../assets/docs.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"TechArticle","headline":"Visually distinct avatar sets for multi-agent systems","description":"Identity-set allocation, visual distance, and manifest guidance for Agent Avatars.","url":"https://notxf1le.github.io/agent-avatars/identity-sets/","isPartOf":{"@type":"WebSite","name":"Agent Avatars","url":"https://notxf1le.github.io/agent-avatars/"},"codeRepository":"https://github.com/NotXf1le/agent-avatars"}
+  </script>
+</head>
+<body>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="../" aria-label="Agent Avatars home"><img class="brand-mark" data-brand-avatar src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="34" height="34" alt="" aria-hidden="true"><span>Agent Avatars</span></a><nav class="nav" aria-label="Main navigation"><a href="../docs/">Docs</a><a href="../examples/">Examples</a><a href="../compare/">Compare</a><a href="https://github.com/NotXf1le/agent-avatars">GitHub</a></nav></div></header>
+  <main>
+    <div class="container breadcrumbs"><a href="../">Home</a><span aria-hidden="true">/</span><span>Identity sets</span></div>
+    <section class="container hero"><p class="eyebrow">Multi-agent identity</p><h1>Make a roster distinct as a system.</h1><p>Allocate avatars together when operators must tell research, billing, security, and orchestration agents apart. Exact signature uniqueness is built in; optional distance rules add visible separation.</p><div class="actions"><a class="button button-primary" href="#allocate" data-track="sets_allocate">Allocate a set</a><a class="button" href="../#playground" data-track="sets_generator">Try identity-set mode</a></div></section>
+    <nav class="container section-nav" aria-label="On this page"><a href="#allocate">Allocate</a><a href="#distance">Visual distance</a><a href="#manifests">Manifests</a><a href="#fallback">Fallback</a><a href="#limits">Limits</a></nav>
+
+    <section class="section" id="allocate"><div class="container"><div class="section-heading"><h2>Allocate identities together.</h2><p><code>createIdentitySet()</code> sorts identity work deterministically, assigns signatures, and returns both render descriptors and a manifest for later growth.</p></div><pre><code>import { createIdentitySet } from "agent-avatars";
+
+const team = createIdentitySet(
+  ["research", "support", "billing"],
+  {
+    namespace: "my-product/agents",
+    ensureUnique: true,
+    minimumShapeDistance: 4,
+    minimumPaletteDistance: 20,
+    distanceMode: "either",
+    includeSvg: true,
+  }
+);</code></pre></div></section>
+
+    <section class="section" id="distance"><div class="container"><div class="section-heading"><h2>Separate shape, palette, or both.</h2><p>A signature prevents exact shape-and-palette duplicates. A visual-distance policy can additionally require different bitmap cells, different palette appearance, or both cues.</p></div><div class="grid"><article class="card"><h3>Shape distance</h3><p>Hamming distance across the complete 5 × 4 bitmap. The integer threshold ranges from 0 to 20.</p></article><article class="card"><h3>Palette distance</h3><p>A versioned perceptual metric compares light and dark foreground/background pairs. The finite threshold ranges from 0 to 100.</p></article><article class="card"><h3>Either or both</h3><p><code>either</code> accepts one sufficiently strong cue. <code>both</code> requires both thresholds and is stricter for small sets.</p></article></div><p class="callout">Higher thresholds reduce feasible capacity. The allocator is deterministic and greedy; exhausting its attempt limit does not prove that no packing exists elsewhere.</p></div></section>
+
+    <section class="section" id="manifests"><div class="container"><div class="section-heading"><h2>Keep historical assignments stable.</h2><p>Persist the returned manifest and pass it back when the roster grows. Existing agents keep their signatures while new identities are constrained by the stored policy.</p></div><pre><code>const first = createIdentitySet(["research", "support"], policy);
+
+saveManifest(first.manifest);
+
+const expanded = createIdentitySet(
+  ["research", "support", "billing"],
+  { ...policy, manifest: loadManifest() }
+);</code></pre><p class="callout">Treat the manifest as versioned application data. A stored policy must match the next request, and tampered assignments are validated before use.</p></div></section>
+
+    <section class="section" id="fallback"><div class="container"><div class="section-heading"><h2>A controlled fallback for interactive tools.</h2><p>The strict API throws when allocation is infeasible. Interactive interfaces can choose the fallback helper, inspect its adjustment, and explain the effective policy to the user.</p></div><pre><code>import { createIdentitySetWithFallback } from "agent-avatars";
+
+const team = createIdentitySetWithFallback(seeds, {
+  minimumShapeDistance: 8,
+  minimumPaletteDistance: 30,
+  distanceMode: "both",
+  manifest: previousManifest,
+});
+
+if (team.policyAdjustment) {
+  console.info(team.policyAdjustment);
+}</code></pre><p class="callout">The fallback helper never weakens an existing manifest policy. For a new set, it performs a bounded deterministic relaxation and reports requested and applied values.</p></div></section>
+
+    <section class="section" id="limits"><div class="container"><div class="section-heading"><h2>Capacity is explicit.</h2><p>Validation happens before expensive work. Use the catalog stats and errors to set product limits that match your palettes and separation policy.</p></div><div class="grid two"><article class="card"><h3>Bounded input</h3><p>One call accepts at most 10,000 seeds, 10,000 manifest entries, and 256 custom palettes.</p></article><article class="card"><h3>Exact capacity</h3><p><code>getCatalogStats().signatureStates</code> reports shape-and-palette signature capacity, not guaranteed perceptual capacity under a distance policy.</p></article></div></div></section>
+
+    <section class="container cta"><h2>See the group before shipping it.</h2><p>The generator can build, inspect, copy, and download a manifest-backed identity set directly in the browser.</p><div class="actions"><a class="button" href="../#playground" data-track="sets_open_generator">Open generator</a><a class="button" href="../examples/" data-track="sets_examples">Integration examples</a></div></section>
+  </main>
+  <footer class="site-footer"><div class="container footer-inner"><p>Agent Avatars · deterministic identity sets</p><div class="footer-links"><a href="../docs/">Docs</a><a href="../react/">React</a><a href="../private-avatars/">Private avatars</a><a href="../compare/">Compare</a></div></div></footer>
+  <script type="module" src="../assets/site-attribution.mjs"></script>
+  <script type="module" src="../assets/site-brand.mjs"></script>
+</body>
+</html>

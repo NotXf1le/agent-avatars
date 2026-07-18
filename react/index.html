@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Deterministic React Avatars for React 18, 19 &amp; SSR</title>
+  <meta name="description" content="Render deterministic agent avatars in React 18 or 19 with TypeScript, server-side rendering, stable seeds, image fallbacks, and local SVG data URIs.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://notxf1le.github.io/agent-avatars/react/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <meta property="og:type" content="article"><meta property="og:site_name" content="Agent Avatars">
+  <meta property="og:title" content="Deterministic React Avatars for React 18, 19 &amp; SSR">
+  <meta property="og:description" content="A typed React image component for stable, locally generated agent identities.">
+  <meta property="og:url" content="https://notxf1le.github.io/agent-avatars/react/">
+  <meta property="og:image" content="https://notxf1le.github.io/agent-avatars/examples/hero-agent-dashboard.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../assets/docs.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"TechArticle","headline":"Deterministic React avatars for React 18, 19, and SSR","description":"React and TypeScript integration guide for Agent Avatars.","url":"https://notxf1le.github.io/agent-avatars/react/","isPartOf":{"@type":"WebSite","name":"Agent Avatars","url":"https://notxf1le.github.io/agent-avatars/"},"codeRepository":"https://github.com/NotXf1le/agent-avatars"}
+  </script>
+</head>
+<body>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="../" aria-label="Agent Avatars home"><img class="brand-mark" data-brand-avatar src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="34" height="34" alt="" aria-hidden="true"><span>Agent Avatars</span></a><nav class="nav" aria-label="Main navigation"><a href="../docs/">Docs</a><a href="../examples/">Examples</a><a href="../compare/">Compare</a><a href="https://github.com/NotXf1le/agent-avatars">GitHub</a></nav></div></header>
+  <main>
+    <div class="container breadcrumbs"><a href="../">Home</a><span aria-hidden="true">/</span><span>React</span></div>
+    <section class="container hero"><p class="eyebrow">React integration</p><h1>Stable agent identity across client and server.</h1><p>Render deterministic avatars through a typed React 18/19 component. The same seed and options produce the same local SVG data URI during server-side rendering and in the browser.</p><div class="actions"><a class="button button-primary" href="#component" data-track="react_component">Use the component</a><a class="button" href="../#playground" data-track="react_generator">Try a seed</a></div></section>
+    <nav class="container section-nav" aria-label="On this page"><a href="#component">Component</a><a href="#ssr">SSR</a><a href="#fallback">Fallback</a><a href="#url">URL props</a><a href="#typescript">TypeScript</a></nav>
+
+    <section class="section" id="component"><div class="container"><div class="section-heading"><h2>One component, ordinary image props.</h2><p><code>AgentAvatar</code> renders an <code>&lt;img&gt;</code>. Pass a stable seed, display size, avatar options, accessible alternative text, and normal image attributes.</p></div><pre><code>import { AgentAvatar } from "agent-avatars/react";
+
+export function ResearchAssistant() {
+  return (
+    &lt;AgentAvatar
+      seed="research-assistant"
+      size={64}
+      options={{ namespace: "my-product/agents", theme: "dark" }}
+      alt="Research assistant"
+      className="agent-avatar"
+    /&gt;
+  );
+}</code></pre></div></section>
+
+    <section class="section" id="ssr"><div class="container"><div class="section-heading"><h2>SSR without an avatar request.</h2><p>Generation is synchronous and local. Server-rendered markup already contains the deterministic SVG data URI, so the identity does not wait for an external avatar API.</p></div><div class="grid"><article class="card"><h3>React 18 and 19</h3><p>The optional peer dependency range is <code>&gt;=18 &lt;20</code>. Install React separately in your application.</p></article><article class="card"><h3>Stable hydration input</h3><p>Use the same seed, namespace, theme, and palette on the server and client. Do not derive the seed from a browser-only random value.</p></article><article class="card"><h3>Forwarded ref</h3><p>The component forwards its ref to the underlying image element and accepts image attributes except direct <code>src</code>, width, and height control.</p></article></div></div></section>
+
+    <section class="section" id="fallback"><div class="container"><div class="section-heading"><h2>Keep uploaded images first.</h2><p>Use an explicitly configured image while it loads successfully, and switch to a deterministic identity only when the source is missing or broken.</p></div><pre><code>import { useState } from "react";
+import { AgentAvatar } from "agent-avatars/react";
+
+export function AgentImage({ src, agent }) {
+  const [failedSrc, setFailedSrc] = useState();
+
+  if (!src || failedSrc === src) {
+    return (
+      &lt;AgentAvatar
+        seed={agent.id ?? agent.name}
+        size={40}
+        options={{ namespace: "my-product/agents" }}
+        alt={`${agent.name} avatar`}
+      /&gt;
+    );
+  }
+
+  return &lt;img src={src} width="40" height="40" alt={`${agent.name} avatar`} onError={() =&gt; setFailedSrc(src)} /&gt;;
+}</code></pre></div></section>
+
+    <section class="section" id="url"><div class="container"><div class="section-heading"><h2>When a component wants a URL.</h2><p>Some UI kits accept an <code>avatar</code> or <code>src</code> string instead of a React element. Generate a local SVG data URI through the root entry point.</p></div><pre><code>import { avatarDataUri } from "agent-avatars";
+
+const item = {
+  title: agent.name,
+  avatar: avatarDataUri(agent.id, {
+    namespace: "my-product/agents",
+    theme: "light",
+    size: 40,
+  }),
+};</code></pre><p class="callout">If your application has a Content Security Policy, allow <code>data:</code> for images before using SVG data URIs.</p></div></section>
+
+    <section class="section" id="typescript"><div class="container"><div class="section-heading"><h2>Typed subpath imports.</h2><p>Declarations ship with the package. TypeScript consumers need TypeScript 4.7 or newer and <code>Node16</code>, <code>NodeNext</code>, or <code>Bundler</code> module resolution.</p></div><div class="grid two"><article class="card"><h3>Seed selection</h3><p>Prefer an immutable agent ID. Names work as a fallback, but renaming a display label will also change its avatar.</p></article><article class="card"><h3>Private identifiers</h3><p>Never render a sensitive identifier directly in browser code. Use the <a href="../private-avatars/">server-side HMAC workflow</a>.</p></article></div></div></section>
+
+    <section class="container cta"><h2>Build a complete agent roster.</h2><p>When individual deterministic hashes are not enough, allocate a reusable set with explicit visual separation.</p><div class="actions"><a class="button" href="../identity-sets/" data-track="react_identity_sets">Identity-set guide</a><a class="button" href="../docs/" data-track="react_docs">All APIs</a></div></section>
+  </main>
+  <footer class="site-footer"><div class="container footer-inner"><p>Agent Avatars · React 18/19 · MIT</p><div class="footer-links"><a href="../docs/">Docs</a><a href="../examples/">Examples</a><a href="../private-avatars/">Private avatars</a><a href="https://www.npmjs.com/package/agent-avatars">npm</a></div></div></footer>
+  <script type="module" src="../assets/site-attribution.mjs"></script>
+  <script type="module" src="../assets/site-brand.mjs"></script>
+</body>
+</html>

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Private Deterministic Avatars with Server-Side HMAC</title>
+  <meta name="description" content="Generate stable avatars from sensitive identifiers without exposing the original seed. Derive HMAC-SHA-256 identity seeds in Node.js and render safe output.">
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1">
+  <link rel="canonical" href="https://notxf1le.github.io/agent-avatars/private-avatars/">
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <meta property="og:type" content="article"><meta property="og:site_name" content="Agent Avatars">
+  <meta property="og:title" content="Private Deterministic Avatars with Server-Side HMAC">
+  <meta property="og:description" content="Protect sensitive avatar seeds with the Node.js-only private entry point.">
+  <meta property="og:url" content="https://notxf1le.github.io/agent-avatars/private-avatars/">
+  <meta property="og:image" content="https://notxf1le.github.io/agent-avatars/examples/private-seed-flow.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="../assets/docs.css">
+  <script type="application/ld+json">
+  {"@context":"https://schema.org","@type":"TechArticle","headline":"Private deterministic avatars with server-side HMAC","description":"A server-side HMAC workflow for sensitive Agent Avatars identity seeds.","url":"https://notxf1le.github.io/agent-avatars/private-avatars/","isPartOf":{"@type":"WebSite","name":"Agent Avatars","url":"https://notxf1le.github.io/agent-avatars/"},"codeRepository":"https://github.com/NotXf1le/agent-avatars"}
+  </script>
+</head>
+<body>
+  <header class="site-header"><div class="container header-inner"><a class="brand" href="../" aria-label="Agent Avatars home"><img class="brand-mark" data-brand-avatar src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" width="34" height="34" alt="" aria-hidden="true"><span>Agent Avatars</span></a><nav class="nav" aria-label="Main navigation"><a href="../docs/">Docs</a><a href="../examples/">Examples</a><a href="../compare/">Compare</a><a href="https://github.com/NotXf1le/agent-avatars">GitHub</a></nav></div></header>
+  <main>
+    <div class="container breadcrumbs"><a href="../">Home</a><span aria-hidden="true">/</span><span>Private avatars</span></div>
+    <section class="container hero"><p class="eyebrow">Private identity</p><h1>Stable avatars without exposing the identifier.</h1><p>Ordinary deterministic output is reproducible by anyone who knows the seed. For emails, account IDs, or other sensitive values, derive an HMAC seed on a trusted Node.js server first.</p><div class="actions"><a class="button button-primary" href="#workflow" data-track="private_workflow">Use the private API</a><a class="button" href="../docs/" data-track="private_docs">Read all APIs</a></div></section>
+    <nav class="container section-nav" aria-label="On this page"><a href="#workflow">Workflow</a><a href="#api">API</a><a href="#secrets">Secrets</a><a href="#rotation">Rotation</a><a href="#limits">Limitations</a></nav>
+
+    <section class="section" id="workflow"><div class="container"><div class="section-heading"><h2>Derive on the server, render the result.</h2><p>The private entry point canonicalizes the identifier and namespace, then signs a domain-separated message with HMAC-SHA-256. Only the derived value needs to reach ordinary rendering code.</p></div><div class="grid"><article class="card"><h3>1. Trusted input</h3><p>Receive the sensitive identity inside a server route, job, or trusted Node.js process.</p></article><article class="card"><h3>2. HMAC derivation</h3><p>Use a secret of at least 32 encoded bytes. The secret never belongs in a client bundle.</p></article><article class="card"><h3>3. Safe rendering seed</h3><p>Render the returned <code>hmac-sha256:</code> value or call a private avatar helper directly.</p></article></div></div></section>
+
+    <section class="section" id="api"><div class="container"><div class="section-heading"><h2>Three asynchronous helpers.</h2><p>Import from the Node.js-only <code>agent-avatars/private</code> entry point. It uses the Web Crypto implementation from <code>node:crypto</code>.</p></div><pre><code>import { derivePrivateSeed } from "agent-avatars/private";
+import { createHashAvatar } from "agent-avatars";
+
+const privateSeed = await derivePrivateSeed("person@example.com", {
+  namespace: "my-product/users",
+  secret: process.env.AVATAR_HMAC_SECRET,
+});
+
+const svg = createHashAvatar(privateSeed, {
+  seedMode: "raw",
+  namespace: "my-product/users",
+});</code></pre><div class="grid"><article class="card"><h3><code>derivePrivateSeed()</code></h3><p>Returns the stable HMAC-derived seed for storage or use by another renderer.</p></article><article class="card"><h3><code>createPrivateAvatarDescriptor()</code></h3><p>Returns a complete descriptor without exposing an ordinary seed to the avatar selection step.</p></article><article class="card"><h3><code>createPrivateHashAvatar()</code></h3><p>Derives and renders an SVG string in one asynchronous call.</p></article></div></div></section>
+
+    <section class="section" id="secrets"><div class="container"><div class="section-heading"><h2>Treat the secret as production infrastructure.</h2><p>Use a secret manager or protected environment configuration. Validate that it exists at startup and keep environments isolated.</p></div><div class="grid two"><article class="card"><h3>Do</h3><ul><li>Generate a high-entropy value of at least 32 bytes.</li><li>Keep separate secrets for unrelated trust boundaries.</li><li>Limit access to the service that derives identities.</li><li>Back up the secret if identities must remain stable.</li></ul></article><article class="card"><h3>Do not</h3><ul><li>Commit the secret to source control.</li><li>Prefix a public seed with a fixed string and call it private.</li><li>Expose the private entry point or secret in browser code.</li><li>Log the original identifier and secret together.</li></ul></article></div></div></section>
+
+    <section class="section" id="rotation"><div class="container"><div class="section-heading"><h2>Secret rotation changes identity.</h2><p>HMAC output depends on the secret. Rotating it intentionally produces new derived seeds and therefore new avatars.</p></div><div class="prose"><p>Plan rotation like a data migration: version the active secret, keep the previous version during a controlled transition, regenerate stored output, and remove old access only when clients have adopted the new identity.</p><p class="callout">The package does not manage keys, store identifiers, or migrate existing records. Those responsibilities remain with the application.</p></div></div></section>
+
+    <section class="section" id="limits"><div class="container"><div class="section-heading"><h2>Know what HMAC does not solve.</h2><p>It prevents reproduction without the secret; it does not make the final avatar anonymous in every product context.</p></div><div class="grid two"><article class="card"><h3>Stable output is still linkable</h3><p>The same private identity remains recognizable wherever the same derivation domain and rendering options are reused.</p></article><article class="card"><h3>Access patterns still matter</h3><p>Application logs, URLs, analytics payloads, and surrounding profile data can reveal identity independently of the avatar.</p></article></div></div></section>
+
+    <section class="container cta"><h2>Keep public and private identity flows separate.</h2><p>Use ordinary seeds for agents and services that are already public. Reserve server-side derivation for identifiers that should not be guessable.</p><div class="actions"><a class="button" href="../examples/" data-track="private_examples">View server examples</a><a class="button" href="../identity-sets/" data-track="private_sets">Plan identity sets</a></div></section>
+  </main>
+  <footer class="site-footer"><div class="container footer-inner"><p>Agent Avatars · Node.js private identities</p><div class="footer-links"><a href="../docs/">Docs</a><a href="../react/">React</a><a href="../examples/">Examples</a><a href="https://github.com/NotXf1le/agent-avatars/blob/main/SECURITY.md">Security</a></div></div></footer>
+  <script type="module" src="../assets/site-attribution.mjs"></script>
+  <script type="module" src="../assets/site-brand.mjs"></script>
+</body>
+</html>
