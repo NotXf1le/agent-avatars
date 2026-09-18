@@ -110,13 +110,13 @@ const output = {
     });
   }),
   gallery: diverseGallery.map((item) => ({
-    light: avatar(item.seed, 84, {
+    light: avatar(item.seed, 128, {
       namespace: "readme-gallery-diverse",
       palette: item.palette,
       theme: "light",
       collisionNonce: item.collisionNonce,
     }),
-    dark: avatar(item.seed, 84, {
+    dark: avatar(item.seed, 128, {
       namespace: "readme-gallery-diverse",
       palette: item.palette,
       theme: "dark",

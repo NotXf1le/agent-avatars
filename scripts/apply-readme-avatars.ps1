@@ -71,23 +71,6 @@ function Paint-Avatar($graphics, $asset, [int] $centerX, [int] $centerY, [string
   }
 }
 
-function Paint-PaletteLabel($graphics, [string] $paletteId, [int] $x, [int] $y) {
-  $surfaceBrush = [System.Drawing.SolidBrush]::new((Color "#FFFFFF"))
-  $graphics.FillRectangle($surfaceBrush, $x, $y, 230, 22)
-  $surfaceBrush.Dispose()
-
-  $font = [System.Drawing.Font]::new(
-    "Consolas",
-    12,
-    [System.Drawing.FontStyle]::Regular,
-    [System.Drawing.GraphicsUnit]::Pixel
-  )
-  $textBrush = [System.Drawing.SolidBrush]::new((Color "#6E6A63"))
-  $graphics.DrawString("palette: $paletteId", $font, $textBrush, $x, $y)
-  $textBrush.Dispose()
-  $font.Dispose()
-}
-
 function Apply-Hero {
   $path, $bitmap, $graphics = Open-Graphic "hero-agent-dashboard.png"
   for ($i = 0; $i -lt $assets.hero.Count; $i++) {
@@ -102,15 +85,17 @@ function Apply-Hero {
 }
 
 function Apply-Gallery {
-  $path, $bitmap, $graphics = Open-Graphic "avatar-gallery.png"
+  $path = Join-Path $Examples "avatar-gallery.png"
+  $bitmap = [System.Drawing.Bitmap]::new(1200, 440)
+  $graphics = [System.Drawing.Graphics]::FromImage($bitmap)
+  $graphics.Clear((Color "#FFFFFF"))
   for ($i = 0; $i -lt $assets.gallery.Count; $i++) {
     $column = $i % 4
     $row = [Math]::Floor($i / 4)
-    $x = 48 + $column * 276
-    $y = 120 + $row * 208
-    Paint-PaletteLabel $graphics $assets.gallery[$i].light.paletteId ($x + 20) ($y + 46)
-    Paint-Avatar $graphics $assets.gallery[$i].light ($x + 86) ($y + 132) "#FFFFFF"
-    Paint-Avatar $graphics $assets.gallery[$i].dark ($x + 194) ($y + 132) "#FFFFFF"
+    $x = 180 + $column * 280
+    $y = 120 + $row * 200
+    Paint-Avatar $graphics $assets.gallery[$i].light ($x - 56) $y "#FFFFFF"
+    Paint-Avatar $graphics $assets.gallery[$i].dark ($x + 56) $y "#FFFFFF"
   }
   Save-Graphic $path $bitmap $graphics
 }
