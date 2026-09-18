@@ -116,8 +116,32 @@ export async function runSecurityRegressionTests() {
     () => createHashAvatar("numeric-type", { size: null }),
     () => createAvatarPng("numeric-type", { size: null }),
     () => createAvatarPngSet("numeric-type", { sizes: null }),
+    () => createAvatarDescriptor("options-type", []),
+    () => createHashAvatar("options-type", []),
+    () => createHashAvatar("options-type", 32, []),
+    () => createAvatarPng("options-type", []),
+    () => createAvatarPng("options-type", 32, []),
   ]) {
     assert.throws(invoke, TypeError);
+  }
+  for (const palette of [NaN, Infinity, -Infinity]) {
+    assert.throws(() => createAvatarDescriptor("palette-type", { palette }), TypeError);
+  }
+  for (const invoke of [
+    () => createAvatarDescriptor("palette-null", { palette: null }),
+    () => createHashAvatar("palette-null", { palette: null }),
+    () => createAvatarPng("palette-null", { palette: null }),
+  ]) {
+    assert.throws(invoke, TypeError);
+  }
+  for (const palette of [-1, 1.5]) {
+    assert.throws(() => createAvatarDescriptor("palette-range", { palette }), RangeError);
+  }
+  for (const invalidOptions of [null, [], () => {}, "invalid", 1, true]) {
+    assert.throws(
+      () => validateAvatarBitmap(descriptor.rows, invalidOptions),
+      /options must be an object/
+    );
   }
   assert.throws(() => createAvatarDescriptor("numeric-range", { minPixels: 6.5 }), RangeError);
   assert.throws(() => createAvatarDescriptor("numeric-range", { minDensity: -0.1 }), RangeError);
@@ -207,6 +231,26 @@ export async function runSecurityRegressionTests() {
     /manifest.entries must contain at most 10000 entries/
   );
   assert.equal(manifestEntryReads, 0, "manifest entries must not be read after the count limit fails");
+
+  const boundaryOptions = { includeSvg: false, ensureUnique: false };
+  const boundarySet = createIdentitySet(["manifest-boundary-existing"], boundaryOptions);
+  const growthIdentityKey = createIdentitySet(["manifest-boundary-new"], boundaryOptions).items[0].identityKey;
+  const boundaryIdentityKey = boundarySet.items[0].identityKey;
+  const boundaryEntry = boundarySet.manifest.entries[boundaryIdentityKey];
+  for (let index = 0, entryCount = 1; entryCount < MAX_MANIFEST_ENTRIES; index++) {
+    const identityKey = index.toString(16).padStart(32, "0");
+    if (identityKey !== boundaryIdentityKey && identityKey !== growthIdentityKey) {
+      boundarySet.manifest.entries[identityKey] = boundaryEntry;
+      entryCount++;
+    }
+  }
+  assert.doesNotThrow(
+    () => createIdentitySet(["manifest-boundary-existing"], { ...boundaryOptions, manifest: boundarySet.manifest })
+  );
+  assert.throws(
+    () => createIdentitySet(["manifest-boundary-new"], { ...boundaryOptions, manifest: boundarySet.manifest }),
+    /manifest.entries must contain at most 10000 entries/
+  );
 
   assert.throws(
     () => createAvatarPngSet("png-count-limit", {

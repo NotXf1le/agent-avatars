@@ -593,6 +593,9 @@ function getCatalog(constraints) {
 }
 
 function validateAvatarBitmap(gridOrRows, options = {}) {
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("options must be an object.");
+  }
   const rows = normalizeRows(gridOrRows);
   const constraints = normalizeConstraints(options);
   const analysis = analyzeRows(rows);
@@ -698,7 +701,7 @@ function normalizePaletteEntry(input, index, minimumContrast, allowLowContrast) 
 
 function normalizePaletteCollection(options, allowLowContrast) {
   let palettes;
-  let paletteValue = options.palette ?? "auto";
+  let paletteValue = options.palette === undefined ? "auto" : options.palette;
   const minimumContrastValue = options.minimumContrast === undefined
     ? MIN_CUSTOM_CONTRAST
     : options.minimumContrast;
@@ -759,11 +762,14 @@ function normalizePaletteCollection(options, allowLowContrast) {
 }
 
 function normalizeChoice(value, names, label) {
-  if (value === undefined || value === null || value === "auto") {
+  if (value === undefined || value === "auto") {
     return Object.freeze(Array.from({ length: names.length }, (_, index) => index));
   }
 
   if (typeof value === "number") {
+    if (!Number.isFinite(value)) {
+      throw new TypeError(`${label} index must be a finite number.`);
+    }
     if (!Number.isInteger(value) || value < 0 || value >= names.length) {
       throw new RangeError(`${label} index must be an integer in [0, ${names.length - 1}].`);
     }
@@ -982,14 +988,21 @@ function createHashAvatarFromDescriptor(descriptor, size = 96) {
 
 function optionsFromArgs(sizeOrOptions, explicitOptions) {
   if (typeof sizeOrOptions === "object" && sizeOrOptions !== null) {
+    if (Array.isArray(sizeOrOptions)) {
+      throw new TypeError("options must be an object.");
+    }
     return {
       size: sizeOrOptions.size === undefined ? 96 : sizeOrOptions.size,
       options: { ...sizeOrOptions },
     };
   }
+  const options = explicitOptions === undefined ? {} : explicitOptions;
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("options must be an object.");
+  }
   return {
     size: sizeOrOptions === undefined ? 96 : sizeOrOptions,
-    options: { ...(explicitOptions ?? {}) },
+    options: { ...options },
   };
 }
 
@@ -1349,6 +1362,9 @@ function createIdentitySet(seeds, options = {}) {
   }
 
   const unassignedCount = Array.from(uniqueRecords.values()).filter((record) => !manifestEntries[record.identityKey]).length;
+  if (hydratedManifest.resolvedEntries.length + unassignedCount > MAX_MANIFEST_ENTRIES) {
+    throw new RangeError(`manifest.entries must contain at most ${MAX_MANIFEST_ENTRIES} entries.`);
+  }
   if (ensureUnique && usedSignatures.size + unassignedCount > normalized.stateSpace) {
     throw new RangeError(`The requested set needs ${usedSignatures.size + unassignedCount} unique signatures, but the configured state space contains only ${normalized.stateSpace}.`);
   }

@@ -12,6 +12,10 @@ const AgentAvatar = React.forwardRef(function AgentAvatar(props, ref) {
     ...imageProps
   } = props;
 
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("options must be an object.");
+  }
+
   const src = avatarDataUri(seed, { ...options, size });
   return React.createElement("img", {
     ...imageProps,

@@ -30,6 +30,13 @@ export async function runReactTests() {
   assert.match(markup, /loading="lazy"/);
   assert.match(markup, /data-avatar-test="rendered"/);
 
+  for (const options of [null, [], () => {}, "invalid", 1, true]) {
+    assert.throws(
+      () => renderToStaticMarkup(React.createElement(AgentAvatar, { seed: "invalid-options", options })),
+      /options must be an object/
+    );
+  }
+
   return {
     reactVersion: React.version,
     staticRender: true,

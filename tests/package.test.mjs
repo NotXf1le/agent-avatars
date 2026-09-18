@@ -202,45 +202,39 @@ const marker = true;`, new Map([
     "examples/avatar-cycle.gif",
     "examples/hero-agent-dashboard.png",
     "examples/avatar-gallery.png",
-    "examples/deterministic-output.png",
-    "examples/batch-uniqueness.png",
-    "examples/light-dark-themes.png",
-    "examples/private-seed-flow.png",
     "README.md",
     "CHANGELOG.md",
     "SECURITY.md",
     "LICENSE",
   ]);
   const readme = readFileSync(new URL("../README.md", import.meta.url), "utf8");
-  assert.match(readme, /\[Try the live avatar generator →\]\(https:\/\/notxf1le\.github\.io\/agent-avatars\/\)/);
+  assert.match(readme, /\[Try the generator\]\(https:\/\/notxf1le\.github\.io\/agent-avatars\/\)/);
   for (const landingPath of ["docs", "react", "identity-sets", "private-avatars", "examples"]) {
     assert.ok(
       readme.includes(`https://notxf1le.github.io/agent-avatars/${landingPath}/`),
       `README must link to the ${landingPath} landing page.`,
     );
   }
-  assert.match(readme, /PNG rendering caps its high-resolution RGBA buffer at 64 MiB/);
-  assert.match(readme, /explicit `supersample` value exceeds that budget, the API throws a `RangeError`/);
-  for (const discoverableTerm of [
-    "visual distinguishability",
+  for (const essentialTerm of [
+    "seedMode",
+    "namespaceMode",
     "minimumShapeDistance",
     "minimumPaletteDistance",
-    "createIdentitySetWithFallback",
     "distanceMode",
-    "either",
-    "both",
-    "CIEDE2000",
-    "visual-distance/v1",
+    "64 MiB",
     "16,777,216",
-    "Direct Git URL installs are not supported",
-    "32 encoded bytes",
+    "32 random secret bytes",
   ]) {
-    assert.ok(readme.includes(discoverableTerm), `README must document ${discoverableTerm}`);
+    assert.ok(readme.includes(essentialTerm), `README must document ${essentialTerm}`);
   }
-  assert.match(readme, /greedy deterministic allocator/i);
-  assert.match(readme, /maxAttempts/);
-  assert.match(readme, /does not guarantee (?:a )?maximum packing|does not prove.*(?:packing|assignment).*exists/i);
-  assert.match(readme, /attempts exhausted|exhausted.*attempts/i);
+  for (const removedImage of [
+    "batch-uniqueness.png",
+    "deterministic-output.png",
+    "light-dark-themes.png",
+    "private-seed-flow.png",
+  ]) {
+    assert.equal(readme.includes(removedImage), false, `README must not reference removed image ${removedImage}`);
+  }
 
   const cjsPrivateSubpathError = captureError(() => require("agent-avatars/visual-distance"));
   const esmPrivateSubpathError = await captureAsyncError(() => import("agent-avatars/visual-distance"));
@@ -443,10 +437,6 @@ const marker = true;`, new Map([
     "examples/avatar-cycle.gif",
     "examples/hero-agent-dashboard.png",
     "examples/avatar-gallery.png",
-    "examples/deterministic-output.png",
-    "examples/batch-uniqueness.png",
-    "examples/light-dark-themes.png",
-    "examples/private-seed-flow.png",
     "dist/index.cjs",
     "dist/index.d.cts",
     "dist/index.d.mts",

@@ -106,10 +106,7 @@ export async function runDemoTests() {
     "llms.txt",
     "robots.txt",
     "sitemap.xml",
-    "examples/batch-uniqueness.png",
-    "examples/deterministic-output.png",
     "examples/hero-agent-dashboard.png",
-    "examples/private-seed-flow.png",
     ...publicPages.map(([path]) => path),
   ]) {
     assert.ok(pageFiles.includes(publicFile), `GitHub Pages artifact must include ${publicFile}.`);

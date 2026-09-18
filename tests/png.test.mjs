@@ -39,6 +39,12 @@ export async function runPngTests() {
   const descriptor = createAvatarDescriptor("descriptor-check", { namespace: "png" });
   const expected = png.createAvatarPngFromDescriptor(descriptor, 32);
   assert.deepEqual(dimensions(expected), [32, 32]);
+  for (const invalidOptions of [null, [], () => {}, "invalid", 1, true]) {
+    assert.throws(
+      () => png.createAvatarPngFromDescriptor(descriptor, 32, invalidOptions),
+      /options must be an object/
+    );
+  }
   assert.throws(
     () => png.createAvatarPngFromDescriptor({ ...descriptor, styleVersion: "2" }, 32),
     /descriptor must be a 1 avatar descriptor/

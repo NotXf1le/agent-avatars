@@ -1,6 +1,6 @@
 param(
-  [ValidateSet("hero", "gallery", "deterministic", "batch", "themes", "private")]
-  [string[]] $Targets = @("hero", "gallery", "deterministic", "batch", "themes", "private")
+  [ValidateSet("hero", "gallery")]
+  [string[]] $Targets = @("hero", "gallery")
 )
 
 $ErrorActionPreference = "Stop"
@@ -115,47 +115,7 @@ function Apply-Gallery {
   Save-Graphic $path $bitmap $graphics
 }
 
-function Apply-Deterministic {
-  $path, $bitmap, $graphics = Open-Graphic "deterministic-output.png"
-  foreach ($centerX in @(224, 600, 976)) {
-    Paint-Avatar $graphics $assets.deterministic $centerX 270 "#FFFFFF"
-  }
-  Save-Graphic $path $bitmap $graphics
-}
-
-function Apply-Batch {
-  $path, $bitmap, $graphics = Open-Graphic "batch-uniqueness.png"
-  $centers = @(140, 324, 508, 692, 876, 1060)
-  for ($i = 0; $i -lt $centers.Count; $i++) {
-    Paint-Avatar $graphics $assets.batchNaive[$i] $centers[$i] 218 "#EFEDE8"
-    Paint-Avatar $graphics $assets.batch[$i] $centers[$i] 432 "#FFFFFF"
-  }
-  Save-Graphic $path $bitmap $graphics
-}
-
-function Apply-Themes {
-  $path, $bitmap, $graphics = Open-Graphic "light-dark-themes.png"
-  for ($i = 0; $i -lt $assets.themes.Count; $i++) {
-    $top = 228 + $i * 72
-    $lightSurface = if ($i -eq 1) { "#E8F2FC" } else { "#FFFFFF" }
-    $darkSurface = if ($i -eq 1) { "#1D2F40" } else { "#1C1C1E" }
-    Paint-Avatar $graphics $assets.themes[$i].light 98 ($top + 27) $lightSurface
-    Paint-Avatar $graphics $assets.themes[$i].dark 682 ($top + 27) $darkSurface
-  }
-  Save-Graphic $path $bitmap $graphics
-}
-
-function Apply-Private {
-  $path, $bitmap, $graphics = Open-Graphic "private-seed-flow.png"
-  Paint-Avatar $graphics $assets.private 1035 260 "#FFFFFF"
-  Save-Graphic $path $bitmap $graphics
-}
-
 if ($Targets -contains "hero") { Apply-Hero }
 if ($Targets -contains "gallery") { Apply-Gallery }
-if ($Targets -contains "deterministic") { Apply-Deterministic }
-if ($Targets -contains "batch") { Apply-Batch }
-if ($Targets -contains "themes") { Apply-Themes }
-if ($Targets -contains "private") { Apply-Private }
 
 Write-Output "Applied official createAvatarPng/createAvatarPngFromDescriptor output to: $($Targets -join ', ')."

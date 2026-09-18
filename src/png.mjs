@@ -235,6 +235,9 @@ function encodePng(rgba, width, height) {
 }
 
 function createAvatarPngFromDescriptor(descriptor, size = 96, options = {}) {
+  if (typeof options !== "object" || options === null || Array.isArray(options)) {
+    throw new TypeError("options must be an object.");
+  }
   const snapshot = snapshotRenderableDescriptor(descriptor);
   const targetSize = normalizePngSize(size);
   const supersample = normalizeSupersample(options.supersample, targetSize);
@@ -245,14 +248,21 @@ function createAvatarPngFromDescriptor(descriptor, size = 96, options = {}) {
 
 function optionsFromArgs(sizeOrOptions, explicitOptions) {
   if (typeof sizeOrOptions === "object" && sizeOrOptions !== null) {
+    if (Array.isArray(sizeOrOptions)) {
+      throw new TypeError("options must be an object.");
+    }
     return {
       size: sizeOrOptions.size === undefined ? 96 : sizeOrOptions.size,
       options: { ...sizeOrOptions },
     };
   }
+  const options = explicitOptions === undefined ? {} : explicitOptions;
+  if (!options || typeof options !== "object" || Array.isArray(options)) {
+    throw new TypeError("options must be an object.");
+  }
   return {
     size: sizeOrOptions === undefined ? 96 : sizeOrOptions,
-    options: { ...(explicitOptions ?? {}) },
+    options: { ...options },
   };
 }
 
