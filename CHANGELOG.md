@@ -6,6 +6,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-09-18
+
 ### Added
 
 - Added canonical, social preview, crawler discovery, sitemap, and structured software metadata to the GitHub Pages demo.
@@ -16,6 +18,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 ### Changed
 
 - Unified the main demo and documentation pages around the same warm neutral palette, typography, pill controls, radii, shadows, and animated brand avatar.
+- Reworked the package README into a shorter integration guide focused on stable IDs, runtime entry points, limits, and security boundaries.
 
 ### Fixed
 
@@ -23,6 +26,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 - Rejected sparse arrays consistently at public rows, grids, seeds, palettes, descriptor, and PNG-size boundaries.
 - Aligned numeric runtime validation, TypeScript declarations, and documented error classes.
 - Made PNG set replacement exception-atomic with staging, rollback, and a manifest-last commit.
+- Prevented identity-set growth from returning manifests above the 10,000-entry read limit.
+- Rejected invalid option containers consistently across SVG, PNG descriptor, bitmap-validation, and React APIs.
+- Rejected `null` and non-finite numeric palette selections with the documented error type.
+- Corrected the documentation of the npm package dry-run workflow.
+
+### Removed
+
+- Removed four redundant README mockup images from the repository, npm package, and Pages artifact.
 
 ## [1.0.1] - 2026-07-17
 
