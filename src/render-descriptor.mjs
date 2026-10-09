@@ -1,4 +1,4 @@
-const AVATAR_STYLE_VERSION = "2";
+const AVATAR_STYLE_VERSION = "1";
 const GRID_HEIGHT = 4;
 const MAX_ROW_VALUE = 31;
 

@@ -248,8 +248,8 @@ const marker = true;`, new Map([
   assert.deepEqual(esm.createAvatarDescriptor("module", options), cjs.createAvatarDescriptor("module", options));
   assert.equal(esm.getCatalogStats().signatureStates, 21984);
   assert.equal(cjs.getCatalogStats().signatureStates, 21984);
-  assert.equal(esm.STYLE_VERSION, "2");
-  assert.equal(cjs.STYLE_VERSION, "2");
+  assert.equal(esm.STYLE_VERSION, "1");
+  assert.equal(cjs.STYLE_VERSION, "1");
   assert.equal(esm.derivePrivateSeed, undefined);
   assert.equal(cjs.derivePrivateSeed, undefined);
   const renderDescriptor = esm.createAvatarDescriptor("module-render", options);

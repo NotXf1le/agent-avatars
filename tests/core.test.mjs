@@ -24,7 +24,7 @@ const PRIVATE_SECRET_A = "0123456789abcdef0123456789abcdef";
 const PRIVATE_SECRET_B = "fedcba9876543210fedcba9876543210";
 
 export async function runCoreTests() {
-  assert.equal(api.STYLE_VERSION, "2");
+  assert.equal(api.STYLE_VERSION, "1");
   assert.equal(api.derivePrivateSeed, undefined, "Private helpers must not leak through the browser-safe root entry.");
 
   const cache = createBoundedLruCache(2);
@@ -38,7 +38,7 @@ export async function runCoreTests() {
   assert.equal(cache.get("third"), 3);
 
   const standardStats = api.getCatalogStats();
-  assert.equal(standardStats.styleVersion, "2");
+  assert.equal(standardStats.styleVersion, "1");
   assert.equal(standardStats.rawSymmetricMasks, 4096);
   assert.equal(standardStats.validShapes, 1374);
   assert.equal(standardStats.availablePalettes, 16);
@@ -106,6 +106,10 @@ export async function runCoreTests() {
 
   const repeated = api.createAvatarDescriptor("Felix", { namespace: "acme" });
   assert.deepEqual(repeated, api.createAvatarDescriptor("Felix", { namespace: "acme" }));
+  assert.deepEqual(repeated.rows, [4, 31, 27, 10]);
+  assert.equal(repeated.paletteId, "sky");
+  assert.equal(repeated.identityKey, "e0ad922b97975a8e955017fc724bb517");
+  assert.equal(api.hash32("Felix", { namespace: "acme" }), 397720397);
   assert.equal(
     api.createHashAvatar("Felix", { namespace: "acme" }),
     api.createHashAvatar("  felix  ", { namespace: "ACME" })
@@ -151,8 +155,8 @@ export async function runCoreTests() {
   assert.equal(paletteSvgs.light.size, 16, "All built-in palettes must render distinct light SVGs for the same shape");
   assert.equal(paletteSvgs.dark.size, 16, "All built-in palettes must render distinct dark SVGs for the same shape");
   assert.throws(
-    () => api.createHashAvatarFromDescriptor({ ...light, styleVersion: "1" }),
-    /descriptor must be a 2 avatar descriptor/
+    () => api.createHashAvatarFromDescriptor({ ...light, styleVersion: "2" }),
+    /descriptor must be a 1 avatar descriptor/
   );
   for (const invalidColorPair of [
     ["bad", "#FFFFFF"],
@@ -359,7 +363,7 @@ export async function runCoreTests() {
   ];
 
   const shapePolicyOptions = {
-    namespace: "distance-shape-v2:1",
+    namespace: "distance-shape",
     includeSvg: false,
     minimumShapeDistance: 4,
     minimumPaletteDistance: 0,
@@ -562,9 +566,9 @@ export async function runCoreTests() {
   );
 
   const compatibilitySet = api.createIdentitySet(["compat"], { namespace: "compat", includeSvg: false });
-  assert.equal(compatibilitySet.manifest.namespaceKey, "ac47d5af2b2d4ce4480416779523a160");
-  assert.equal(compatibilitySet.manifest.optionsKey, "68ece1883671dd8d682b8801dbcbf484");
-  assert.equal(compatibilitySet.items[0].signature, "2:s48e:p89998651");
+  assert.equal(compatibilitySet.manifest.namespaceKey, "acc83a9ffab11478302290a7d8436af5");
+  assert.equal(compatibilitySet.manifest.optionsKey, "ceb1cf6b99118f247cac31bdef656b66");
+  assert.equal(compatibilitySet.items[0].signature, "1:s27a:p10643fc6");
   assert.equal(Object.hasOwn(compatibilitySet.manifest, "distinguishability"), false);
   assert.doesNotThrow(() => api.createIdentitySet(["compat"], {
     namespace: "compat",
@@ -574,8 +578,8 @@ export async function runCoreTests() {
   assert.throws(() => api.createIdentitySet(["compat"], {
     namespace: "compat",
     includeSvg: false,
-    manifest: { ...compatibilitySet.manifest, styleVersion: "1" },
-  }), /Manifest styleVersion must be 2/);
+    manifest: { ...compatibilitySet.manifest, styleVersion: "2" },
+  }), /Manifest styleVersion must be 1/);
   for (const distinguishability of [
     undefined,
     null,
@@ -933,6 +937,11 @@ export async function runCoreTests() {
   const privateTwo = await privateApi.derivePrivateSeed("person@example.com", { secret: PRIVATE_SECRET_A, namespace: "tenant" });
   const privateOtherSecret = await privateApi.derivePrivateSeed("person@example.com", { secret: PRIVATE_SECRET_B, namespace: "tenant" });
   const privateOtherNamespace = await privateApi.derivePrivateSeed("person@example.com", { secret: PRIVATE_SECRET_A, namespace: "other" });
+  assert.equal(privateOne, "hmac-sha256:fdf9918a448fa29957c3b4caf7c4822c41471df2ac0bcf0ddc324e88f72772c9");
+  assert.equal(
+    await privateApi.derivePrivateSeed("Ｆｅｌｉｘ", { secret: PRIVATE_SECRET_A, seedMode: "raw", namespace: "raw-space", namespaceMode: "raw" }),
+    "hmac-sha256:b041c053d87d9b94a20548e8907cebac671a5d5eef1da475ded70e649d1c732d"
+  );
   assert.equal(privateOne, privateTwo);
   assert.notEqual(privateOne, privateOtherSecret);
   assert.notEqual(privateOne, privateOtherNamespace);

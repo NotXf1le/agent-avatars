@@ -31,7 +31,7 @@ npx playwright install chromium
 npm run test:release
 ```
 
-Changes to deterministic selection, palettes, rendering, or manifests must preserve existing golden outputs unless the style version is intentionally advanced and the migration is documented.
+Palette-only updates preserve seed derivation, shape selection, and palette selection; update affected color, signature, and manifest-fingerprint goldens. Advance the style version and document migration when intentionally changing deterministic selection or rendering geometry.
 
 Security reports follow [SECURITY.md](SECURITY.md) and must not be filed publicly with exploit details.
 

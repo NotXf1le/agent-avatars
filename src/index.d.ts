@@ -1,4 +1,4 @@
-export type AvatarStyleVersion = "2";
+export type AvatarStyleVersion = "1";
 export type SeedMode = "human" | "raw";
 export type AvatarTheme = "light" | "dark";
 export type VariantChoice<T extends string> = "auto" | T | number;

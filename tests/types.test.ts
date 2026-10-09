@@ -36,7 +36,7 @@ if (fallbackResult.policyAdjustment) {
 }
 const explicitManifest: IdentityManifest = {
   schema: "deterministic-agent-avatars-manifest/v1",
-  styleVersion: "2",
+  styleVersion: "1",
   namespaceKey: "namespace-key",
   optionsKey: "options-key",
   distinguishability: {
@@ -76,7 +76,7 @@ const reactProps: AgentAvatarProps = { seed: "agent", size: 40, options, alt: "A
 const invalidReactProps: AgentAvatarProps = { seed: "agent", src: "manual.svg" };
 // @ts-expect-error AgentAvatar size is controlled by the component prop
 const invalidReactOptions: AgentAvatarProps = { seed: "agent", options: { size: 40 } };
-const version: "2" = STYLE_VERSION;
+const version: "1" = STYLE_VERSION;
 const hashOptions: HashOptions = { namespace: "acme", domain: "consumer-test" };
 const hash: number = hash32("agent", hashOptions);
 void AgentAvatar;

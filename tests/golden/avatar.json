@@ -4,15 +4,15 @@
     "seed": "Felix",
     "size": 96,
     "options": {},
-    "svgSha256": "6401123745863617c54469a3ba205dca525aceda7f7c4a3da39080d6863dfff1",
-    "signature": "2:sab9:p901fdfe5",
+    "svgSha256": "076e3fe6512457b7ce187620608c2143f8b6d371d0e73b46eb9cf77420c78688",
+    "signature": "1:s67c:pc1e675be",
     "rows": [
-      17,
+      4,
       31,
-      10,
-      21
+      17,
+      27
     ],
-    "paletteId": "lilac"
+    "paletteId": "mint"
   },
   {
     "name": "tenant-dark",
@@ -22,15 +22,15 @@
       "namespace": "acme",
       "theme": "dark"
     },
-    "svgSha256": "a3a87f867371e8b572a96881e4794b8c5cbcb8b8d559a5c44e8decb69c63df29",
-    "signature": "2:sf00:p45ad82d8",
+    "svgSha256": "ca8adddc862026e6a52c1f60acc9903e3cdf330e1eaab9eda62385a7b4e9f351",
+    "signature": "1:s6ad:p7e238da9",
     "rows": [
-      0,
-      0,
-      4,
-      31
+      21,
+      21,
+      10,
+      27
     ],
-    "paletteId": "rose"
+    "paletteId": "mist"
   },
   {
     "name": "fixed-palette",
@@ -40,13 +40,13 @@
       "namespace": "northwind",
       "palette": "sky"
     },
-    "svgSha256": "c150db60bae4ed1b7eae9abbeadd37a8a34624e0e1133ac3272e1d75063b31b4",
-    "signature": "2:s3e2:p89998651",
+    "svgSha256": "14f8f6ce6f68a31a3ebd4a5697fb5bbfec70211cd6f29c960ee23103212eddcb",
+    "signature": "1:s173:p89998651",
     "rows": [
-      10,
-      4,
-      31,
-      17
+      27,
+      14,
+      21,
+      0
     ],
     "paletteId": "sky"
   },
@@ -59,15 +59,15 @@
       "namespace": "raw-space",
       "namespaceMode": "raw"
     },
-    "svgSha256": "b2c11f516ae2c6642a9fa614a928f58f70a8f8796093545677e542faf7144e96",
-    "signature": "2:s2a4:p32431f3b",
+    "svgSha256": "36deb3f48af002f3f5d978d398ee5b8c5489052c4b38db1b0e31ab63a140a80b",
+    "signature": "1:s135:p901fdfe5",
     "rows": [
+      21,
+      14,
       4,
-      4,
-      10,
-      17
+      0
     ],
-    "paletteId": "berry"
+    "paletteId": "lilac"
   },
   {
     "name": "custom-constraints",
@@ -78,14 +78,14 @@
       "maxPixels": 6,
       "maxDiagonalConnections": 0
     },
-    "svgSha256": "e8842d7f93e4ac5bc22f7c538a60df5d01152a5e0208147fdd82158fa9082d6a",
-    "signature": "2:s9a4:p234d97dc",
+    "svgSha256": "815bdbb5bd8d125f43a49b52fae47672ca041e54e81f92f36f7636715a017d99",
+    "signature": "1:s132:p901fdfe5",
     "rows": [
-      4,
-      4,
+      10,
       14,
-      4
+      4,
+      0
     ],
-    "paletteId": "aqua"
+    "paletteId": "lilac"
   }
 ]
