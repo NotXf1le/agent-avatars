@@ -39,10 +39,10 @@ Security reports follow [SECURITY.md](SECURITY.md) and must not be filed publicl
 
 Direct Git URL installs are not supported. Publish consumers through the npm tarball, which contains generated `dist` artifacts.
 
-If a source ZIP is required, create it from a clean Git commit rather than the working directory:
+If a source ZIP is required, create it from a clean Git commit:
 
 ```bash
 git archive --format=zip --output agent-avatars-source.zip HEAD
 ```
 
-Do not archive a workspace containing `node_modules`, temporary tarballs, coverage output, or local build artifacts.
+Keep source archives limited to tracked source files. Keep `node_modules`, temporary tarballs, coverage output, and local build artifacts outside the archive.

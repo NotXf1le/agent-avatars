@@ -24,7 +24,7 @@ const PRIVATE_SECRET_A = "0123456789abcdef0123456789abcdef";
 const PRIVATE_SECRET_B = "fedcba9876543210fedcba9876543210";
 
 export async function runCoreTests() {
-  assert.equal(api.STYLE_VERSION, "1");
+  assert.equal(api.STYLE_VERSION, "2");
   assert.equal(api.derivePrivateSeed, undefined, "Private helpers must not leak through the browser-safe root entry.");
 
   const cache = createBoundedLruCache(2);
@@ -38,7 +38,7 @@ export async function runCoreTests() {
   assert.equal(cache.get("third"), 3);
 
   const standardStats = api.getCatalogStats();
-  assert.equal(standardStats.styleVersion, "1");
+  assert.equal(standardStats.styleVersion, "2");
   assert.equal(standardStats.rawSymmetricMasks, 4096);
   assert.equal(standardStats.validShapes, 1374);
   assert.equal(standardStats.availablePalettes, 16);
@@ -134,10 +134,26 @@ export async function runCoreTests() {
     api.createHashAvatar("theme-check", { namespace: "acme", theme: "dark" })
   );
 
+  const paletteSvgs = { light: new Set(), dark: new Set() };
   for (const palette of api.BUILTIN_PALETTES) {
-    assert.ok(api.contrastRatio(palette.light.background, palette.light.foreground) >= 7.7);
-    assert.ok(api.contrastRatio(palette.dark.background, palette.dark.foreground) >= 9.5);
+    const lightDescriptor = api.createAvatarDescriptor("palette-inversion", { palette: palette.id, theme: "light" });
+    const darkDescriptor = api.createAvatarDescriptor("palette-inversion", { palette: palette.id, theme: "dark" });
+    assert.ok(api.contrastRatio(lightDescriptor.colors.background, lightDescriptor.colors.foreground) >= 9, `${palette.id} light contrast must be at least 9:1`);
+    assert.ok(api.contrastRatio(darkDescriptor.colors.background, darkDescriptor.colors.foreground) >= 9, `${palette.id} dark contrast must be at least 9:1`);
+    assert.deepEqual(darkDescriptor.colors, {
+      background: lightDescriptor.colors.foreground,
+      foreground: lightDescriptor.colors.background,
+    }, `${palette.id} must swap background and foreground exactly`);
+    assert.deepEqual(darkDescriptor.rows, lightDescriptor.rows);
+    paletteSvgs.light.add(api.createHashAvatarFromDescriptor(lightDescriptor));
+    paletteSvgs.dark.add(api.createHashAvatarFromDescriptor(darkDescriptor));
   }
+  assert.equal(paletteSvgs.light.size, 16, "All built-in palettes must render distinct light SVGs for the same shape");
+  assert.equal(paletteSvgs.dark.size, 16, "All built-in palettes must render distinct dark SVGs for the same shape");
+  assert.throws(
+    () => api.createHashAvatarFromDescriptor({ ...light, styleVersion: "1" }),
+    /descriptor must be a 2 avatar descriptor/
+  );
   for (const invalidColorPair of [
     ["bad", "#FFFFFF"],
     ["#000000extra", "#FFFFFF"],
@@ -182,8 +198,10 @@ export async function runCoreTests() {
   const rose = api.BUILTIN_PALETTES.find((item) => item.id === "rose");
   const coral = api.BUILTIN_PALETTES.find((item) => item.id === "coral");
   const leaf = api.BUILTIN_PALETTES.find((item) => item.id === "leaf");
-  assert.equal(paletteDistance(rose, coral), 0);
-  assert.equal(oraclePaletteDistance(rose, coral), 0);
+  assert.equal(paletteDistance(rose, rose), 0);
+  assert.equal(oraclePaletteDistance(rose, rose), 0);
+  assert.ok(paletteDistance(rose, coral) > 0);
+  assert.ok(Math.abs(paletteDistance(rose, coral) - oraclePaletteDistance(rose, coral)) < 1e-12);
   assert.ok(Math.abs(paletteDistance(rose, leaf) - oraclePaletteDistance(rose, leaf)) < 1e-12);
   assert.ok(Math.abs(paletteDistance(rose, leaf) - paletteDistance(leaf, rose)) < 1e-12);
   const matrixPalettes = [rose, coral, leaf];
@@ -341,7 +359,7 @@ export async function runCoreTests() {
   ];
 
   const shapePolicyOptions = {
-    namespace: "distance-shape",
+    namespace: "distance-shape-v2:1",
     includeSvg: false,
     minimumShapeDistance: 4,
     minimumPaletteDistance: 0,
@@ -381,7 +399,7 @@ export async function runCoreTests() {
     paletteEqualitySet.items,
     paletteEqualitySet.manifest.distinguishability
   );
-  assert.equal(paletteEqualityPairs[0].palette, exactPaletteThreshold);
+  assert.ok(Math.abs(paletteEqualityPairs[0].palette - exactPaletteThreshold) < 1e-12);
 
   const shapeEitherOnly = api.createIdentitySet(allocationSeeds.slice(0, 6), {
     namespace: "distance-one-channel-shape",
@@ -544,15 +562,20 @@ export async function runCoreTests() {
   );
 
   const compatibilitySet = api.createIdentitySet(["compat"], { namespace: "compat", includeSvg: false });
-  assert.equal(compatibilitySet.manifest.namespaceKey, "acc83a9ffab11478302290a7d8436af5");
-  assert.equal(compatibilitySet.manifest.optionsKey, "7f7b1160442acdacfa41594a921a731d");
-  assert.equal(compatibilitySet.items[0].signature, "1:s27a:p4bf38148");
+  assert.equal(compatibilitySet.manifest.namespaceKey, "ac47d5af2b2d4ce4480416779523a160");
+  assert.equal(compatibilitySet.manifest.optionsKey, "68ece1883671dd8d682b8801dbcbf484");
+  assert.equal(compatibilitySet.items[0].signature, "2:s48e:p89998651");
   assert.equal(Object.hasOwn(compatibilitySet.manifest, "distinguishability"), false);
   assert.doesNotThrow(() => api.createIdentitySet(["compat"], {
     namespace: "compat",
     includeSvg: false,
     manifest: compatibilitySet.manifest,
   }));
+  assert.throws(() => api.createIdentitySet(["compat"], {
+    namespace: "compat",
+    includeSvg: false,
+    manifest: { ...compatibilitySet.manifest, styleVersion: "1" },
+  }), /Manifest styleVersion must be 2/);
   for (const distinguishability of [
     undefined,
     null,

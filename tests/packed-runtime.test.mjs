@@ -99,7 +99,7 @@ export function runPackedRuntimeTest() {
     `, "utf8");
 
     const expected = {
-      styleVersion: "1",
+      styleVersion: "2",
       signatureStates: 21984,
       svg: true,
       png: true,

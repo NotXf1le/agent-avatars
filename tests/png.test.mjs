@@ -46,8 +46,8 @@ export async function runPngTests() {
     );
   }
   assert.throws(
-    () => png.createAvatarPngFromDescriptor({ ...descriptor, styleVersion: "2" }, 32),
-    /descriptor must be a 1 avatar descriptor/
+    () => png.createAvatarPngFromDescriptor({ ...descriptor, styleVersion: "1" }, 32),
+    /descriptor must be a 2 avatar descriptor/
   );
   assert.throws(
     () => png.createAvatarPngFromDescriptor({ ...descriptor, rows: [] }, 32),

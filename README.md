@@ -55,8 +55,6 @@ Set a namespace when the same ID can appear in more than one product or identity
 
 ![Deterministic avatars across built-in palettes in light and dark themes](examples/avatar-gallery.png)
 
-Theme changes the selected palette colors without changing the underlying shape or palette family.
-
 ## React
 
 ```tsx
@@ -131,7 +129,7 @@ Reuse the returned manifest when adding identities so existing assignments remai
 
 ## Sensitive identifiers
 
-Do not generate public avatars directly from email addresses or other guessable identifiers. Derive a private seed on the server with the Node-only private entry point.
+For email addresses and other sensitive identifiers, derive a private seed on the server with the Node-only private entry point.
 
 ```js
 import { createPrivateHashAvatar } from "agent-avatars/private";
@@ -184,7 +182,7 @@ Inputs beyond these limits are rejected before allocation or rendering.
 
 ## Security notes
 
-- Deterministic output is not anonymization: anyone who knows a seed and its options can reproduce the avatar.
+- Anyone who knows a seed and its options can reproduce the avatar.
 - Never treat a namespace as a secret.
 - Keep HMAC secrets server-side and use random secret material, not a human password.
 - Validate and version persisted manifests before reusing them.

@@ -169,7 +169,7 @@ export async function runConsumerTests() {
     const esmResult = JSON.parse(runNode([join(fixtureDirectory, "consumer.mjs")], fixtureDirectory));
     const cjsResult = JSON.parse(runNode([join(fixtureDirectory, "consumer.cjs")], fixtureDirectory));
     assert.deepEqual(esmResult, {
-      styleVersion: "1",
+      styleVersion: "2",
       signatureStates: 21984,
       svg: true,
       png: true,
@@ -184,7 +184,7 @@ export async function runConsumerTests() {
       import { AgentAvatar } from "agent-avatars/react";
       import { derivePrivateSeed } from "agent-avatars/private";
       const options: HashOptions = { namespace: "fixture", domain: "consumer" };
-      const version: "1" = STYLE_VERSION;
+      const version: "2" = STYLE_VERSION;
       const hash: number = hash32("esm-types", options);
       const png: Uint8Array = createAvatarPng("esm-types", { size: 8 });
       void AgentAvatar; void derivePrivateSeed("esm-types", { secret: "0123456789abcdef0123456789abcdef" });
@@ -195,7 +195,7 @@ export async function runConsumerTests() {
       import pngApi = require("agent-avatars/png");
       import reactApi = require("agent-avatars/react");
       import privateApi = require("agent-avatars/private");
-      const version: "1" = api.STYLE_VERSION;
+      const version: "2" = api.STYLE_VERSION;
       const png: Uint8Array = pngApi.createAvatarPng("cjs-types", { size: 8 });
       void reactApi.AgentAvatar; void privateApi.derivePrivateSeed("cjs-types", { secret: "0123456789abcdef0123456789abcdef" });
       void version; void png;

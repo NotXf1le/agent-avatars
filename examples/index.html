@@ -65,7 +65,7 @@ writeAvatarPngSet(seed, "./public/avatars", {
   baseName: "release-agent",
 });</code></pre></div></section>
 
-    <section class="section" id="fallback"><div class="container"><div class="section-heading"><h2>Fallback after a real image fails.</h2><p>Do not replace a configured image preemptively. Track the source that failed, then render the deterministic component for that specific missing or broken value.</p></div><pre><code>const [failedSrc, setFailedSrc] = useState();
+    <section class="section" id="fallback"><div class="container"><div class="section-heading"><h2>Fallback after a real image fails.</h2><p>Show the configured image until it fails. Track the failed source, then render the deterministic component for that specific missing or broken value.</p></div><pre><code>const [failedSrc, setFailedSrc] = useState();
 
 return !src || failedSrc === src
   ? &lt;AgentAvatar seed={agent.id} size={40} alt={`${agent.name} avatar`} /&gt;
