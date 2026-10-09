@@ -5,7 +5,6 @@
 ### Changed
 
 - Updated all 16 built-in palettes. Switching themes swaps background and foreground colors.
-- Preserved `STYLE_VERSION` at `1`, seed derivation, and shape/palette selection. Regenerate identity-set manifests that use the updated built-in palettes.
 
 ## [1.0.2] - 2026-09-18
 
