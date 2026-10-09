@@ -59,7 +59,7 @@ const svg = createHashAvatar("research-assistant", {
   theme: "dark",
   size: 96,
 });</code></pre>
-        <p class="callout">Prefer a durable internal agent ID as the seed. The namespace separates products or identity collections, but it is not a secret.</p>
+        <p class="callout">Prefer a durable internal agent ID as the seed. The namespace is a public identifier that separates products or identity collections.</p>
       </div>
     </section>
 
@@ -116,7 +116,7 @@ window.addEventListener("agent-avatars:conversion", ({ detail }) =&gt; {
         <div class="section-heading"><h2>Common questions.</h2><p>Short answers to the integration decisions that affect stable identity.</p></div>
         <div class="faq">
           <details><summary>Does the same seed always produce the same avatar?</summary><p>Yes, when the package style version, seed, namespace, and identity-affecting options remain the same. Persist identity-set manifests when a group grows.</p></details>
-          <details><summary>Can I use an email address as a seed?</summary><p>Do not expose sensitive identifiers through ordinary deterministic output. Derive a private seed on the server with the private entry point and keep the HMAC secret out of browser code.</p></details>
+          <details><summary>Can I use an email address as a seed?</summary><p>For sensitive identifiers, derive a private seed on the server with the private entry point. Keep the HMAC secret exclusively on the server.</p></details>
           <details><summary>Does SVG generation call a remote service?</summary><p>No. The root package generates output locally. A Content Security Policy may need to permit <code>data:</code> images if you use <code>avatarDataUri()</code>.</p></details>
           <details><summary>Which Node.js and React versions are supported?</summary><p>Runtime consumers support Node.js 18 and newer. React 18 or 19 is an optional peer dependency.</p></details>
         </div>

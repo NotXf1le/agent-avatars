@@ -33,25 +33,25 @@ const MAX_CUSTOM_PALETTES = 256;
 const MAX_IDENTITY_SET_ITEMS = 10_000;
 const MAX_MANIFEST_ENTRIES = 10_000;
 
-// Sixteen deliberately separated pastel families. Every family contains a
-// light and dark pair with WCAG contrast comfortably above 4.5:1.
+// Sixteen distinct color families with contrast of at least 9:1.
+// Dark themes swap each light theme's background and foreground exactly.
 const BUILTIN_PALETTES = Object.freeze([
-  palette("rose",    "#F1DADA", "#492727", "#3D1F1F", "#EED3D3"),
-  palette("leaf",    "#BCF1BC", "#274927", "#1F3D1F", "#D3EED3"),
-  palette("indigo",  "#BCBCF1", "#272749", "#1F1F3D", "#D3D3EE"),
-  palette("aqua",    "#BCF1F1", "#274949", "#1F3D3D", "#D3EEEE"),
-  palette("sand",    "#F1E8BC", "#494327", "#3D381F", "#EEEAD3"),
-  palette("orchid",  "#F1BCDF", "#49273E", "#3D1F33", "#EED3E5"),
-  palette("sky",     "#C8DAF3", "#273549", "#1F2B3D", "#D3DEEE"),
-  palette("mist",    "#EAF5E5", "#324927", "#293D1F", "#DCEED3"),
-  palette("coral",   "#F1BCBC", "#492727", "#3D1F1F", "#EED3D3"),
-  palette("mint",    "#C0EDD2", "#274935", "#1F3D2B", "#D3EEDE"),
-  palette("lilac",   "#EDD7F4", "#412749", "#351F3D", "#E7D3EE"),
-  palette("apricot", "#F1D2BC", "#493527", "#3D2B1F", "#EEDED3"),
-  palette("ice",     "#E5EEF5", "#273B49", "#1F303D", "#D3E3EE"),
-  palette("violet",  "#DFBCF1", "#3E2749", "#331F3D", "#E5D3EE"),
-  palette("lime",    "#D6EDC0", "#384927", "#2E3D1F", "#E0EED3"),
-  palette("berry",   "#E9C4D3", "#492735", "#3D1F2B", "#EED3DE"),
+  palette("rose",    "#F7BAC4", "#520915", "#520915", "#F7BAC4"),
+  palette("leaf",    "#AAEEB0", "#033F08", "#033F08", "#AAEEB0"),
+  palette("indigo",  "#B6BCF6", "#050E68", "#050E68", "#B6BCF6"),
+  palette("aqua",    "#9DEDF1", "#023D41", "#023D41", "#9DEDF1"),
+  palette("sand",    "#F7E59C", "#463802", "#463802", "#F7E59C"),
+  palette("orchid",  "#F0ADEE", "#40053F", "#40053F", "#F0ADEE"),
+  palette("sky",     "#AFD7F8", "#022F53", "#022F53", "#AFD7F8"),
+  palette("mist",    "#D9DDD4", "#30352A", "#30352A", "#D9DDD4"),
+  palette("coral",   "#FABAA8", "#4C1202", "#4C1202", "#FABAA8"),
+  palette("mint",    "#B1F1DA", "#03422B", "#03422B", "#B1F1DA"),
+  palette("lilac",   "#DFD1E6", "#3D2749", "#3D2749", "#DFD1E6"),
+  palette("apricot", "#FAC999", "#472502", "#472502", "#FAC999"),
+  palette("ice",     "#D2D8E0", "#2A313C", "#2A313C", "#D2D8E0"),
+  palette("violet",  "#D4B3F4", "#2E0557", "#2E0557", "#D4B3F4"),
+  palette("lime",    "#D7F395", "#2E4102", "#2E4102", "#D7F395"),
+  palette("berry",   "#F49FCE", "#34031E", "#34031E", "#F49FCE"),
 ]);
 
 const STANDARD_CONSTRAINTS = Object.freeze({

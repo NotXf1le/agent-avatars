@@ -20,7 +20,7 @@ License: MIT
 - `createIdentitySetWithFallback(seeds, options)`: interactive group allocation with a reported bounded policy adjustment for a new infeasible set.
 - `agent-avatars/react`: React 18/19 `AgentAvatar` image component with SSR support.
 - `agent-avatars/png`: Node.js PNG bytes, data URIs, platform-size sets, and filesystem export.
-- `agent-avatars/private`: Node.js HMAC-SHA-256 seed derivation and private avatar helpers. Never ship the secret to browser code.
+- `agent-avatars/private`: Node.js HMAC-SHA-256 seed derivation and private avatar helpers. Keep the secret exclusively on the server.
 
 ## Documentation
 
@@ -34,8 +34,8 @@ License: MIT
 
 ## Important constraints
 
-- Ordinary deterministic output is not anonymization; known seeds can be reproduced.
-- A namespace separates collections but is not a secret.
+- Anyone who knows a seed and its options can reproduce ordinary deterministic output.
+- A namespace is a public identifier that separates collections.
 - Persist identity-set manifests when a roster grows so historical assignments remain stable.
 - Runtime consumers support Node.js 18 and newer. React 18 or 19 is optional.
 - SVG generation is browser-safe. PNG and private entry points use Node.js built-ins.

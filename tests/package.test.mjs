@@ -198,7 +198,6 @@ const marker = true;`, new Map([
   assert.equal(packageJson.scripts["release:dry-run"], "node scripts/release-dry-run.mjs");
   assert.deepEqual(packageJson.files, [
     "dist",
-    "examples/preview.png",
     "examples/avatar-cycle.gif",
     "examples/hero-agent-dashboard.png",
     "examples/avatar-gallery.png",
@@ -433,7 +432,6 @@ const marker = true;`, new Map([
     "CHANGELOG.md",
     "SECURITY.md",
     "package.json",
-    "examples/preview.png",
     "examples/avatar-cycle.gif",
     "examples/hero-agent-dashboard.png",
     "examples/avatar-gallery.png",
